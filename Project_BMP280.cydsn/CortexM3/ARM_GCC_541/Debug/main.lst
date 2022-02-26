@@ -1,0 +1,466 @@
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\cc6u7Xxl.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 6
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.syntax unified
+  15              		.file	"main.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.main,"ax",%progbits
+  20              		.align	2
+  21              		.global	main
+  22              		.thumb
+  23              		.thumb_func
+  24              		.type	main, %function
+  25              	main:
+  26              	.LFB57:
+  27              		.file 1 "main.c"
+   1:main.c        **** 
+   2:main.c        **** 
+   3:main.c        **** #include "BMP280.h"
+   4:main.c        **** #include <project.h>
+   5:main.c        **** #include <stdio.h>
+   6:main.c        **** 
+   7:main.c        **** 
+   8:main.c        **** 
+   9:main.c        **** int main()
+  10:main.c        **** {
+  28              		.loc 1 10 0
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 0
+  31              		@ frame_needed = 1, uses_anonymous_args = 0
+  32 0000 80B5     		push	{r7, lr}
+  33              		.cfi_def_cfa_offset 8
+  34              		.cfi_offset 7, -8
+  35              		.cfi_offset 14, -4
+  36 0002 00AF     		add	r7, sp, #0
+  37              		.cfi_def_cfa_register 7
+  11:main.c        ****     
+  12:main.c        **** 
+  13:main.c        ****    
+  14:main.c        ****     CyGlobalIntEnable;
+  38              		.loc 1 14 0
+  39              		.syntax unified
+  40              	@ 14 "main.c" 1
+  41 0004 62B6     		CPSIE   i
+  42              	@ 0 "" 2
+  15:main.c        **** 
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\cc6u7Xxl.s 			page 2
+
+
+  16:main.c        ****     BMP280_start();  
+  43              		.loc 1 16 0
+  44              		.thumb
+  45              		.syntax unified
+  46 0006 FFF7FEFF 		bl	BMP280_start
+  17:main.c        ****     CyDelay(10u);
+  47              		.loc 1 17 0
+  48 000a 0A20     		movs	r0, #10
+  49 000c FFF7FEFF 		bl	CyDelay
+  18:main.c        ****     BMP280_init();
+  50              		.loc 1 18 0
+  51 0010 FFF7FEFF 		bl	BMP280_init
+  52              	.L2:
+  19:main.c        ****      
+  20:main.c        ****     
+  21:main.c        ****    
+  22:main.c        ****   
+  23:main.c        **** for(;;)
+  24:main.c        ****     {
+  25:main.c        ****            
+  26:main.c        ****         BMP280_init();
+  53              		.loc 1 26 0 discriminator 1
+  54 0014 FFF7FEFF 		bl	BMP280_init
+  27:main.c        ****         BMP280_readTempC();
+  55              		.loc 1 27 0 discriminator 1
+  56 0018 FFF7FEFF 		bl	BMP280_readTempC
+  28:main.c        ****         BMP280_readFloatPressure();
+  57              		.loc 1 28 0 discriminator 1
+  58 001c FFF7FEFF 		bl	BMP280_readFloatPressure
+  29:main.c        ****         BMP280_readFloatAltitudeMeters();
+  59              		.loc 1 29 0 discriminator 1
+  60 0020 FFF7FEFF 		bl	BMP280_readFloatAltitudeMeters
+  30:main.c        ****         
+  31:main.c        ****         CyDelay(1000); 
+  61              		.loc 1 31 0 discriminator 1
+  62 0024 4FF47A70 		mov	r0, #1000
+  63 0028 FFF7FEFF 		bl	CyDelay
+  32:main.c        ****     }
+  64              		.loc 1 32 0 discriminator 1
+  65 002c F2E7     		b	.L2
+  66              		.cfi_endproc
+  67              	.LFE57:
+  68              		.size	main, .-main
+  69 002e 00BF     		.text
+  70              	.Letext0:
+  71              		.file 2 "c:\\program files (x86)\\cypress\\psoc creator\\4.4\\psoc creator\\import\\gnu\\arm\\5.4.
+  72              		.file 3 "c:\\program files (x86)\\cypress\\psoc creator\\4.4\\psoc creator\\import\\gnu\\arm\\5.4.
+  73              		.file 4 "Generated_Source\\PSoC5/core_cm3.h"
+  74              		.section	.debug_info,"",%progbits
+  75              	.Ldebug_info0:
+  76 0000 C7000000 		.4byte	0xc7
+  77 0004 0400     		.2byte	0x4
+  78 0006 00000000 		.4byte	.Ldebug_abbrev0
+  79 000a 04       		.byte	0x4
+  80 000b 01       		.uleb128 0x1
+  81 000c A1000000 		.4byte	.LASF16
+  82 0010 0C       		.byte	0xc
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\cc6u7Xxl.s 			page 3
+
+
+  83 0011 2E000000 		.4byte	.LASF17
+  84 0015 63000000 		.4byte	.LASF18
+  85 0019 00000000 		.4byte	.Ldebug_ranges0+0
+  86 001d 00000000 		.4byte	0
+  87 0021 00000000 		.4byte	.Ldebug_line0
+  88 0025 02       		.uleb128 0x2
+  89 0026 01       		.byte	0x1
+  90 0027 06       		.byte	0x6
+  91 0028 5F010000 		.4byte	.LASF0
+  92 002c 02       		.uleb128 0x2
+  93 002d 01       		.byte	0x1
+  94 002e 08       		.byte	0x8
+  95 002f 2F010000 		.4byte	.LASF1
+  96 0033 02       		.uleb128 0x2
+  97 0034 02       		.byte	0x2
+  98 0035 05       		.byte	0x5
+  99 0036 87010000 		.4byte	.LASF2
+ 100 003a 02       		.uleb128 0x2
+ 101 003b 02       		.byte	0x2
+ 102 003c 07       		.byte	0x7
+ 103 003d 0E000000 		.4byte	.LASF3
+ 104 0041 03       		.uleb128 0x3
+ 105 0042 77010000 		.4byte	.LASF9
+ 106 0046 02       		.byte	0x2
+ 107 0047 3F       		.byte	0x3f
+ 108 0048 4C000000 		.4byte	0x4c
+ 109 004c 02       		.uleb128 0x2
+ 110 004d 04       		.byte	0x4
+ 111 004e 05       		.byte	0x5
+ 112 004f 42010000 		.4byte	.LASF4
+ 113 0053 02       		.uleb128 0x2
+ 114 0054 04       		.byte	0x4
+ 115 0055 07       		.byte	0x7
+ 116 0056 3A000000 		.4byte	.LASF5
+ 117 005a 02       		.uleb128 0x2
+ 118 005b 08       		.byte	0x8
+ 119 005c 05       		.byte	0x5
+ 120 005d 00000000 		.4byte	.LASF6
+ 121 0061 02       		.uleb128 0x2
+ 122 0062 08       		.byte	0x8
+ 123 0063 07       		.byte	0x7
+ 124 0064 4C000000 		.4byte	.LASF7
+ 125 0068 04       		.uleb128 0x4
+ 126 0069 04       		.byte	0x4
+ 127 006a 05       		.byte	0x5
+ 128 006b 696E7400 		.ascii	"int\000"
+ 129 006f 02       		.uleb128 0x2
+ 130 0070 04       		.byte	0x4
+ 131 0071 07       		.byte	0x7
+ 132 0072 21000000 		.4byte	.LASF8
+ 133 0076 03       		.uleb128 0x3
+ 134 0077 91010000 		.4byte	.LASF10
+ 135 007b 03       		.byte	0x3
+ 136 007c 2C       		.byte	0x2c
+ 137 007d 41000000 		.4byte	0x41
+ 138 0081 02       		.uleb128 0x2
+ 139 0082 04       		.byte	0x4
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\cc6u7Xxl.s 			page 4
+
+
+ 140 0083 04       		.byte	0x4
+ 141 0084 81010000 		.4byte	.LASF11
+ 142 0088 02       		.uleb128 0x2
+ 143 0089 08       		.byte	0x8
+ 144 008a 04       		.byte	0x4
+ 145 008b 4B010000 		.4byte	.LASF12
+ 146 008f 02       		.uleb128 0x2
+ 147 0090 01       		.byte	0x1
+ 148 0091 08       		.byte	0x8
+ 149 0092 3D010000 		.4byte	.LASF13
+ 150 0096 02       		.uleb128 0x2
+ 151 0097 08       		.byte	0x8
+ 152 0098 04       		.byte	0x4
+ 153 0099 6B010000 		.4byte	.LASF14
+ 154 009d 02       		.uleb128 0x2
+ 155 009e 04       		.byte	0x4
+ 156 009f 07       		.byte	0x7
+ 157 00a0 99010000 		.4byte	.LASF15
+ 158 00a4 05       		.uleb128 0x5
+ 159 00a5 35000000 		.4byte	.LASF19
+ 160 00a9 01       		.byte	0x1
+ 161 00aa 09       		.byte	0x9
+ 162 00ab 68000000 		.4byte	0x68
+ 163 00af 00000000 		.4byte	.LFB57
+ 164 00b3 2E000000 		.4byte	.LFE57-.LFB57
+ 165 00b7 01       		.uleb128 0x1
+ 166 00b8 9C       		.byte	0x9c
+ 167 00b9 06       		.uleb128 0x6
+ 168 00ba 52010000 		.4byte	.LASF20
+ 169 00be 04       		.byte	0x4
+ 170 00bf 1606     		.2byte	0x616
+ 171 00c1 C5000000 		.4byte	0xc5
+ 172 00c5 07       		.uleb128 0x7
+ 173 00c6 76000000 		.4byte	0x76
+ 174 00ca 00       		.byte	0
+ 175              		.section	.debug_abbrev,"",%progbits
+ 176              	.Ldebug_abbrev0:
+ 177 0000 01       		.uleb128 0x1
+ 178 0001 11       		.uleb128 0x11
+ 179 0002 01       		.byte	0x1
+ 180 0003 25       		.uleb128 0x25
+ 181 0004 0E       		.uleb128 0xe
+ 182 0005 13       		.uleb128 0x13
+ 183 0006 0B       		.uleb128 0xb
+ 184 0007 03       		.uleb128 0x3
+ 185 0008 0E       		.uleb128 0xe
+ 186 0009 1B       		.uleb128 0x1b
+ 187 000a 0E       		.uleb128 0xe
+ 188 000b 55       		.uleb128 0x55
+ 189 000c 17       		.uleb128 0x17
+ 190 000d 11       		.uleb128 0x11
+ 191 000e 01       		.uleb128 0x1
+ 192 000f 10       		.uleb128 0x10
+ 193 0010 17       		.uleb128 0x17
+ 194 0011 00       		.byte	0
+ 195 0012 00       		.byte	0
+ 196 0013 02       		.uleb128 0x2
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\cc6u7Xxl.s 			page 5
+
+
+ 197 0014 24       		.uleb128 0x24
+ 198 0015 00       		.byte	0
+ 199 0016 0B       		.uleb128 0xb
+ 200 0017 0B       		.uleb128 0xb
+ 201 0018 3E       		.uleb128 0x3e
+ 202 0019 0B       		.uleb128 0xb
+ 203 001a 03       		.uleb128 0x3
+ 204 001b 0E       		.uleb128 0xe
+ 205 001c 00       		.byte	0
+ 206 001d 00       		.byte	0
+ 207 001e 03       		.uleb128 0x3
+ 208 001f 16       		.uleb128 0x16
+ 209 0020 00       		.byte	0
+ 210 0021 03       		.uleb128 0x3
+ 211 0022 0E       		.uleb128 0xe
+ 212 0023 3A       		.uleb128 0x3a
+ 213 0024 0B       		.uleb128 0xb
+ 214 0025 3B       		.uleb128 0x3b
+ 215 0026 0B       		.uleb128 0xb
+ 216 0027 49       		.uleb128 0x49
+ 217 0028 13       		.uleb128 0x13
+ 218 0029 00       		.byte	0
+ 219 002a 00       		.byte	0
+ 220 002b 04       		.uleb128 0x4
+ 221 002c 24       		.uleb128 0x24
+ 222 002d 00       		.byte	0
+ 223 002e 0B       		.uleb128 0xb
+ 224 002f 0B       		.uleb128 0xb
+ 225 0030 3E       		.uleb128 0x3e
+ 226 0031 0B       		.uleb128 0xb
+ 227 0032 03       		.uleb128 0x3
+ 228 0033 08       		.uleb128 0x8
+ 229 0034 00       		.byte	0
+ 230 0035 00       		.byte	0
+ 231 0036 05       		.uleb128 0x5
+ 232 0037 2E       		.uleb128 0x2e
+ 233 0038 00       		.byte	0
+ 234 0039 3F       		.uleb128 0x3f
+ 235 003a 19       		.uleb128 0x19
+ 236 003b 03       		.uleb128 0x3
+ 237 003c 0E       		.uleb128 0xe
+ 238 003d 3A       		.uleb128 0x3a
+ 239 003e 0B       		.uleb128 0xb
+ 240 003f 3B       		.uleb128 0x3b
+ 241 0040 0B       		.uleb128 0xb
+ 242 0041 49       		.uleb128 0x49
+ 243 0042 13       		.uleb128 0x13
+ 244 0043 11       		.uleb128 0x11
+ 245 0044 01       		.uleb128 0x1
+ 246 0045 12       		.uleb128 0x12
+ 247 0046 06       		.uleb128 0x6
+ 248 0047 40       		.uleb128 0x40
+ 249 0048 18       		.uleb128 0x18
+ 250 0049 9642     		.uleb128 0x2116
+ 251 004b 19       		.uleb128 0x19
+ 252 004c 00       		.byte	0
+ 253 004d 00       		.byte	0
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\cc6u7Xxl.s 			page 6
+
+
+ 254 004e 06       		.uleb128 0x6
+ 255 004f 34       		.uleb128 0x34
+ 256 0050 00       		.byte	0
+ 257 0051 03       		.uleb128 0x3
+ 258 0052 0E       		.uleb128 0xe
+ 259 0053 3A       		.uleb128 0x3a
+ 260 0054 0B       		.uleb128 0xb
+ 261 0055 3B       		.uleb128 0x3b
+ 262 0056 05       		.uleb128 0x5
+ 263 0057 49       		.uleb128 0x49
+ 264 0058 13       		.uleb128 0x13
+ 265 0059 3F       		.uleb128 0x3f
+ 266 005a 19       		.uleb128 0x19
+ 267 005b 3C       		.uleb128 0x3c
+ 268 005c 19       		.uleb128 0x19
+ 269 005d 00       		.byte	0
+ 270 005e 00       		.byte	0
+ 271 005f 07       		.uleb128 0x7
+ 272 0060 35       		.uleb128 0x35
+ 273 0061 00       		.byte	0
+ 274 0062 49       		.uleb128 0x49
+ 275 0063 13       		.uleb128 0x13
+ 276 0064 00       		.byte	0
+ 277 0065 00       		.byte	0
+ 278 0066 00       		.byte	0
+ 279              		.section	.debug_aranges,"",%progbits
+ 280 0000 1C000000 		.4byte	0x1c
+ 281 0004 0200     		.2byte	0x2
+ 282 0006 00000000 		.4byte	.Ldebug_info0
+ 283 000a 04       		.byte	0x4
+ 284 000b 00       		.byte	0
+ 285 000c 0000     		.2byte	0
+ 286 000e 0000     		.2byte	0
+ 287 0010 00000000 		.4byte	.LFB57
+ 288 0014 2E000000 		.4byte	.LFE57-.LFB57
+ 289 0018 00000000 		.4byte	0
+ 290 001c 00000000 		.4byte	0
+ 291              		.section	.debug_ranges,"",%progbits
+ 292              	.Ldebug_ranges0:
+ 293 0000 00000000 		.4byte	.LFB57
+ 294 0004 2E000000 		.4byte	.LFE57
+ 295 0008 00000000 		.4byte	0
+ 296 000c 00000000 		.4byte	0
+ 297              		.section	.debug_line,"",%progbits
+ 298              	.Ldebug_line0:
+ 299 0000 76010000 		.section	.debug_str,"MS",%progbits,1
+ 299      02003F01 
+ 299      00000201 
+ 299      FB0E0D00 
+ 299      01010101 
+ 300              	.LASF6:
+ 301 0000 6C6F6E67 		.ascii	"long long int\000"
+ 301      206C6F6E 
+ 301      6720696E 
+ 301      7400
+ 302              	.LASF3:
+ 303 000e 73686F72 		.ascii	"short unsigned int\000"
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\cc6u7Xxl.s 			page 7
+
+
+ 303      7420756E 
+ 303      7369676E 
+ 303      65642069 
+ 303      6E7400
+ 304              	.LASF8:
+ 305 0021 756E7369 		.ascii	"unsigned int\000"
+ 305      676E6564 
+ 305      20696E74 
+ 305      00
+ 306              	.LASF17:
+ 307 002e 6D61696E 		.ascii	"main.c\000"
+ 307      2E6300
+ 308              	.LASF19:
+ 309 0035 6D61696E 		.ascii	"main\000"
+ 309      00
+ 310              	.LASF5:
+ 311 003a 6C6F6E67 		.ascii	"long unsigned int\000"
+ 311      20756E73 
+ 311      69676E65 
+ 311      6420696E 
+ 311      7400
+ 312              	.LASF7:
+ 313 004c 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 313      206C6F6E 
+ 313      6720756E 
+ 313      7369676E 
+ 313      65642069 
+ 314              	.LASF18:
+ 315 0063 433A5C55 		.ascii	"C:\\Users\\Arisvis\\Desktop\\WheatherStation\\Proje"
+ 315      73657273 
+ 315      5C417269 
+ 315      73766973 
+ 315      5C446573 
+ 316 0091 63745F42 		.ascii	"ct_BMP280.cydsn\000"
+ 316      4D503238 
+ 316      302E6379 
+ 316      64736E00 
+ 317              	.LASF16:
+ 318 00a1 474E5520 		.ascii	"GNU C11 5.4.1 20160609 (release) [ARM/embedded-5-br"
+ 318      43313120 
+ 318      352E342E 
+ 318      31203230 
+ 318      31363036 
+ 319 00d4 616E6368 		.ascii	"anch revision 237715] -mcpu=cortex-m3 -mthumb -g -O"
+ 319      20726576 
+ 319      6973696F 
+ 319      6E203233 
+ 319      37373135 
+ 320 0107 30202D66 		.ascii	"0 -ffunction-sections -ffat-lto-objects\000"
+ 320      66756E63 
+ 320      74696F6E 
+ 320      2D736563 
+ 320      74696F6E 
+ 321              	.LASF1:
+ 322 012f 756E7369 		.ascii	"unsigned char\000"
+ 322      676E6564 
+ 322      20636861 
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\cc6u7Xxl.s 			page 8
+
+
+ 322      7200
+ 323              	.LASF13:
+ 324 013d 63686172 		.ascii	"char\000"
+ 324      00
+ 325              	.LASF4:
+ 326 0142 6C6F6E67 		.ascii	"long int\000"
+ 326      20696E74 
+ 326      00
+ 327              	.LASF12:
+ 328 014b 646F7562 		.ascii	"double\000"
+ 328      6C6500
+ 329              	.LASF20:
+ 330 0152 49544D5F 		.ascii	"ITM_RxBuffer\000"
+ 330      52784275 
+ 330      66666572 
+ 330      00
+ 331              	.LASF0:
+ 332 015f 7369676E 		.ascii	"signed char\000"
+ 332      65642063 
+ 332      68617200 
+ 333              	.LASF14:
+ 334 016b 6C6F6E67 		.ascii	"long double\000"
+ 334      20646F75 
+ 334      626C6500 
+ 335              	.LASF9:
+ 336 0177 5F5F696E 		.ascii	"__int32_t\000"
+ 336      7433325F 
+ 336      7400
+ 337              	.LASF11:
+ 338 0181 666C6F61 		.ascii	"float\000"
+ 338      7400
+ 339              	.LASF2:
+ 340 0187 73686F72 		.ascii	"short int\000"
+ 340      7420696E 
+ 340      7400
+ 341              	.LASF10:
+ 342 0191 696E7433 		.ascii	"int32_t\000"
+ 342      325F7400 
+ 343              	.LASF15:
+ 344 0199 73697A65 		.ascii	"sizetype\000"
+ 344      74797065 
+ 344      00
+ 345              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 5.4.1 20160609 (release) [ARM/embedded-5-bran

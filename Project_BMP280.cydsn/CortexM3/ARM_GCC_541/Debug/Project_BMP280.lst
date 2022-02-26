@@ -1,0 +1,3238 @@
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\ccOsInVI.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 6
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.syntax unified
+  15              		.file	"BME280.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.global	bme280
+  20              		.data
+  21              		.align	2
+  22              		.type	bme280, %object
+  23              		.size	bme280, 44
+  24              	bme280:
+  25 0000 00       		.byte	0
+  26 0001 76       		.byte	118
+  27 0002 0A       		.byte	10
+  28 0003 03       		.byte	3
+  29 0004 0000     		.space	2
+  30 0006 02       		.byte	2
+  31 0007 05       		.byte	5
+  32 0008 00000000 		.space	24
+  32      00000000 
+  32      00000000 
+  32      00000000 
+  32      00000000 
+  33 0020 00000000 		.word	0
+  34 0024 003C1CC6 		.word	-971228160
+  35 0028 003C1CC6 		.word	-971228160
+  36              		.section	.text.BME280_start,"ax",%progbits
+  37              		.align	2
+  38              		.global	BME280_start
+  39              		.thumb
+  40              		.thumb_func
+  41              		.type	BME280_start, %function
+  42              	BME280_start:
+  43              	.LFB63:
+  44              		.file 1 "BME280.c"
+   1:BME280.c      **** /******************************************************************************
+   2:BME280.c      **** SparkFunBME280.cpp
+   3:BME280.c      **** BME280 Arduino and Teensy Driver
+   4:BME280.c      **** Marshall Taylor @ SparkFun Electronics
+   5:BME280.c      **** May 20, 2015
+   6:BME280.c      **** https://github.com/sparkfun/BME280_Breakout
+   7:BME280.c      **** 
+   8:BME280.c      **** Resources:
+   9:BME280.c      **** Uses Wire.h for i2c operation
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\ccOsInVI.s 			page 2
+
+
+  10:BME280.c      **** Uses SPI.h for SPI operation
+  11:BME280.c      **** 
+  12:BME280.c      **** Development environment specifics:
+  13:BME280.c      **** Arduino IDE 1.6.4
+  14:BME280.c      **** Teensy loader 1.23
+  15:BME280.c      **** 
+  16:BME280.c      **** This code is released under the [MIT License](http://opensource.org/licenses/MIT).
+  17:BME280.c      **** Please review the LICENSE.md file included with this example. If you have any questions 
+  18:BME280.c      **** or concerns with licensing, please contact techsupport@sparkfun.com.
+  19:BME280.c      **** Distributed as-is; no warranty is given.
+  20:BME280.c      **** ******************************************************************************/
+  21:BME280.c      **** //See SparkFunBME280.h for additional topology notes.
+  22:BME280.c      **** 
+  23:BME280.c      **** #include "BME280.h"
+  24:BME280.c      **** #include <math.h>
+  25:BME280.c      **** 
+  26:BME280.c      **** 
+  27:BME280.c      **** //****************************************************************************//
+  28:BME280.c      **** //
+  29:BME280.c      **** //  Settings and configuration
+  30:BME280.c      **** //
+  31:BME280.c      **** //****************************************************************************//
+  32:BME280.c      **** 
+  33:BME280.c      **** //Construct with these default settings if nothing is specified
+  34:BME280.c      **** BME280 bme280 = {
+  35:BME280.c      ****     .settings = {
+  36:BME280.c      ****         //Select interface mode
+  37:BME280.c      ****         .commInterface  = BME280_I2C_MODE,
+  38:BME280.c      ****     	//Select address for I2C.  Does nothing for SPI            
+  39:BME280.c      ****         .I2CAddress     = 0x76,
+  40:BME280.c      ****     	//Select CS pin for SPI.  Does nothing for I2C            
+  41:BME280.c      ****         .chipSelectPin  = 10,
+  42:BME280.c      ****         .runMode        = 3,
+  43:BME280.c      ****         .tempOverSample = 2,
+  44:BME280.c      ****         .pressOverSample= 5,
+  45:BME280.c      **** 
+  46:BME280.c      ****         },
+  47:BME280.c      ****     .calibration = {},
+  48:BME280.c      ****     .t_fine = 0,
+  49:BME280.c      ****     .temp_C     = -9999,
+  50:BME280.c      ****     .press_Pa   = -9999,
+  51:BME280.c      **** 
+  52:BME280.c      **** };
+  53:BME280.c      **** 
+  54:BME280.c      **** void BME280_start() {
+  45              		.loc 1 54 0
+  46              		.cfi_startproc
+  47              		@ args = 0, pretend = 0, frame = 0
+  48              		@ frame_needed = 1, uses_anonymous_args = 0
+  49 0000 80B5     		push	{r7, lr}
+  50              		.cfi_def_cfa_offset 8
+  51              		.cfi_offset 7, -8
+  52              		.cfi_offset 14, -4
+  53 0002 00AF     		add	r7, sp, #0
+  54              		.cfi_def_cfa_register 7
+  55:BME280.c      ****     I2C_Start();
+  55              		.loc 1 55 0
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\ccOsInVI.s 			page 3
+
+
+  56 0004 FFF7FEFF 		bl	I2C_Start
+  56:BME280.c      ****     I2C_Sleep();
+  57              		.loc 1 56 0
+  58 0008 FFF7FEFF 		bl	I2C_Sleep
+  57:BME280.c      **** }
+  59              		.loc 1 57 0
+  60 000c 00BF     		nop
+  61 000e 80BD     		pop	{r7, pc}
+  62              		.cfi_endproc
+  63              	.LFE63:
+  64              		.size	BME280_start, .-BME280_start
+  65              		.section	.text.BME280_stop,"ax",%progbits
+  66              		.align	2
+  67              		.global	BME280_stop
+  68              		.thumb
+  69              		.thumb_func
+  70              		.type	BME280_stop, %function
+  71              	BME280_stop:
+  72              	.LFB64:
+  58:BME280.c      **** 
+  59:BME280.c      **** void BME280_stop() {
+  73              		.loc 1 59 0
+  74              		.cfi_startproc
+  75              		@ args = 0, pretend = 0, frame = 0
+  76              		@ frame_needed = 1, uses_anonymous_args = 0
+  77 0000 80B5     		push	{r7, lr}
+  78              		.cfi_def_cfa_offset 8
+  79              		.cfi_offset 7, -8
+  80              		.cfi_offset 14, -4
+  81 0002 00AF     		add	r7, sp, #0
+  82              		.cfi_def_cfa_register 7
+  60:BME280.c      ****     I2C_Stop();
+  83              		.loc 1 60 0
+  84 0004 FFF7FEFF 		bl	I2C_Stop
+  61:BME280.c      **** }
+  85              		.loc 1 61 0
+  86 0008 00BF     		nop
+  87 000a 80BD     		pop	{r7, pc}
+  88              		.cfi_endproc
+  89              	.LFE64:
+  90              		.size	BME280_stop, .-BME280_stop
+  91              		.section	.text.BME280_init,"ax",%progbits
+  92              		.align	2
+  93              		.global	BME280_init
+  94              		.thumb
+  95              		.thumb_func
+  96              		.type	BME280_init, %function
+  97              	BME280_init:
+  98              	.LFB65:
+  62:BME280.c      **** 
+  63:BME280.c      **** //****************************************************************************//
+  64:BME280.c      **** //
+  65:BME280.c      **** //  Configuration section
+  66:BME280.c      **** //
+  67:BME280.c      **** //  This uses the stored SensorSettings to start the IMU
+  68:BME280.c      **** //  Use statements such as "mySensor.settings.commInterface = SPI_MODE;" to 
+  69:BME280.c      **** //  configure before calling .begin();
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\ccOsInVI.s 			page 4
+
+
+  70:BME280.c      **** //
+  71:BME280.c      **** //****************************************************************************//
+  72:BME280.c      **** uint8_t BME280_init()
+  73:BME280.c      **** {
+  99              		.loc 1 73 0
+ 100              		.cfi_startproc
+ 101              		@ args = 0, pretend = 0, frame = 8
+ 102              		@ frame_needed = 1, uses_anonymous_args = 0
+ 103 0000 90B5     		push	{r4, r7, lr}
+ 104              		.cfi_def_cfa_offset 12
+ 105              		.cfi_offset 4, -12
+ 106              		.cfi_offset 7, -8
+ 107              		.cfi_offset 14, -4
+ 108 0002 83B0     		sub	sp, sp, #12
+ 109              		.cfi_def_cfa_offset 24
+ 110 0004 00AF     		add	r7, sp, #0
+ 111              		.cfi_def_cfa_register 7
+  74:BME280.c      **** 	//Check the settings structure values to determine how to setup the device
+  75:BME280.c      **** 	uint8_t data_to_write = 0, device_address;  //Temporary variable
+ 112              		.loc 1 75 0
+ 113 0006 0023     		movs	r3, #0
+ 114 0008 FB71     		strb	r3, [r7, #7]
+  76:BME280.c      **** 	I2C_Start();
+ 115              		.loc 1 76 0
+ 116 000a FFF7FEFF 		bl	I2C_Start
+  77:BME280.c      ****     I2C_Sleep();
+ 117              		.loc 1 77 0
+ 118 000e FFF7FEFF 		bl	I2C_Sleep
+  78:BME280.c      ****     
+  79:BME280.c      **** 	//Reading all compensation data, range 0x88:A1, 0xE1:E7
+  80:BME280.c      **** 	bme280.calibration.dig_T1 = ((uint16_t)((BME280_readRegister(BME280_DIG_T1_MSB_REG) << 8) + BME280
+ 119              		.loc 1 80 0
+ 120 0012 8920     		movs	r0, #137
+ 121 0014 FFF7FEFF 		bl	BME280_readRegister
+ 122 0018 0346     		mov	r3, r0
+ 123 001a 9BB2     		uxth	r3, r3
+ 124 001c 1B02     		lsls	r3, r3, #8
+ 125 001e 9CB2     		uxth	r4, r3
+ 126 0020 8820     		movs	r0, #136
+ 127 0022 FFF7FEFF 		bl	BME280_readRegister
+ 128 0026 0346     		mov	r3, r0
+ 129 0028 9BB2     		uxth	r3, r3
+ 130 002a 2344     		add	r3, r3, r4
+ 131 002c 9AB2     		uxth	r2, r3
+ 132 002e 7F4B     		ldr	r3, .L5
+ 133 0030 1A81     		strh	r2, [r3, #8]	@ movhi
+  81:BME280.c      **** 	bme280.calibration.dig_T2 = ((int16_t)((BME280_readRegister(BME280_DIG_T2_MSB_REG) << 8) + BME280_
+ 134              		.loc 1 81 0
+ 135 0032 8B20     		movs	r0, #139
+ 136 0034 FFF7FEFF 		bl	BME280_readRegister
+ 137 0038 0346     		mov	r3, r0
+ 138 003a 9BB2     		uxth	r3, r3
+ 139 003c 1B02     		lsls	r3, r3, #8
+ 140 003e 9CB2     		uxth	r4, r3
+ 141 0040 8A20     		movs	r0, #138
+ 142 0042 FFF7FEFF 		bl	BME280_readRegister
+ 143 0046 0346     		mov	r3, r0
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\ccOsInVI.s 			page 5
+
+
+ 144 0048 9BB2     		uxth	r3, r3
+ 145 004a 2344     		add	r3, r3, r4
+ 146 004c 9BB2     		uxth	r3, r3
+ 147 004e 1AB2     		sxth	r2, r3
+ 148 0050 764B     		ldr	r3, .L5
+ 149 0052 5A81     		strh	r2, [r3, #10]	@ movhi
+  82:BME280.c      **** 	bme280.calibration.dig_T3 = ((int16_t)((BME280_readRegister(BME280_DIG_T3_MSB_REG) << 8) + BME280_
+ 150              		.loc 1 82 0
+ 151 0054 8D20     		movs	r0, #141
+ 152 0056 FFF7FEFF 		bl	BME280_readRegister
+ 153 005a 0346     		mov	r3, r0
+ 154 005c 9BB2     		uxth	r3, r3
+ 155 005e 1B02     		lsls	r3, r3, #8
+ 156 0060 9CB2     		uxth	r4, r3
+ 157 0062 8C20     		movs	r0, #140
+ 158 0064 FFF7FEFF 		bl	BME280_readRegister
+ 159 0068 0346     		mov	r3, r0
+ 160 006a 9BB2     		uxth	r3, r3
+ 161 006c 2344     		add	r3, r3, r4
+ 162 006e 9BB2     		uxth	r3, r3
+ 163 0070 1AB2     		sxth	r2, r3
+ 164 0072 6E4B     		ldr	r3, .L5
+ 165 0074 9A81     		strh	r2, [r3, #12]	@ movhi
+  83:BME280.c      **** 
+  84:BME280.c      **** 	bme280.calibration.dig_P1 = ((uint16_t)((BME280_readRegister(BME280_DIG_P1_MSB_REG) << 8) + BME280
+ 166              		.loc 1 84 0
+ 167 0076 8F20     		movs	r0, #143
+ 168 0078 FFF7FEFF 		bl	BME280_readRegister
+ 169 007c 0346     		mov	r3, r0
+ 170 007e 9BB2     		uxth	r3, r3
+ 171 0080 1B02     		lsls	r3, r3, #8
+ 172 0082 9CB2     		uxth	r4, r3
+ 173 0084 8E20     		movs	r0, #142
+ 174 0086 FFF7FEFF 		bl	BME280_readRegister
+ 175 008a 0346     		mov	r3, r0
+ 176 008c 9BB2     		uxth	r3, r3
+ 177 008e 2344     		add	r3, r3, r4
+ 178 0090 9AB2     		uxth	r2, r3
+ 179 0092 664B     		ldr	r3, .L5
+ 180 0094 DA81     		strh	r2, [r3, #14]	@ movhi
+  85:BME280.c      **** 	bme280.calibration.dig_P2 = ((int16_t)((BME280_readRegister(BME280_DIG_P2_MSB_REG) << 8) + BME280_
+ 181              		.loc 1 85 0
+ 182 0096 9120     		movs	r0, #145
+ 183 0098 FFF7FEFF 		bl	BME280_readRegister
+ 184 009c 0346     		mov	r3, r0
+ 185 009e 9BB2     		uxth	r3, r3
+ 186 00a0 1B02     		lsls	r3, r3, #8
+ 187 00a2 9CB2     		uxth	r4, r3
+ 188 00a4 9020     		movs	r0, #144
+ 189 00a6 FFF7FEFF 		bl	BME280_readRegister
+ 190 00aa 0346     		mov	r3, r0
+ 191 00ac 9BB2     		uxth	r3, r3
+ 192 00ae 2344     		add	r3, r3, r4
+ 193 00b0 9BB2     		uxth	r3, r3
+ 194 00b2 1AB2     		sxth	r2, r3
+ 195 00b4 5D4B     		ldr	r3, .L5
+ 196 00b6 1A82     		strh	r2, [r3, #16]	@ movhi
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\ccOsInVI.s 			page 6
+
+
+  86:BME280.c      **** 	bme280.calibration.dig_P3 = ((int16_t)((BME280_readRegister(BME280_DIG_P3_MSB_REG) << 8) + BME280_
+ 197              		.loc 1 86 0
+ 198 00b8 9320     		movs	r0, #147
+ 199 00ba FFF7FEFF 		bl	BME280_readRegister
+ 200 00be 0346     		mov	r3, r0
+ 201 00c0 9BB2     		uxth	r3, r3
+ 202 00c2 1B02     		lsls	r3, r3, #8
+ 203 00c4 9CB2     		uxth	r4, r3
+ 204 00c6 9220     		movs	r0, #146
+ 205 00c8 FFF7FEFF 		bl	BME280_readRegister
+ 206 00cc 0346     		mov	r3, r0
+ 207 00ce 9BB2     		uxth	r3, r3
+ 208 00d0 2344     		add	r3, r3, r4
+ 209 00d2 9BB2     		uxth	r3, r3
+ 210 00d4 1AB2     		sxth	r2, r3
+ 211 00d6 554B     		ldr	r3, .L5
+ 212 00d8 5A82     		strh	r2, [r3, #18]	@ movhi
+  87:BME280.c      **** 	bme280.calibration.dig_P4 = ((int16_t)((BME280_readRegister(BME280_DIG_P4_MSB_REG) << 8) + BME280_
+ 213              		.loc 1 87 0
+ 214 00da 9520     		movs	r0, #149
+ 215 00dc FFF7FEFF 		bl	BME280_readRegister
+ 216 00e0 0346     		mov	r3, r0
+ 217 00e2 9BB2     		uxth	r3, r3
+ 218 00e4 1B02     		lsls	r3, r3, #8
+ 219 00e6 9CB2     		uxth	r4, r3
+ 220 00e8 9420     		movs	r0, #148
+ 221 00ea FFF7FEFF 		bl	BME280_readRegister
+ 222 00ee 0346     		mov	r3, r0
+ 223 00f0 9BB2     		uxth	r3, r3
+ 224 00f2 2344     		add	r3, r3, r4
+ 225 00f4 9BB2     		uxth	r3, r3
+ 226 00f6 1AB2     		sxth	r2, r3
+ 227 00f8 4C4B     		ldr	r3, .L5
+ 228 00fa 9A82     		strh	r2, [r3, #20]	@ movhi
+  88:BME280.c      **** 	bme280.calibration.dig_P5 = ((int16_t)((BME280_readRegister(BME280_DIG_P5_MSB_REG) << 8) + BME280_
+ 229              		.loc 1 88 0
+ 230 00fc 9720     		movs	r0, #151
+ 231 00fe FFF7FEFF 		bl	BME280_readRegister
+ 232 0102 0346     		mov	r3, r0
+ 233 0104 9BB2     		uxth	r3, r3
+ 234 0106 1B02     		lsls	r3, r3, #8
+ 235 0108 9CB2     		uxth	r4, r3
+ 236 010a 9620     		movs	r0, #150
+ 237 010c FFF7FEFF 		bl	BME280_readRegister
+ 238 0110 0346     		mov	r3, r0
+ 239 0112 9BB2     		uxth	r3, r3
+ 240 0114 2344     		add	r3, r3, r4
+ 241 0116 9BB2     		uxth	r3, r3
+ 242 0118 1AB2     		sxth	r2, r3
+ 243 011a 444B     		ldr	r3, .L5
+ 244 011c DA82     		strh	r2, [r3, #22]	@ movhi
+  89:BME280.c      **** 	bme280.calibration.dig_P6 = ((int16_t)((BME280_readRegister(BME280_DIG_P6_MSB_REG) << 8) + BME280_
+ 245              		.loc 1 89 0
+ 246 011e 9920     		movs	r0, #153
+ 247 0120 FFF7FEFF 		bl	BME280_readRegister
+ 248 0124 0346     		mov	r3, r0
+ 249 0126 9BB2     		uxth	r3, r3
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\ccOsInVI.s 			page 7
+
+
+ 250 0128 1B02     		lsls	r3, r3, #8
+ 251 012a 9CB2     		uxth	r4, r3
+ 252 012c 9820     		movs	r0, #152
+ 253 012e FFF7FEFF 		bl	BME280_readRegister
+ 254 0132 0346     		mov	r3, r0
+ 255 0134 9BB2     		uxth	r3, r3
+ 256 0136 2344     		add	r3, r3, r4
+ 257 0138 9BB2     		uxth	r3, r3
+ 258 013a 1AB2     		sxth	r2, r3
+ 259 013c 3B4B     		ldr	r3, .L5
+ 260 013e 1A83     		strh	r2, [r3, #24]	@ movhi
+  90:BME280.c      **** 	bme280.calibration.dig_P7 = ((int16_t)((BME280_readRegister(BME280_DIG_P7_MSB_REG) << 8) + BME280_
+ 261              		.loc 1 90 0
+ 262 0140 9B20     		movs	r0, #155
+ 263 0142 FFF7FEFF 		bl	BME280_readRegister
+ 264 0146 0346     		mov	r3, r0
+ 265 0148 9BB2     		uxth	r3, r3
+ 266 014a 1B02     		lsls	r3, r3, #8
+ 267 014c 9CB2     		uxth	r4, r3
+ 268 014e 9A20     		movs	r0, #154
+ 269 0150 FFF7FEFF 		bl	BME280_readRegister
+ 270 0154 0346     		mov	r3, r0
+ 271 0156 9BB2     		uxth	r3, r3
+ 272 0158 2344     		add	r3, r3, r4
+ 273 015a 9BB2     		uxth	r3, r3
+ 274 015c 1AB2     		sxth	r2, r3
+ 275 015e 334B     		ldr	r3, .L5
+ 276 0160 5A83     		strh	r2, [r3, #26]	@ movhi
+  91:BME280.c      **** 	bme280.calibration.dig_P8 = ((int16_t)((BME280_readRegister(BME280_DIG_P8_MSB_REG) << 8) + BME280_
+ 277              		.loc 1 91 0
+ 278 0162 9D20     		movs	r0, #157
+ 279 0164 FFF7FEFF 		bl	BME280_readRegister
+ 280 0168 0346     		mov	r3, r0
+ 281 016a 9BB2     		uxth	r3, r3
+ 282 016c 1B02     		lsls	r3, r3, #8
+ 283 016e 9CB2     		uxth	r4, r3
+ 284 0170 9C20     		movs	r0, #156
+ 285 0172 FFF7FEFF 		bl	BME280_readRegister
+ 286 0176 0346     		mov	r3, r0
+ 287 0178 9BB2     		uxth	r3, r3
+ 288 017a 2344     		add	r3, r3, r4
+ 289 017c 9BB2     		uxth	r3, r3
+ 290 017e 1AB2     		sxth	r2, r3
+ 291 0180 2A4B     		ldr	r3, .L5
+ 292 0182 9A83     		strh	r2, [r3, #28]	@ movhi
+  92:BME280.c      **** 	bme280.calibration.dig_P9 = ((int16_t)((BME280_readRegister(BME280_DIG_P9_MSB_REG) << 8) + BME280_
+ 293              		.loc 1 92 0
+ 294 0184 9F20     		movs	r0, #159
+ 295 0186 FFF7FEFF 		bl	BME280_readRegister
+ 296 018a 0346     		mov	r3, r0
+ 297 018c 9BB2     		uxth	r3, r3
+ 298 018e 1B02     		lsls	r3, r3, #8
+ 299 0190 9CB2     		uxth	r4, r3
+ 300 0192 9E20     		movs	r0, #158
+ 301 0194 FFF7FEFF 		bl	BME280_readRegister
+ 302 0198 0346     		mov	r3, r0
+ 303 019a 9BB2     		uxth	r3, r3
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\ccOsInVI.s 			page 8
+
+
+ 304 019c 2344     		add	r3, r3, r4
+ 305 019e 9BB2     		uxth	r3, r3
+ 306 01a0 1AB2     		sxth	r2, r3
+ 307 01a2 224B     		ldr	r3, .L5
+ 308 01a4 DA83     		strh	r2, [r3, #30]	@ movhi
+  93:BME280.c      **** 
+  94:BME280.c      **** 
+  95:BME280.c      **** 
+  96:BME280.c      **** 	//Set the oversampling control words.
+  97:BME280.c      **** 	//config will only be writeable in sleep mode, so first insure that.
+  98:BME280.c      **** 	BME280_writeRegister(BME280_CTRL_MEAS_REG, 0x00);
+ 309              		.loc 1 98 0
+ 310 01a6 0021     		movs	r1, #0
+ 311 01a8 F420     		movs	r0, #244
+ 312 01aa FFF7FEFF 		bl	BME280_writeRegister
+  99:BME280.c      **** 	
+ 100:BME280.c      **** 	//Set the config word
+ 101:BME280.c      **** 	data_to_write = (bme280.settings.tStandby << 0x5) & 0xE0;
+ 313              		.loc 1 101 0
+ 314 01ae 1F4B     		ldr	r3, .L5
+ 315 01b0 1B79     		ldrb	r3, [r3, #4]	@ zero_extendqisi2
+ 316 01b2 5B01     		lsls	r3, r3, #5
+ 317 01b4 FB71     		strb	r3, [r7, #7]
+ 102:BME280.c      **** 	data_to_write |= (bme280.settings.filter << 0x02) & 0x1C;
+ 318              		.loc 1 102 0
+ 319 01b6 1D4B     		ldr	r3, .L5
+ 320 01b8 5B79     		ldrb	r3, [r3, #5]	@ zero_extendqisi2
+ 321 01ba 9B00     		lsls	r3, r3, #2
+ 322 01bc 5BB2     		sxtb	r3, r3
+ 323 01be 03F01C03 		and	r3, r3, #28
+ 324 01c2 5AB2     		sxtb	r2, r3
+ 325 01c4 97F90730 		ldrsb	r3, [r7, #7]
+ 326 01c8 1343     		orrs	r3, r3, r2
+ 327 01ca 5BB2     		sxtb	r3, r3
+ 328 01cc FB71     		strb	r3, [r7, #7]
+ 103:BME280.c      **** 	BME280_writeRegister(BME280_CONFIG_REG, data_to_write);
+ 329              		.loc 1 103 0
+ 330 01ce FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+ 331 01d0 1946     		mov	r1, r3
+ 332 01d2 F520     		movs	r0, #245
+ 333 01d4 FFF7FEFF 		bl	BME280_writeRegister
+ 104:BME280.c      **** 	
+ 105:BME280.c      **** 
+ 106:BME280.c      **** 	
+ 107:BME280.c      **** 	//set ctrl_meas
+ 108:BME280.c      **** 	//First, set temp oversampling
+ 109:BME280.c      **** 	data_to_write = (bme280.settings.tempOverSample << 0x05) & 0xE0;
+ 334              		.loc 1 109 0
+ 335 01d8 144B     		ldr	r3, .L5
+ 336 01da 9B79     		ldrb	r3, [r3, #6]	@ zero_extendqisi2
+ 337 01dc 5B01     		lsls	r3, r3, #5
+ 338 01de FB71     		strb	r3, [r7, #7]
+ 110:BME280.c      **** 	//Next, pressure oversampling
+ 111:BME280.c      **** 	data_to_write |= (bme280.settings.pressOverSample << 0x02) & 0x1C;
+ 339              		.loc 1 111 0
+ 340 01e0 124B     		ldr	r3, .L5
+ 341 01e2 DB79     		ldrb	r3, [r3, #7]	@ zero_extendqisi2
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\ccOsInVI.s 			page 9
+
+
+ 342 01e4 9B00     		lsls	r3, r3, #2
+ 343 01e6 5BB2     		sxtb	r3, r3
+ 344 01e8 03F01C03 		and	r3, r3, #28
+ 345 01ec 5AB2     		sxtb	r2, r3
+ 346 01ee 97F90730 		ldrsb	r3, [r7, #7]
+ 347 01f2 1343     		orrs	r3, r3, r2
+ 348 01f4 5BB2     		sxtb	r3, r3
+ 349 01f6 FB71     		strb	r3, [r7, #7]
+ 112:BME280.c      **** 	//Last, set mode
+ 113:BME280.c      **** 	data_to_write |= (bme280.settings.runMode) & 0x03;
+ 350              		.loc 1 113 0
+ 351 01f8 0C4B     		ldr	r3, .L5
+ 352 01fa DB78     		ldrb	r3, [r3, #3]	@ zero_extendqisi2
+ 353 01fc 5BB2     		sxtb	r3, r3
+ 354 01fe 03F00303 		and	r3, r3, #3
+ 355 0202 5AB2     		sxtb	r2, r3
+ 356 0204 97F90730 		ldrsb	r3, [r7, #7]
+ 357 0208 1343     		orrs	r3, r3, r2
+ 358 020a 5BB2     		sxtb	r3, r3
+ 359 020c FB71     		strb	r3, [r7, #7]
+ 114:BME280.c      **** 	//Load the byte
+ 115:BME280.c      **** 	BME280_writeRegister(BME280_CTRL_MEAS_REG, data_to_write);
+ 360              		.loc 1 115 0
+ 361 020e FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+ 362 0210 1946     		mov	r1, r3
+ 363 0212 F420     		movs	r0, #244
+ 364 0214 FFF7FEFF 		bl	BME280_writeRegister
+ 116:BME280.c      **** 	
+ 117:BME280.c      ****     // dataToWrite is a placeholder for the value we will return
+ 118:BME280.c      **** 	device_address = BME280_readRegister(0xD0);
+ 365              		.loc 1 118 0
+ 366 0218 D020     		movs	r0, #208
+ 367 021a FFF7FEFF 		bl	BME280_readRegister
+ 368 021e 0346     		mov	r3, r0
+ 369 0220 BB71     		strb	r3, [r7, #6]
+ 119:BME280.c      ****     return device_address;
+ 370              		.loc 1 119 0
+ 371 0222 BB79     		ldrb	r3, [r7, #6]	@ zero_extendqisi2
+ 120:BME280.c      **** }
+ 372              		.loc 1 120 0
+ 373 0224 1846     		mov	r0, r3
+ 374 0226 0C37     		adds	r7, r7, #12
+ 375              		.cfi_def_cfa_offset 12
+ 376 0228 BD46     		mov	sp, r7
+ 377              		.cfi_def_cfa_register 13
+ 378              		@ sp needed
+ 379 022a 90BD     		pop	{r4, r7, pc}
+ 380              	.L6:
+ 381              		.align	2
+ 382              	.L5:
+ 383 022c 00000000 		.word	bme280
+ 384              		.cfi_endproc
+ 385              	.LFE65:
+ 386              		.size	BME280_init, .-BME280_init
+ 387              		.section	.text.BME280_reset,"ax",%progbits
+ 388              		.align	2
+ 389              		.global	BME280_reset
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\ccOsInVI.s 			page 10
+
+
+ 390              		.thumb
+ 391              		.thumb_func
+ 392              		.type	BME280_reset, %function
+ 393              	BME280_reset:
+ 394              	.LFB66:
+ 121:BME280.c      **** 
+ 122:BME280.c      **** //Strictly resets.  Run BME280_init() afterwards
+ 123:BME280.c      **** void BME280_reset()
+ 124:BME280.c      **** {
+ 395              		.loc 1 124 0
+ 396              		.cfi_startproc
+ 397              		@ args = 0, pretend = 0, frame = 0
+ 398              		@ frame_needed = 1, uses_anonymous_args = 0
+ 399 0000 80B5     		push	{r7, lr}
+ 400              		.cfi_def_cfa_offset 8
+ 401              		.cfi_offset 7, -8
+ 402              		.cfi_offset 14, -4
+ 403 0002 00AF     		add	r7, sp, #0
+ 404              		.cfi_def_cfa_register 7
+ 125:BME280.c      **** 	BME280_writeRegister(BME280_RST_REG, 0xB6);
+ 405              		.loc 1 125 0
+ 406 0004 B621     		movs	r1, #182
+ 407 0006 E020     		movs	r0, #224
+ 408 0008 FFF7FEFF 		bl	BME280_writeRegister
+ 126:BME280.c      **** 	
+ 127:BME280.c      **** }
+ 409              		.loc 1 127 0
+ 410 000c 00BF     		nop
+ 411 000e 80BD     		pop	{r7, pc}
+ 412              		.cfi_endproc
+ 413              	.LFE66:
+ 414              		.size	BME280_reset, .-BME280_reset
+ 415              		.global	__aeabi_ldivmod
+ 416              		.global	__aeabi_l2f
+ 417              		.global	__aeabi_fdiv
+ 418              		.section	.text.BME280_readFloatPressure,"ax",%progbits
+ 419              		.align	2
+ 420              		.global	BME280_readFloatPressure
+ 421              		.thumb
+ 422              		.thumb_func
+ 423              		.type	BME280_readFloatPressure, %function
+ 424              	BME280_readFloatPressure:
+ 425              	.LFB67:
+ 128:BME280.c      **** 
+ 129:BME280.c      **** //****************************************************************************//
+ 130:BME280.c      **** //
+ 131:BME280.c      **** //  Pressure Section
+ 132:BME280.c      **** //
+ 133:BME280.c      **** //****************************************************************************//
+ 134:BME280.c      **** float BME280_readFloatPressure( void )
+ 135:BME280.c      **** {
+ 426              		.loc 1 135 0
+ 427              		.cfi_startproc
+ 428              		@ args = 0, pretend = 0, frame = 136
+ 429              		@ frame_needed = 1, uses_anonymous_args = 0
+ 430 0000 2DE9B04F 		push	{r4, r5, r7, r8, r9, r10, fp, lr}
+ 431              		.cfi_def_cfa_offset 32
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\ccOsInVI.s 			page 11
+
+
+ 432              		.cfi_offset 4, -32
+ 433              		.cfi_offset 5, -28
+ 434              		.cfi_offset 7, -24
+ 435              		.cfi_offset 8, -20
+ 436              		.cfi_offset 9, -16
+ 437              		.cfi_offset 10, -12
+ 438              		.cfi_offset 11, -8
+ 439              		.cfi_offset 14, -4
+ 440 0004 A2B0     		sub	sp, sp, #136
+ 441              		.cfi_def_cfa_offset 168
+ 442 0006 00AF     		add	r7, sp, #0
+ 443              		.cfi_def_cfa_register 7
+ 136:BME280.c      **** 
+ 137:BME280.c      **** 	// Returns pressure in Pa as unsigned 32 bit integer in Q24.8 format (24 integer bits and 8 fracti
+ 138:BME280.c      **** 	// Output value of “24674867” represents 24674867/256 = 96386.2 Pa = 963.862 hPa
+ 139:BME280.c      **** 	int32_t adc_P = ((uint32_t)BME280_readRegister(BME280_PRESSURE_MSB_REG) << 12) | ((uint32_t)BME280
+ 444              		.loc 1 139 0
+ 445 0008 F720     		movs	r0, #247
+ 446 000a FFF7FEFF 		bl	BME280_readRegister
+ 447 000e 0346     		mov	r3, r0
+ 448 0010 1C03     		lsls	r4, r3, #12
+ 449 0012 F820     		movs	r0, #248
+ 450 0014 FFF7FEFF 		bl	BME280_readRegister
+ 451 0018 0346     		mov	r3, r0
+ 452 001a 1B01     		lsls	r3, r3, #4
+ 453 001c 1C43     		orrs	r4, r4, r3
+ 454 001e F920     		movs	r0, #249
+ 455 0020 FFF7FEFF 		bl	BME280_readRegister
+ 456 0024 0346     		mov	r3, r0
+ 457 0026 1B09     		lsrs	r3, r3, #4
+ 458 0028 DBB2     		uxtb	r3, r3
+ 459 002a 03F00F03 		and	r3, r3, #15
+ 460 002e 2343     		orrs	r3, r3, r4
+ 461 0030 C7F88430 		str	r3, [r7, #132]
+ 140:BME280.c      **** 	
+ 141:BME280.c      **** 	int64_t var1, var2, p_acc;
+ 142:BME280.c      **** 	var1 = ((int64_t) bme280.t_fine) - 128000;
+ 462              		.loc 1 142 0
+ 463 0034 644B     		ldr	r3, .L11
+ 464 0036 1B6A     		ldr	r3, [r3, #32]
+ 465 0038 4FEAE374 		asr	r4, r3, #31
+ 466 003c B3F5FA33 		subs	r3, r3, #128000
+ 467 0040 44F1FF34 		adc	r4, r4, #-1
+ 468 0044 C7E91E34 		strd	r3, [r7, #120]
+ 143:BME280.c      **** 	var2 = var1 * var1 * (int64_t) bme280.calibration.dig_P6;
+ 469              		.loc 1 143 0
+ 470 0048 FA6F     		ldr	r2, [r7, #124]
+ 471 004a BB6F     		ldr	r3, [r7, #120]
+ 472 004c 03FB02F1 		mul	r1, r3, r2
+ 473 0050 FA6F     		ldr	r2, [r7, #124]
+ 474 0052 BB6F     		ldr	r3, [r7, #120]
+ 475 0054 03FB02F3 		mul	r3, r3, r2
+ 476 0058 CC18     		adds	r4, r1, r3
+ 477 005a BA6F     		ldr	r2, [r7, #120]
+ 478 005c BB6F     		ldr	r3, [r7, #120]
+ 479 005e A2FB0301 		umull	r0, r1, r2, r3
+ 480 0062 6318     		adds	r3, r4, r1
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\ccOsInVI.s 			page 12
+
+
+ 481 0064 1946     		mov	r1, r3
+ 482 0066 584B     		ldr	r3, .L11
+ 483 0068 B3F91830 		ldrsh	r3, [r3, #24]
+ 484 006c 1BB2     		sxth	r3, r3
+ 485 006e 4FEAE374 		asr	r4, r3, #31
+ 486 0072 03FB01F5 		mul	r5, r3, r1
+ 487 0076 00FB04F2 		mul	r2, r0, r4
+ 488 007a 2A44     		add	r2, r2, r5
+ 489 007c A0FB0334 		umull	r3, r4, r0, r3
+ 490 0080 2244     		add	r2, r2, r4
+ 491 0082 1446     		mov	r4, r2
+ 492 0084 C7E91C34 		strd	r3, [r7, #112]
+ 493 0088 C7E91C34 		strd	r3, [r7, #112]
+ 144:BME280.c      **** 	var2 = var2 + ((var1 * (int64_t) bme280.calibration.dig_P5)<<17);
+ 494              		.loc 1 144 0
+ 495 008c 4E4B     		ldr	r3, .L11
+ 496 008e B3F91630 		ldrsh	r3, [r3, #22]
+ 497 0092 1BB2     		sxth	r3, r3
+ 498 0094 4FEAE374 		asr	r4, r3, #31
+ 499 0098 BA6F     		ldr	r2, [r7, #120]
+ 500 009a 04FB02F1 		mul	r1, r4, r2
+ 501 009e FA6F     		ldr	r2, [r7, #124]
+ 502 00a0 03FB02F2 		mul	r2, r3, r2
+ 503 00a4 1144     		add	r1, r1, r2
+ 504 00a6 BA6F     		ldr	r2, [r7, #120]
+ 505 00a8 A2FB0334 		umull	r3, r4, r2, r3
+ 506 00ac 0A19     		adds	r2, r1, r4
+ 507 00ae 1446     		mov	r4, r2
+ 508 00b0 4FEA4449 		lsl	r9, r4, #17
+ 509 00b4 49EAD339 		orr	r9, r9, r3, lsr #15
+ 510 00b8 4FEA4348 		lsl	r8, r3, #17
+ 511 00bc D7E91C34 		ldrd	r3, [r7, #112]
+ 512 00c0 13EB0803 		adds	r3, r3, r8
+ 513 00c4 44EB0904 		adc	r4, r4, r9
+ 514 00c8 C7E91C34 		strd	r3, [r7, #112]
+ 145:BME280.c      **** 	var2 = var2 + (((int64_t) bme280.calibration.dig_P4)<<35);
+ 515              		.loc 1 145 0
+ 516 00cc 3E4B     		ldr	r3, .L11
+ 517 00ce B3F91430 		ldrsh	r3, [r3, #20]
+ 518 00d2 1BB2     		sxth	r3, r3
+ 519 00d4 4FEAE374 		asr	r4, r3, #31
+ 520 00d8 DB00     		lsls	r3, r3, #3
+ 521 00da FB60     		str	r3, [r7, #12]
+ 522 00dc 0023     		movs	r3, #0
+ 523 00de BB60     		str	r3, [r7, #8]
+ 524 00e0 D7E91C34 		ldrd	r3, [r7, #112]
+ 525 00e4 D7E90212 		ldrd	r1, [r7, #8]
+ 526 00e8 C918     		adds	r1, r1, r3
+ 527 00ea 42EB0402 		adc	r2, r2, r4
+ 528 00ee 0B46     		mov	r3, r1
+ 529 00f0 1446     		mov	r4, r2
+ 530 00f2 C7E91C34 		strd	r3, [r7, #112]
+ 146:BME280.c      **** 	var1 = ((var1 * var1 * (int64_t) bme280.calibration.dig_P3)>>8) + ((var1 * (int64_t) bme280.calibr
+ 531              		.loc 1 146 0
+ 532 00f6 FA6F     		ldr	r2, [r7, #124]
+ 533 00f8 BB6F     		ldr	r3, [r7, #120]
+ 534 00fa 03FB02F1 		mul	r1, r3, r2
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\ccOsInVI.s 			page 13
+
+
+ 535 00fe FA6F     		ldr	r2, [r7, #124]
+ 536 0100 BB6F     		ldr	r3, [r7, #120]
+ 537 0102 03FB02F3 		mul	r3, r3, r2
+ 538 0106 CC18     		adds	r4, r1, r3
+ 539 0108 BA6F     		ldr	r2, [r7, #120]
+ 540 010a BB6F     		ldr	r3, [r7, #120]
+ 541 010c A2FB0301 		umull	r0, r1, r2, r3
+ 542 0110 6318     		adds	r3, r4, r1
+ 543 0112 1946     		mov	r1, r3
+ 544 0114 2C4B     		ldr	r3, .L11
+ 545 0116 B3F91230 		ldrsh	r3, [r3, #18]
+ 546 011a 1BB2     		sxth	r3, r3
+ 547 011c 4FEAE374 		asr	r4, r3, #31
+ 548 0120 03FB01F5 		mul	r5, r3, r1
+ 549 0124 00FB04F2 		mul	r2, r0, r4
+ 550 0128 2A44     		add	r2, r2, r5
+ 551 012a A0FB0334 		umull	r3, r4, r0, r3
+ 552 012e 2244     		add	r2, r2, r4
+ 553 0130 1446     		mov	r4, r2
+ 554 0132 1A0A     		lsrs	r2, r3, #8
+ 555 0134 3A66     		str	r2, [r7, #96]
+ 556 0136 3A6E     		ldr	r2, [r7, #96]
+ 557 0138 42EA0462 		orr	r2, r2, r4, lsl #24
+ 558 013c 3A66     		str	r2, [r7, #96]
+ 559 013e 2312     		asrs	r3, r4, #8
+ 560 0140 7B66     		str	r3, [r7, #100]
+ 561 0142 214B     		ldr	r3, .L11
+ 562 0144 B3F91030 		ldrsh	r3, [r3, #16]
+ 563 0148 1BB2     		sxth	r3, r3
+ 564 014a 4FEAE374 		asr	r4, r3, #31
+ 565 014e BA6F     		ldr	r2, [r7, #120]
+ 566 0150 04FB02F1 		mul	r1, r4, r2
+ 567 0154 FA6F     		ldr	r2, [r7, #124]
+ 568 0156 03FB02F2 		mul	r2, r3, r2
+ 569 015a 1144     		add	r1, r1, r2
+ 570 015c BA6F     		ldr	r2, [r7, #120]
+ 571 015e A2FB0334 		umull	r3, r4, r2, r3
+ 572 0162 0A19     		adds	r2, r1, r4
+ 573 0164 1446     		mov	r4, r2
+ 574 0166 4FEA043B 		lsl	fp, r4, #12
+ 575 016a 4BEA135B 		orr	fp, fp, r3, lsr #20
+ 576 016e 4FEA033A 		lsl	r10, r3, #12
+ 577 0172 D7E91834 		ldrd	r3, [r7, #96]
+ 578 0176 13EB0A03 		adds	r3, r3, r10
+ 579 017a 44EB0B04 		adc	r4, r4, fp
+ 580 017e C7E91E34 		strd	r3, [r7, #120]
+ 147:BME280.c      **** 	var1 = (((((int64_t)1)<<47)+var1))*((int64_t) bme280.calibration.dig_P1)>>33;
+ 581              		.loc 1 147 0
+ 582 0182 D7E91E34 		ldrd	r3, [r7, #120]
+ 583 0186 191C     		adds	r1, r3, #0
+ 584 0188 44F50042 		adc	r2, r4, #32768
+ 585 018c 0E4B     		ldr	r3, .L11
+ 586 018e DB89     		ldrh	r3, [r3, #14]
+ 587 0190 9BB2     		uxth	r3, r3
+ 588 0192 4FF00004 		mov	r4, #0
+ 589 0196 03FB02F5 		mul	r5, r3, r2
+ 590 019a 01FB04F0 		mul	r0, r1, r4
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\ccOsInVI.s 			page 14
+
+
+ 591 019e 2844     		add	r0, r0, r5
+ 592 01a0 A1FB0334 		umull	r3, r4, r1, r3
+ 593 01a4 0219     		adds	r2, r0, r4
+ 594 01a6 1446     		mov	r4, r2
+ 595 01a8 6210     		asrs	r2, r4, #1
+ 596 01aa 3A60     		str	r2, [r7]
+ 597 01ac E317     		asrs	r3, r4, #31
+ 598 01ae 7B60     		str	r3, [r7, #4]
+ 599 01b0 D7E90034 		ldrd	r3, [r7]
+ 600 01b4 C7E91E34 		strd	r3, [r7, #120]
+ 148:BME280.c      **** 	if (var1 == 0)
+ 601              		.loc 1 148 0
+ 602 01b8 D7E91E34 		ldrd	r3, [r7, #120]
+ 603 01bc 2343     		orrs	r3, r3, r4
+ 604 01be 05D1     		bne	.L9
+ 149:BME280.c      **** 	{
+ 150:BME280.c      **** 		return 0; // avoid exception caused by division by zero
+ 605              		.loc 1 150 0
+ 606 01c0 4FF00003 		mov	r3, #0
+ 607 01c4 F3E0     		b	.L10
+ 608              	.L12:
+ 609 01c6 00BF     		.align	2
+ 610              	.L11:
+ 611 01c8 00000000 		.word	bme280
+ 612              	.L9:
+ 151:BME280.c      **** 	}
+ 152:BME280.c      **** 	p_acc = 1048576 - adc_P;
+ 613              		.loc 1 152 0
+ 614 01cc D7F88430 		ldr	r3, [r7, #132]
+ 615 01d0 C3F58013 		rsb	r3, r3, #1048576
+ 616 01d4 4FEAE374 		asr	r4, r3, #31
+ 617 01d8 C7E91A34 		strd	r3, [r7, #104]
+ 153:BME280.c      **** 	p_acc = (((p_acc<<31) - var2)*3125)/var1;
+ 618              		.loc 1 153 0
+ 619 01dc D7E91A34 		ldrd	r3, [r7, #104]
+ 620 01e0 E207     		lsls	r2, r4, #31
+ 621 01e2 FA65     		str	r2, [r7, #92]
+ 622 01e4 FA6D     		ldr	r2, [r7, #92]
+ 623 01e6 42EA5302 		orr	r2, r2, r3, lsr #1
+ 624 01ea FA65     		str	r2, [r7, #92]
+ 625 01ec DB07     		lsls	r3, r3, #31
+ 626 01ee BB65     		str	r3, [r7, #88]
+ 627 01f0 D7E91C34 		ldrd	r3, [r7, #112]
+ 628 01f4 D7E91612 		ldrd	r1, [r7, #88]
+ 629 01f8 C91A     		subs	r1, r1, r3
+ 630 01fa 62EB0402 		sbc	r2, r2, r4
+ 631 01fe 0B46     		mov	r3, r1
+ 632 0200 1446     		mov	r4, r2
+ 633 0202 DB18     		adds	r3, r3, r3
+ 634 0204 44EB0404 		adc	r4, r4, r4
+ 635 0208 5B18     		adds	r3, r3, r1
+ 636 020a 44EB0204 		adc	r4, r4, r2
+ 637 020e A001     		lsls	r0, r4, #6
+ 638 0210 7863     		str	r0, [r7, #52]
+ 639 0212 786B     		ldr	r0, [r7, #52]
+ 640 0214 40EA9360 		orr	r0, r0, r3, lsr #26
+ 641 0218 7863     		str	r0, [r7, #52]
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\ccOsInVI.s 			page 15
+
+
+ 642 021a 9801     		lsls	r0, r3, #6
+ 643 021c 3863     		str	r0, [r7, #48]
+ 644 021e D7E90C89 		ldrd	r8, [r7, #48]
+ 645 0222 18EB0308 		adds	r8, r8, r3
+ 646 0226 49EB0409 		adc	r9, r9, r4
+ 647 022a 4346     		mov	r3, r8
+ 648 022c 4C46     		mov	r4, r9
+ 649 022e A000     		lsls	r0, r4, #2
+ 650 0230 F862     		str	r0, [r7, #44]
+ 651 0232 F86A     		ldr	r0, [r7, #44]
+ 652 0234 40EA9370 		orr	r0, r0, r3, lsr #30
+ 653 0238 F862     		str	r0, [r7, #44]
+ 654 023a 9B00     		lsls	r3, r3, #2
+ 655 023c BB62     		str	r3, [r7, #40]
+ 656 023e D7E90A34 		ldrd	r3, [r7, #40]
+ 657 0242 5B18     		adds	r3, r3, r1
+ 658 0244 44EB0204 		adc	r4, r4, r2
+ 659 0248 A000     		lsls	r0, r4, #2
+ 660 024a 7862     		str	r0, [r7, #36]
+ 661 024c 786A     		ldr	r0, [r7, #36]
+ 662 024e 40EA9370 		orr	r0, r0, r3, lsr #30
+ 663 0252 7862     		str	r0, [r7, #36]
+ 664 0254 9B00     		lsls	r3, r3, #2
+ 665 0256 3B62     		str	r3, [r7, #32]
+ 666 0258 D7E90834 		ldrd	r3, [r7, #32]
+ 667 025c 13EB0108 		adds	r8, r3, r1
+ 668 0260 44EB0209 		adc	r9, r4, r2
+ 669 0264 4046     		mov	r0, r8
+ 670 0266 4946     		mov	r1, r9
+ 671 0268 D7E91E23 		ldrd	r2, [r7, #120]
+ 672 026c FFF7FEFF 		bl	__aeabi_ldivmod
+ 673 0270 0346     		mov	r3, r0
+ 674 0272 0C46     		mov	r4, r1
+ 675 0274 C7E91A34 		strd	r3, [r7, #104]
+ 154:BME280.c      **** 	var1 = (((int64_t) bme280.calibration.dig_P9) * (p_acc>>13) * (p_acc>>13)) >> 25;
+ 676              		.loc 1 154 0
+ 677 0278 4F4B     		ldr	r3, .L13
+ 678 027a B3F91E30 		ldrsh	r3, [r3, #30]
+ 679 027e 18B2     		sxth	r0, r3
+ 680 0280 4FEAE071 		asr	r1, r0, #31
+ 681 0284 D7E91A34 		ldrd	r3, [r7, #104]
+ 682 0288 5A0B     		lsrs	r2, r3, #13
+ 683 028a 3A65     		str	r2, [r7, #80]
+ 684 028c 3A6D     		ldr	r2, [r7, #80]
+ 685 028e 42EAC442 		orr	r2, r2, r4, lsl #19
+ 686 0292 3A65     		str	r2, [r7, #80]
+ 687 0294 6313     		asrs	r3, r4, #13
+ 688 0296 7B65     		str	r3, [r7, #84]
+ 689 0298 D7E91445 		ldrd	r4, [r7, #80]
+ 690 029c 2346     		mov	r3, r4
+ 691 029e 03FB01F2 		mul	r2, r3, r1
+ 692 02a2 2B46     		mov	r3, r5
+ 693 02a4 00FB03F3 		mul	r3, r0, r3
+ 694 02a8 1A44     		add	r2, r2, r3
+ 695 02aa 2346     		mov	r3, r4
+ 696 02ac A0FB0334 		umull	r3, r4, r0, r3
+ 697 02b0 2244     		add	r2, r2, r4
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\ccOsInVI.s 			page 16
+
+
+ 698 02b2 1446     		mov	r4, r2
+ 699 02b4 D7E91A12 		ldrd	r1, [r7, #104]
+ 700 02b8 480B     		lsrs	r0, r1, #13
+ 701 02ba B864     		str	r0, [r7, #72]
+ 702 02bc B86C     		ldr	r0, [r7, #72]
+ 703 02be 40EAC240 		orr	r0, r0, r2, lsl #19
+ 704 02c2 B864     		str	r0, [r7, #72]
+ 705 02c4 5213     		asrs	r2, r2, #13
+ 706 02c6 FA64     		str	r2, [r7, #76]
+ 707 02c8 D7E91289 		ldrd	r8, [r7, #72]
+ 708 02cc 4246     		mov	r2, r8
+ 709 02ce 02FB04F1 		mul	r1, r2, r4
+ 710 02d2 4A46     		mov	r2, r9
+ 711 02d4 03FB02F2 		mul	r2, r3, r2
+ 712 02d8 0A44     		add	r2, r2, r1
+ 713 02da 4146     		mov	r1, r8
+ 714 02dc A3FB0134 		umull	r3, r4, r3, r1
+ 715 02e0 2244     		add	r2, r2, r4
+ 716 02e2 1446     		mov	r4, r2
+ 717 02e4 5A0E     		lsrs	r2, r3, #25
+ 718 02e6 BA61     		str	r2, [r7, #24]
+ 719 02e8 BA69     		ldr	r2, [r7, #24]
+ 720 02ea 42EAC412 		orr	r2, r2, r4, lsl #7
+ 721 02ee BA61     		str	r2, [r7, #24]
+ 722 02f0 6316     		asrs	r3, r4, #25
+ 723 02f2 FB61     		str	r3, [r7, #28]
+ 724 02f4 D7E90634 		ldrd	r3, [r7, #24]
+ 725 02f8 C7E91E34 		strd	r3, [r7, #120]
+ 155:BME280.c      **** 	var2 = (((int64_t) bme280.calibration.dig_P8) * p_acc) >> 19;
+ 726              		.loc 1 155 0
+ 727 02fc 2E4B     		ldr	r3, .L13
+ 728 02fe B3F91C30 		ldrsh	r3, [r3, #28]
+ 729 0302 1BB2     		sxth	r3, r3
+ 730 0304 4FEAE374 		asr	r4, r3, #31
+ 731 0308 BA6E     		ldr	r2, [r7, #104]
+ 732 030a 04FB02F1 		mul	r1, r4, r2
+ 733 030e FA6E     		ldr	r2, [r7, #108]
+ 734 0310 03FB02F2 		mul	r2, r3, r2
+ 735 0314 0A44     		add	r2, r2, r1
+ 736 0316 B96E     		ldr	r1, [r7, #104]
+ 737 0318 A1FB0334 		umull	r3, r4, r1, r3
+ 738 031c 2244     		add	r2, r2, r4
+ 739 031e 1446     		mov	r4, r2
+ 740 0320 DA0C     		lsrs	r2, r3, #19
+ 741 0322 3A61     		str	r2, [r7, #16]
+ 742 0324 3A69     		ldr	r2, [r7, #16]
+ 743 0326 42EA4432 		orr	r2, r2, r4, lsl #13
+ 744 032a 3A61     		str	r2, [r7, #16]
+ 745 032c E314     		asrs	r3, r4, #19
+ 746 032e 7B61     		str	r3, [r7, #20]
+ 747 0330 D7E90434 		ldrd	r3, [r7, #16]
+ 748 0334 C7E91C34 		strd	r3, [r7, #112]
+ 156:BME280.c      **** 	p_acc = ((p_acc + var1 + var2) >> 8) + (((int64_t) bme280.calibration.dig_P7)<<4);
+ 749              		.loc 1 156 0
+ 750 0338 D7E91A12 		ldrd	r1, [r7, #104]
+ 751 033c D7E91E34 		ldrd	r3, [r7, #120]
+ 752 0340 C918     		adds	r1, r1, r3
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\ccOsInVI.s 			page 17
+
+
+ 753 0342 42EB0402 		adc	r2, r2, r4
+ 754 0346 D7E91C34 		ldrd	r3, [r7, #112]
+ 755 034a 5B18     		adds	r3, r3, r1
+ 756 034c 44EB0204 		adc	r4, r4, r2
+ 757 0350 1A0A     		lsrs	r2, r3, #8
+ 758 0352 3A64     		str	r2, [r7, #64]
+ 759 0354 3A6C     		ldr	r2, [r7, #64]
+ 760 0356 42EA0462 		orr	r2, r2, r4, lsl #24
+ 761 035a 3A64     		str	r2, [r7, #64]
+ 762 035c 2312     		asrs	r3, r4, #8
+ 763 035e 7B64     		str	r3, [r7, #68]
+ 764 0360 154B     		ldr	r3, .L13
+ 765 0362 B3F91A30 		ldrsh	r3, [r3, #26]
+ 766 0366 1BB2     		sxth	r3, r3
+ 767 0368 4FEAE374 		asr	r4, r3, #31
+ 768 036c 2201     		lsls	r2, r4, #4
+ 769 036e FA63     		str	r2, [r7, #60]
+ 770 0370 FA6B     		ldr	r2, [r7, #60]
+ 771 0372 42EA1372 		orr	r2, r2, r3, lsr #28
+ 772 0376 FA63     		str	r2, [r7, #60]
+ 773 0378 1B01     		lsls	r3, r3, #4
+ 774 037a BB63     		str	r3, [r7, #56]
+ 775 037c D7E91034 		ldrd	r3, [r7, #64]
+ 776 0380 D7E90E12 		ldrd	r1, [r7, #56]
+ 777 0384 5B18     		adds	r3, r3, r1
+ 778 0386 44EB0204 		adc	r4, r4, r2
+ 779 038a C7E91A34 		strd	r3, [r7, #104]
+ 157:BME280.c      **** 	
+ 158:BME280.c      ****     bme280.press_Pa = (float)p_acc / 256.0;
+ 780              		.loc 1 158 0
+ 781 038e D7E91A01 		ldrd	r0, [r7, #104]
+ 782 0392 FFF7FEFF 		bl	__aeabi_l2f
+ 783 0396 0346     		mov	r3, r0
+ 784 0398 4FF08741 		mov	r1, #1132462080
+ 785 039c 1846     		mov	r0, r3
+ 786 039e FFF7FEFF 		bl	__aeabi_fdiv
+ 787 03a2 0346     		mov	r3, r0
+ 788 03a4 1A46     		mov	r2, r3
+ 789 03a6 044B     		ldr	r3, .L13
+ 790 03a8 9A62     		str	r2, [r3, #40]	@ float
+ 159:BME280.c      ****     return bme280.press_Pa;
+ 791              		.loc 1 159 0
+ 792 03aa 034B     		ldr	r3, .L13
+ 793 03ac 9B6A     		ldr	r3, [r3, #40]	@ float
+ 794              	.L10:
+ 160:BME280.c      **** 	
+ 161:BME280.c      **** }
+ 795              		.loc 1 161 0
+ 796 03ae 1846     		mov	r0, r3
+ 797 03b0 8837     		adds	r7, r7, #136
+ 798              		.cfi_def_cfa_offset 32
+ 799 03b2 BD46     		mov	sp, r7
+ 800              		.cfi_def_cfa_register 13
+ 801              		@ sp needed
+ 802 03b4 BDE8B08F 		pop	{r4, r5, r7, r8, r9, r10, fp, pc}
+ 803              	.L14:
+ 804              		.align	2
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\ccOsInVI.s 			page 18
+
+
+ 805              	.L13:
+ 806 03b8 00000000 		.word	bme280
+ 807              		.cfi_endproc
+ 808              	.LFE67:
+ 809              		.size	BME280_readFloatPressure, .-BME280_readFloatPressure
+ 810              		.global	__aeabi_f2d
+ 811              		.global	__aeabi_dsub
+ 812              		.global	__aeabi_dmul
+ 813              		.global	__aeabi_d2f
+ 814              		.section	.text.BME280_readFloatAltitudeMeters,"ax",%progbits
+ 815              		.align	2
+ 816              		.global	BME280_readFloatAltitudeMeters
+ 817              		.thumb
+ 818              		.thumb_func
+ 819              		.type	BME280_readFloatAltitudeMeters, %function
+ 820              	BME280_readFloatAltitudeMeters:
+ 821              	.LFB68:
+ 162:BME280.c      **** 
+ 163:BME280.c      **** float BME280_readFloatAltitudeMeters( void )
+ 164:BME280.c      **** {
+ 822              		.loc 1 164 0
+ 823              		.cfi_startproc
+ 824              		@ args = 0, pretend = 0, frame = 8
+ 825              		@ frame_needed = 1, uses_anonymous_args = 0
+ 826 0000 90B5     		push	{r4, r7, lr}
+ 827              		.cfi_def_cfa_offset 12
+ 828              		.cfi_offset 4, -12
+ 829              		.cfi_offset 7, -8
+ 830              		.cfi_offset 14, -4
+ 831 0002 83B0     		sub	sp, sp, #12
+ 832              		.cfi_def_cfa_offset 24
+ 833 0004 00AF     		add	r7, sp, #0
+ 834              		.cfi_def_cfa_register 7
+ 165:BME280.c      **** 	float heightOutput = 0;
+ 835              		.loc 1 165 0
+ 836 0006 4FF00003 		mov	r3, #0
+ 837 000a 7B60     		str	r3, [r7, #4]	@ float
+ 166:BME280.c      **** 	
+ 167:BME280.c      **** 	heightOutput = ((float)-45846.2)*(pow(((float) BME280_readFloatPressure()/(float) P_SURFACE), 0.19
+ 838              		.loc 1 167 0
+ 839 000c FFF7FEFF 		bl	BME280_readFloatPressure
+ 840 0010 0346     		mov	r3, r0
+ 841 0012 1949     		ldr	r1, .L17+16
+ 842 0014 1846     		mov	r0, r3
+ 843 0016 FFF7FEFF 		bl	__aeabi_fdiv
+ 844 001a 0346     		mov	r3, r0
+ 845 001c 1846     		mov	r0, r3
+ 846 001e FFF7FEFF 		bl	__aeabi_f2d
+ 847 0022 11A3     		adr	r3, .L17
+ 848 0024 D3E90023 		ldrd	r2, [r3]
+ 849 0028 FFF7FEFF 		bl	pow
+ 850 002c 4FF00002 		mov	r2, #0
+ 851 0030 124B     		ldr	r3, .L17+20
+ 852 0032 FFF7FEFF 		bl	__aeabi_dsub
+ 853 0036 0346     		mov	r3, r0
+ 854 0038 0C46     		mov	r4, r1
+ 855 003a 1846     		mov	r0, r3
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\ccOsInVI.s 			page 19
+
+
+ 856 003c 2146     		mov	r1, r4
+ 857 003e 0CA3     		adr	r3, .L17+8
+ 858 0040 D3E90023 		ldrd	r2, [r3]
+ 859 0044 FFF7FEFF 		bl	__aeabi_dmul
+ 860 0048 0346     		mov	r3, r0
+ 861 004a 0C46     		mov	r4, r1
+ 862 004c 1846     		mov	r0, r3
+ 863 004e 2146     		mov	r1, r4
+ 864 0050 FFF7FEFF 		bl	__aeabi_d2f
+ 865 0054 0346     		mov	r3, r0
+ 866 0056 7B60     		str	r3, [r7, #4]	@ float
+ 168:BME280.c      **** 	return heightOutput;
+ 867              		.loc 1 168 0
+ 868 0058 7B68     		ldr	r3, [r7, #4]	@ float
+ 169:BME280.c      **** 	
+ 170:BME280.c      **** }
+ 869              		.loc 1 170 0
+ 870 005a 1846     		mov	r0, r3
+ 871 005c 0C37     		adds	r7, r7, #12
+ 872              		.cfi_def_cfa_offset 12
+ 873 005e BD46     		mov	sp, r7
+ 874              		.cfi_def_cfa_register 13
+ 875              		@ sp needed
+ 876 0060 90BD     		pop	{r4, r7, pc}
+ 877              	.L18:
+ 878 0062 00BFAFF3 		.align	3
+ 878      0080
+ 879              	.L17:
+ 880 0068 C5C551B9 		.word	-1185823291
+ 881 006c 895AC83F 		.word	1070094985
+ 882 0070 00000060 		.word	1610612736
+ 883 0074 C662E6C0 		.word	-1058643258
+ 884 0078 80E6C547 		.word	1204151936
+ 885 007c 0000F03F 		.word	1072693248
+ 886              		.cfi_endproc
+ 887              	.LFE68:
+ 888              		.size	BME280_readFloatAltitudeMeters, .-BME280_readFloatAltitudeMeters
+ 889              		.section	.text.BME280_readFloatAltitudeFeet,"ax",%progbits
+ 890              		.align	2
+ 891              		.global	BME280_readFloatAltitudeFeet
+ 892              		.thumb
+ 893              		.thumb_func
+ 894              		.type	BME280_readFloatAltitudeFeet, %function
+ 895              	BME280_readFloatAltitudeFeet:
+ 896              	.LFB69:
+ 171:BME280.c      **** 
+ 172:BME280.c      **** float BME280_readFloatAltitudeFeet( void )
+ 173:BME280.c      **** {
+ 897              		.loc 1 173 0
+ 898              		.cfi_startproc
+ 899              		@ args = 0, pretend = 0, frame = 8
+ 900              		@ frame_needed = 1, uses_anonymous_args = 0
+ 901 0000 90B5     		push	{r4, r7, lr}
+ 902              		.cfi_def_cfa_offset 12
+ 903              		.cfi_offset 4, -12
+ 904              		.cfi_offset 7, -8
+ 905              		.cfi_offset 14, -4
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\ccOsInVI.s 			page 20
+
+
+ 906 0002 83B0     		sub	sp, sp, #12
+ 907              		.cfi_def_cfa_offset 24
+ 908 0004 00AF     		add	r7, sp, #0
+ 909              		.cfi_def_cfa_register 7
+ 174:BME280.c      **** 	float heightOutput = 0;
+ 910              		.loc 1 174 0
+ 911 0006 4FF00003 		mov	r3, #0
+ 912 000a 7B60     		str	r3, [r7, #4]	@ float
+ 175:BME280.c      **** 	
+ 176:BME280.c      **** 	heightOutput = BME280_readFloatAltitudeMeters() * 3.28084;
+ 913              		.loc 1 176 0
+ 914 000c FFF7FEFF 		bl	BME280_readFloatAltitudeMeters
+ 915 0010 0346     		mov	r3, r0
+ 916 0012 1846     		mov	r0, r3
+ 917 0014 FFF7FEFF 		bl	__aeabi_f2d
+ 918 0018 09A3     		adr	r3, .L21
+ 919 001a D3E90023 		ldrd	r2, [r3]
+ 920 001e FFF7FEFF 		bl	__aeabi_dmul
+ 921 0022 0346     		mov	r3, r0
+ 922 0024 0C46     		mov	r4, r1
+ 923 0026 1846     		mov	r0, r3
+ 924 0028 2146     		mov	r1, r4
+ 925 002a FFF7FEFF 		bl	__aeabi_d2f
+ 926 002e 0346     		mov	r3, r0
+ 927 0030 7B60     		str	r3, [r7, #4]	@ float
+ 177:BME280.c      **** 	return heightOutput;
+ 928              		.loc 1 177 0
+ 929 0032 7B68     		ldr	r3, [r7, #4]	@ float
+ 178:BME280.c      **** 	
+ 179:BME280.c      **** }
+ 930              		.loc 1 179 0
+ 931 0034 1846     		mov	r0, r3
+ 932 0036 0C37     		adds	r7, r7, #12
+ 933              		.cfi_def_cfa_offset 12
+ 934 0038 BD46     		mov	sp, r7
+ 935              		.cfi_def_cfa_register 13
+ 936              		@ sp needed
+ 937 003a 90BD     		pop	{r4, r7, pc}
+ 938              	.L22:
+ 939 003c AFF30080 		.align	3
+ 940              	.L21:
+ 941 0040 E544BB0A 		.word	180045029
+ 942 0044 293F0A40 		.word	1074413353
+ 943              		.cfi_endproc
+ 944              	.LFE69:
+ 945              		.size	BME280_readFloatAltitudeFeet, .-BME280_readFloatAltitudeFeet
+ 946              		.global	__aeabi_i2f
+ 947              		.section	.text.BME280_readTempC,"ax",%progbits
+ 948              		.align	2
+ 949              		.global	BME280_readTempC
+ 950              		.thumb
+ 951              		.thumb_func
+ 952              		.type	BME280_readTempC, %function
+ 953              	BME280_readTempC:
+ 954              	.LFB70:
+ 180:BME280.c      **** 
+ 181:BME280.c      **** 
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\ccOsInVI.s 			page 21
+
+
+ 182:BME280.c      **** 
+ 183:BME280.c      **** 
+ 184:BME280.c      **** //****************************************************************************//
+ 185:BME280.c      **** //
+ 186:BME280.c      **** //  Temperature Section
+ 187:BME280.c      **** //
+ 188:BME280.c      **** //****************************************************************************//
+ 189:BME280.c      **** 
+ 190:BME280.c      **** float BME280_readTempC( void )
+ 191:BME280.c      **** {
+ 955              		.loc 1 191 0
+ 956              		.cfi_startproc
+ 957              		@ args = 0, pretend = 0, frame = 32
+ 958              		@ frame_needed = 1, uses_anonymous_args = 0
+ 959 0000 90B5     		push	{r4, r7, lr}
+ 960              		.cfi_def_cfa_offset 12
+ 961              		.cfi_offset 4, -12
+ 962              		.cfi_offset 7, -8
+ 963              		.cfi_offset 14, -4
+ 964 0002 89B0     		sub	sp, sp, #36
+ 965              		.cfi_def_cfa_offset 48
+ 966 0004 00AF     		add	r7, sp, #0
+ 967              		.cfi_def_cfa_register 7
+ 192:BME280.c      **** 	// Returns temperature in DegC, resolution is 0.01 DegC. Output value of “5123” equals 51.23 D
+ 193:BME280.c      **** 	// t_fine carries fine temperature as global value
+ 194:BME280.c      **** 
+ 195:BME280.c      **** 	//get the reading (adc_T);
+ 196:BME280.c      **** 	int32_t adc_T = ((uint32_t)BME280_readRegister(BME280_TEMPERATURE_MSB_REG) << 12) | ((uint32_t)BME
+ 968              		.loc 1 196 0
+ 969 0006 FA20     		movs	r0, #250
+ 970 0008 FFF7FEFF 		bl	BME280_readRegister
+ 971 000c 0346     		mov	r3, r0
+ 972 000e 1C03     		lsls	r4, r3, #12
+ 973 0010 FB20     		movs	r0, #251
+ 974 0012 FFF7FEFF 		bl	BME280_readRegister
+ 975 0016 0346     		mov	r3, r0
+ 976 0018 1B01     		lsls	r3, r3, #4
+ 977 001a 1C43     		orrs	r4, r4, r3
+ 978 001c FC20     		movs	r0, #252
+ 979 001e FFF7FEFF 		bl	BME280_readRegister
+ 980 0022 0346     		mov	r3, r0
+ 981 0024 1B09     		lsrs	r3, r3, #4
+ 982 0026 DBB2     		uxtb	r3, r3
+ 983 0028 03F00F03 		and	r3, r3, #15
+ 984 002c 2343     		orrs	r3, r3, r4
+ 985 002e FB61     		str	r3, [r7, #28]
+ 197:BME280.c      **** 
+ 198:BME280.c      **** 	//By datasheet, calibrate
+ 199:BME280.c      **** 	int64_t var1, var2;
+ 200:BME280.c      **** 
+ 201:BME280.c      **** 	var1 = ((((adc_T>>3) - ((int32_t)bme280.calibration.dig_T1<<1))) * ((int32_t)bme280.calibration.di
+ 986              		.loc 1 201 0
+ 987 0030 FB69     		ldr	r3, [r7, #28]
+ 988 0032 DA10     		asrs	r2, r3, #3
+ 989 0034 224B     		ldr	r3, .L25
+ 990 0036 1B89     		ldrh	r3, [r3, #8]
+ 991 0038 5B00     		lsls	r3, r3, #1
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\ccOsInVI.s 			page 22
+
+
+ 992 003a D31A     		subs	r3, r2, r3
+ 993 003c 204A     		ldr	r2, .L25
+ 994 003e B2F90A20 		ldrsh	r2, [r2, #10]
+ 995 0042 02FB03F3 		mul	r3, r2, r3
+ 996 0046 DB12     		asrs	r3, r3, #11
+ 997 0048 4FEAE374 		asr	r4, r3, #31
+ 998 004c C7E90434 		strd	r3, [r7, #16]
+ 202:BME280.c      **** 	var2 = (((((adc_T>>4) - ((int32_t)bme280.calibration.dig_T1)) * ((adc_T>>4) - ((int32_t)bme280.cal
+ 999              		.loc 1 202 0
+ 1000 0050 FB69     		ldr	r3, [r7, #28]
+ 1001 0052 1B11     		asrs	r3, r3, #4
+ 1002 0054 1A4A     		ldr	r2, .L25
+ 1003 0056 1289     		ldrh	r2, [r2, #8]
+ 1004 0058 9B1A     		subs	r3, r3, r2
+ 1005 005a FA69     		ldr	r2, [r7, #28]
+ 1006 005c 1211     		asrs	r2, r2, #4
+ 1007 005e 1849     		ldr	r1, .L25
+ 1008 0060 0989     		ldrh	r1, [r1, #8]
+ 1009 0062 521A     		subs	r2, r2, r1
+ 1010 0064 02FB03F3 		mul	r3, r2, r3
+ 1011 0068 1B13     		asrs	r3, r3, #12
+ 1012 006a 154A     		ldr	r2, .L25
+ 1013 006c B2F90C20 		ldrsh	r2, [r2, #12]
+ 1014 0070 02FB03F3 		mul	r3, r2, r3
+ 1015 0074 9B13     		asrs	r3, r3, #14
+ 1016 0076 4FEAE374 		asr	r4, r3, #31
+ 1017 007a C7E90234 		strd	r3, [r7, #8]
+ 203:BME280.c      **** 	
+ 204:BME280.c      ****     bme280.t_fine = var1 + var2;
+ 1018              		.loc 1 204 0
+ 1019 007e 3A69     		ldr	r2, [r7, #16]
+ 1020 0080 BB68     		ldr	r3, [r7, #8]
+ 1021 0082 1344     		add	r3, r3, r2
+ 1022 0084 1A46     		mov	r2, r3
+ 1023 0086 0E4B     		ldr	r3, .L25
+ 1024 0088 1A62     		str	r2, [r3, #32]
+ 205:BME280.c      **** 	float output = (bme280.t_fine * 5 + 128) >> 8;
+ 1025              		.loc 1 205 0
+ 1026 008a 0D4B     		ldr	r3, .L25
+ 1027 008c 1A6A     		ldr	r2, [r3, #32]
+ 1028 008e 1346     		mov	r3, r2
+ 1029 0090 9B00     		lsls	r3, r3, #2
+ 1030 0092 1344     		add	r3, r3, r2
+ 1031 0094 8033     		adds	r3, r3, #128
+ 1032 0096 1B12     		asrs	r3, r3, #8
+ 1033 0098 1846     		mov	r0, r3
+ 1034 009a FFF7FEFF 		bl	__aeabi_i2f
+ 1035 009e 0346     		mov	r3, r0
+ 1036 00a0 7B60     		str	r3, [r7, #4]	@ float
+ 206:BME280.c      **** 
+ 207:BME280.c      **** 	output = output / 100;
+ 1037              		.loc 1 207 0
+ 1038 00a2 0849     		ldr	r1, .L25+4
+ 1039 00a4 7868     		ldr	r0, [r7, #4]	@ float
+ 1040 00a6 FFF7FEFF 		bl	__aeabi_fdiv
+ 1041 00aa 0346     		mov	r3, r0
+ 1042 00ac 7B60     		str	r3, [r7, #4]	@ float
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\ccOsInVI.s 			page 23
+
+
+ 208:BME280.c      **** 	
+ 209:BME280.c      ****     bme280.temp_C = output;
+ 1043              		.loc 1 209 0
+ 1044 00ae 044A     		ldr	r2, .L25
+ 1045 00b0 7B68     		ldr	r3, [r7, #4]	@ float
+ 1046 00b2 5362     		str	r3, [r2, #36]	@ float
+ 210:BME280.c      **** 	return bme280.temp_C;
+ 1047              		.loc 1 210 0
+ 1048 00b4 024B     		ldr	r3, .L25
+ 1049 00b6 5B6A     		ldr	r3, [r3, #36]	@ float
+ 211:BME280.c      **** }
+ 1050              		.loc 1 211 0
+ 1051 00b8 1846     		mov	r0, r3
+ 1052 00ba 2437     		adds	r7, r7, #36
+ 1053              		.cfi_def_cfa_offset 12
+ 1054 00bc BD46     		mov	sp, r7
+ 1055              		.cfi_def_cfa_register 13
+ 1056              		@ sp needed
+ 1057 00be 90BD     		pop	{r4, r7, pc}
+ 1058              	.L26:
+ 1059              		.align	2
+ 1060              	.L25:
+ 1061 00c0 00000000 		.word	bme280
+ 1062 00c4 0000C842 		.word	1120403456
+ 1063              		.cfi_endproc
+ 1064              	.LFE70:
+ 1065              		.size	BME280_readTempC, .-BME280_readTempC
+ 1066              		.global	__aeabi_fmul
+ 1067              		.global	__aeabi_fadd
+ 1068              		.section	.text.BME280_readTempF,"ax",%progbits
+ 1069              		.align	2
+ 1070              		.global	BME280_readTempF
+ 1071              		.thumb
+ 1072              		.thumb_func
+ 1073              		.type	BME280_readTempF, %function
+ 1074              	BME280_readTempF:
+ 1075              	.LFB71:
+ 212:BME280.c      **** 
+ 213:BME280.c      **** float BME280_readTempF( void )
+ 214:BME280.c      **** {
+ 1076              		.loc 1 214 0
+ 1077              		.cfi_startproc
+ 1078              		@ args = 0, pretend = 0, frame = 8
+ 1079              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1080 0000 80B5     		push	{r7, lr}
+ 1081              		.cfi_def_cfa_offset 8
+ 1082              		.cfi_offset 7, -8
+ 1083              		.cfi_offset 14, -4
+ 1084 0002 82B0     		sub	sp, sp, #8
+ 1085              		.cfi_def_cfa_offset 16
+ 1086 0004 00AF     		add	r7, sp, #0
+ 1087              		.cfi_def_cfa_register 7
+ 215:BME280.c      **** 	float output = BME280_readTempC();
+ 1088              		.loc 1 215 0
+ 1089 0006 FFF7FEFF 		bl	BME280_readTempC
+ 1090 000a 7860     		str	r0, [r7, #4]	@ float
+ 216:BME280.c      **** 	output = (output * 9) / 5 + 32;
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\ccOsInVI.s 			page 24
+
+
+ 1091              		.loc 1 216 0
+ 1092 000c 0A49     		ldr	r1, .L29
+ 1093 000e 7868     		ldr	r0, [r7, #4]	@ float
+ 1094 0010 FFF7FEFF 		bl	__aeabi_fmul
+ 1095 0014 0346     		mov	r3, r0
+ 1096 0016 0949     		ldr	r1, .L29+4
+ 1097 0018 1846     		mov	r0, r3
+ 1098 001a FFF7FEFF 		bl	__aeabi_fdiv
+ 1099 001e 0346     		mov	r3, r0
+ 1100 0020 4FF08441 		mov	r1, #1107296256
+ 1101 0024 1846     		mov	r0, r3
+ 1102 0026 FFF7FEFF 		bl	__aeabi_fadd
+ 1103 002a 0346     		mov	r3, r0
+ 1104 002c 7B60     		str	r3, [r7, #4]	@ float
+ 217:BME280.c      **** 
+ 218:BME280.c      **** 	return output;
+ 1105              		.loc 1 218 0
+ 1106 002e 7B68     		ldr	r3, [r7, #4]	@ float
+ 219:BME280.c      **** }
+ 1107              		.loc 1 219 0
+ 1108 0030 1846     		mov	r0, r3
+ 1109 0032 0837     		adds	r7, r7, #8
+ 1110              		.cfi_def_cfa_offset 8
+ 1111 0034 BD46     		mov	sp, r7
+ 1112              		.cfi_def_cfa_register 13
+ 1113              		@ sp needed
+ 1114 0036 80BD     		pop	{r7, pc}
+ 1115              	.L30:
+ 1116              		.align	2
+ 1117              	.L29:
+ 1118 0038 00001041 		.word	1091567616
+ 1119 003c 0000A040 		.word	1084227584
+ 1120              		.cfi_endproc
+ 1121              	.LFE71:
+ 1122              		.size	BME280_readTempF, .-BME280_readTempF
+ 1123              		.section	.text.BME280_readRegister,"ax",%progbits
+ 1124              		.align	2
+ 1125              		.global	BME280_readRegister
+ 1126              		.thumb
+ 1127              		.thumb_func
+ 1128              		.type	BME280_readRegister, %function
+ 1129              	BME280_readRegister:
+ 1130              	.LFB72:
+ 220:BME280.c      **** 
+ 221:BME280.c      **** //****************************************************************************//
+ 222:BME280.c      **** //
+ 223:BME280.c      **** //  Utility
+ 224:BME280.c      **** //
+ 225:BME280.c      **** //****************************************************************************//
+ 226:BME280.c      **** uint8_t BME280_readRegister(uint8_t offset)
+ 227:BME280.c      **** {
+ 1131              		.loc 1 227 0
+ 1132              		.cfi_startproc
+ 1133              		@ args = 0, pretend = 0, frame = 16
+ 1134              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1135 0000 80B5     		push	{r7, lr}
+ 1136              		.cfi_def_cfa_offset 8
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\ccOsInVI.s 			page 25
+
+
+ 1137              		.cfi_offset 7, -8
+ 1138              		.cfi_offset 14, -4
+ 1139 0002 84B0     		sub	sp, sp, #16
+ 1140              		.cfi_def_cfa_offset 24
+ 1141 0004 00AF     		add	r7, sp, #0
+ 1142              		.cfi_def_cfa_register 7
+ 1143 0006 0346     		mov	r3, r0
+ 1144 0008 FB71     		strb	r3, [r7, #7]
+ 228:BME280.c      **** 	//Return value
+ 229:BME280.c      **** 	uint8_t result;
+ 230:BME280.c      **** 	uint8_t numBytes = 1;
+ 1145              		.loc 1 230 0
+ 1146 000a 0123     		movs	r3, #1
+ 1147 000c 7B73     		strb	r3, [r7, #13]
+ 231:BME280.c      ****     
+ 232:BME280.c      ****     uint16  iter;
+ 233:BME280.c      ****     
+ 234:BME280.c      **** 	switch (bme280.settings.commInterface) {
+ 1148              		.loc 1 234 0
+ 1149 000e 244B     		ldr	r3, .L48
+ 1150 0010 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 1151 0012 002B     		cmp	r3, #0
+ 1152 0014 02D0     		beq	.L33
+ 1153 0016 012B     		cmp	r3, #1
+ 1154 0018 3CD0     		beq	.L45
+ 235:BME280.c      **** 
+ 236:BME280.c      ****     	case BME280_I2C_MODE:
+ 237:BME280.c      ****             I2C_Wakeup();
+ 238:BME280.c      ****             I2C_MasterClearStatus(); /* Clear any previous status */
+ 239:BME280.c      ****             
+ 240:BME280.c      ****             // Write to register
+ 241:BME280.c      ****             I2C_MasterWriteBuf(bme280.settings.I2CAddress, (uint8 *) &offset, 1, I2C_MODE_COMPLETE_
+ 242:BME280.c      ****             for(iter = 0; iter < BME280_MAX_ITER; iter++)
+ 243:BME280.c      ****             {
+ 244:BME280.c      ****                 if(0u != (I2C_MasterStatus() & I2C_MSTAT_WR_CMPLT))
+ 245:BME280.c      ****                 {
+ 246:BME280.c      ****                     /* Transfer complete. Check Master status to make sure that transfer
+ 247:BME280.c      ****                     completed without errors. */
+ 248:BME280.c      ****                     break;
+ 249:BME280.c      ****                 }
+ 250:BME280.c      ****             }        
+ 251:BME280.c      ****             
+ 252:BME280.c      ****             // Read Buffer        
+ 253:BME280.c      ****             I2C_MasterReadBuf(bme280.settings.I2CAddress, &result, numBytes, I2C_MODE_COMPLETE_XFER
+ 254:BME280.c      ****             
+ 255:BME280.c      ****             for(iter = 0; iter < BME280_MAX_ITER; iter++){
+ 256:BME280.c      ****                 if(0u != (I2C_MasterStatus() & I2C_MSTAT_RD_CMPLT))
+ 257:BME280.c      ****                 {
+ 258:BME280.c      ****                     /* Transfer complete. Check Master status to make sure that transfer
+ 259:BME280.c      ****                     completed without errors. */
+ 260:BME280.c      ****                     break;
+ 261:BME280.c      ****                 }
+ 262:BME280.c      ****                 
+ 263:BME280.c      ****             }
+ 264:BME280.c      ****             I2C_Sleep();
+ 265:BME280.c      **** 
+ 266:BME280.c      ****     		break;
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\ccOsInVI.s 			page 26
+
+
+ 267:BME280.c      **** 
+ 268:BME280.c      ****     	case BME280_SPI_MODE:
+ 269:BME280.c      ****     		// TODO
+ 270:BME280.c      ****     		break;
+ 271:BME280.c      **** 
+ 272:BME280.c      ****     	default:
+ 273:BME280.c      ****     		break;
+ 1155              		.loc 1 273 0
+ 1156 001a 3CE0     		b	.L43
+ 1157              	.L33:
+ 237:BME280.c      ****             I2C_MasterClearStatus(); /* Clear any previous status */
+ 1158              		.loc 1 237 0
+ 1159 001c FFF7FEFF 		bl	I2C_Wakeup
+ 238:BME280.c      ****             
+ 1160              		.loc 1 238 0
+ 1161 0020 FFF7FEFF 		bl	I2C_MasterClearStatus
+ 241:BME280.c      ****             for(iter = 0; iter < BME280_MAX_ITER; iter++)
+ 1162              		.loc 1 241 0
+ 1163 0024 1E4B     		ldr	r3, .L48
+ 1164 0026 5878     		ldrb	r0, [r3, #1]	@ zero_extendqisi2
+ 1165 0028 F91D     		adds	r1, r7, #7
+ 1166 002a 0023     		movs	r3, #0
+ 1167 002c 0122     		movs	r2, #1
+ 1168 002e FFF7FEFF 		bl	I2C_MasterWriteBuf
+ 242:BME280.c      ****             {
+ 1169              		.loc 1 242 0
+ 1170 0032 0023     		movs	r3, #0
+ 1171 0034 FB81     		strh	r3, [r7, #14]	@ movhi
+ 1172 0036 09E0     		b	.L35
+ 1173              	.L38:
+ 244:BME280.c      ****                 {
+ 1174              		.loc 1 244 0
+ 1175 0038 FFF7FEFF 		bl	I2C_MasterStatus
+ 1176 003c 0346     		mov	r3, r0
+ 1177 003e 03F00203 		and	r3, r3, #2
+ 1178 0042 002B     		cmp	r3, #0
+ 1179 0044 07D1     		bne	.L46
+ 242:BME280.c      ****             {
+ 1180              		.loc 1 242 0 discriminator 2
+ 1181 0046 FB89     		ldrh	r3, [r7, #14]
+ 1182 0048 0133     		adds	r3, r3, #1
+ 1183 004a FB81     		strh	r3, [r7, #14]	@ movhi
+ 1184              	.L35:
+ 242:BME280.c      ****             {
+ 1185              		.loc 1 242 0 is_stmt 0 discriminator 1
+ 1186 004c FB89     		ldrh	r3, [r7, #14]
+ 1187 004e B3F5967F 		cmp	r3, #300
+ 1188 0052 F1D3     		bcc	.L38
+ 1189 0054 00E0     		b	.L37
+ 1190              	.L46:
+ 248:BME280.c      ****                 }
+ 1191              		.loc 1 248 0 is_stmt 1
+ 1192 0056 00BF     		nop
+ 1193              	.L37:
+ 253:BME280.c      ****             
+ 1194              		.loc 1 253 0
+ 1195 0058 114B     		ldr	r3, .L48
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\ccOsInVI.s 			page 27
+
+
+ 1196 005a 5878     		ldrb	r0, [r3, #1]	@ zero_extendqisi2
+ 1197 005c 7A7B     		ldrb	r2, [r7, #13]	@ zero_extendqisi2
+ 1198 005e 07F10C01 		add	r1, r7, #12
+ 1199 0062 0023     		movs	r3, #0
+ 1200 0064 FFF7FEFF 		bl	I2C_MasterReadBuf
+ 255:BME280.c      ****                 if(0u != (I2C_MasterStatus() & I2C_MSTAT_RD_CMPLT))
+ 1201              		.loc 1 255 0
+ 1202 0068 0023     		movs	r3, #0
+ 1203 006a FB81     		strh	r3, [r7, #14]	@ movhi
+ 1204 006c 09E0     		b	.L39
+ 1205              	.L42:
+ 256:BME280.c      ****                 {
+ 1206              		.loc 1 256 0
+ 1207 006e FFF7FEFF 		bl	I2C_MasterStatus
+ 1208 0072 0346     		mov	r3, r0
+ 1209 0074 03F00103 		and	r3, r3, #1
+ 1210 0078 002B     		cmp	r3, #0
+ 1211 007a 07D1     		bne	.L47
+ 255:BME280.c      ****                 if(0u != (I2C_MasterStatus() & I2C_MSTAT_RD_CMPLT))
+ 1212              		.loc 1 255 0 discriminator 2
+ 1213 007c FB89     		ldrh	r3, [r7, #14]
+ 1214 007e 0133     		adds	r3, r3, #1
+ 1215 0080 FB81     		strh	r3, [r7, #14]	@ movhi
+ 1216              	.L39:
+ 255:BME280.c      ****                 if(0u != (I2C_MasterStatus() & I2C_MSTAT_RD_CMPLT))
+ 1217              		.loc 1 255 0 is_stmt 0 discriminator 1
+ 1218 0082 FB89     		ldrh	r3, [r7, #14]
+ 1219 0084 B3F5967F 		cmp	r3, #300
+ 1220 0088 F1D3     		bcc	.L42
+ 1221 008a 00E0     		b	.L41
+ 1222              	.L47:
+ 260:BME280.c      ****                 }
+ 1223              		.loc 1 260 0 is_stmt 1
+ 1224 008c 00BF     		nop
+ 1225              	.L41:
+ 264:BME280.c      **** 
+ 1226              		.loc 1 264 0
+ 1227 008e FFF7FEFF 		bl	I2C_Sleep
+ 266:BME280.c      **** 
+ 1228              		.loc 1 266 0
+ 1229 0092 00E0     		b	.L43
+ 1230              	.L45:
+ 270:BME280.c      **** 
+ 1231              		.loc 1 270 0
+ 1232 0094 00BF     		nop
+ 1233              	.L43:
+ 274:BME280.c      **** 	}
+ 275:BME280.c      **** 	return result;
+ 1234              		.loc 1 275 0
+ 1235 0096 3B7B     		ldrb	r3, [r7, #12]	@ zero_extendqisi2
+ 276:BME280.c      **** }
+ 1236              		.loc 1 276 0
+ 1237 0098 1846     		mov	r0, r3
+ 1238 009a 1037     		adds	r7, r7, #16
+ 1239              		.cfi_def_cfa_offset 8
+ 1240 009c BD46     		mov	sp, r7
+ 1241              		.cfi_def_cfa_register 13
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\ccOsInVI.s 			page 28
+
+
+ 1242              		@ sp needed
+ 1243 009e 80BD     		pop	{r7, pc}
+ 1244              	.L49:
+ 1245              		.align	2
+ 1246              	.L48:
+ 1247 00a0 00000000 		.word	bme280
+ 1248              		.cfi_endproc
+ 1249              	.LFE72:
+ 1250              		.size	BME280_readRegister, .-BME280_readRegister
+ 1251              		.section	.text.BME280_writeRegister,"ax",%progbits
+ 1252              		.align	2
+ 1253              		.global	BME280_writeRegister
+ 1254              		.thumb
+ 1255              		.thumb_func
+ 1256              		.type	BME280_writeRegister, %function
+ 1257              	BME280_writeRegister:
+ 1258              	.LFB73:
+ 277:BME280.c      **** 
+ 278:BME280.c      **** 
+ 279:BME280.c      **** void BME280_writeRegister(uint8_t offset, uint8_t data)
+ 280:BME280.c      **** {
+ 1259              		.loc 1 280 0
+ 1260              		.cfi_startproc
+ 1261              		@ args = 0, pretend = 0, frame = 16
+ 1262              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1263 0000 80B5     		push	{r7, lr}
+ 1264              		.cfi_def_cfa_offset 8
+ 1265              		.cfi_offset 7, -8
+ 1266              		.cfi_offset 14, -4
+ 1267 0002 84B0     		sub	sp, sp, #16
+ 1268              		.cfi_def_cfa_offset 24
+ 1269 0004 00AF     		add	r7, sp, #0
+ 1270              		.cfi_def_cfa_register 7
+ 1271 0006 0346     		mov	r3, r0
+ 1272 0008 0A46     		mov	r2, r1
+ 1273 000a FB71     		strb	r3, [r7, #7]
+ 1274 000c 1346     		mov	r3, r2
+ 1275 000e BB71     		strb	r3, [r7, #6]
+ 281:BME280.c      ****     uint8 packet[] = {offset, data};
+ 1276              		.loc 1 281 0
+ 1277 0010 FB79     		ldrb	r3, [r7, #7]
+ 1278 0012 3B73     		strb	r3, [r7, #12]
+ 1279 0014 BB79     		ldrb	r3, [r7, #6]
+ 1280 0016 7B73     		strb	r3, [r7, #13]
+ 282:BME280.c      ****     uint16 iter;
+ 283:BME280.c      ****     
+ 284:BME280.c      **** 	switch (bme280.settings.commInterface)
+ 1281              		.loc 1 284 0
+ 1282 0018 164B     		ldr	r3, .L61
+ 1283 001a 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 1284 001c 002B     		cmp	r3, #0
+ 1285 001e 02D0     		beq	.L52
+ 1286 0020 012B     		cmp	r3, #1
+ 1287 0022 22D0     		beq	.L59
+ 285:BME280.c      **** 	{
+ 286:BME280.c      ****     	case BME280_I2C_MODE:
+ 287:BME280.c      ****     		//Write the byte
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\ccOsInVI.s 			page 29
+
+
+ 288:BME280.c      ****             I2C_Wakeup();
+ 289:BME280.c      ****             I2C_MasterClearStatus(); /* Clear any previous status */
+ 290:BME280.c      ****             
+ 291:BME280.c      ****             // Write to register
+ 292:BME280.c      ****             I2C_MasterWriteBuf(bme280.settings.I2CAddress, (uint8 *) &packet, 2, I2C_MODE_COMPLETE_
+ 293:BME280.c      ****             for(iter = 0; iter < BME280_MAX_ITER; iter++)
+ 294:BME280.c      ****             {
+ 295:BME280.c      ****                 if(0u != (I2C_MasterStatus() & I2C_MSTAT_WR_CMPLT))
+ 296:BME280.c      ****                 {
+ 297:BME280.c      ****                     // Transfer complete. Check Master status to make sure that transfer
+ 298:BME280.c      ****                     //completed without errors. 
+ 299:BME280.c      ****                     break;               
+ 300:BME280.c      ****                 }
+ 301:BME280.c      ****             }          
+ 302:BME280.c      ****             
+ 303:BME280.c      ****             I2C_Sleep();        
+ 304:BME280.c      **** 
+ 305:BME280.c      ****     		break;
+ 306:BME280.c      **** 
+ 307:BME280.c      ****     	case BME280_SPI_MODE:
+ 308:BME280.c      ****     		//TODO
+ 309:BME280.c      ****     		break;
+ 310:BME280.c      **** 
+ 311:BME280.c      ****     	default:
+ 312:BME280.c      ****     		break;
+ 1288              		.loc 1 312 0
+ 1289 0024 22E0     		b	.L58
+ 1290              	.L52:
+ 288:BME280.c      ****             I2C_MasterClearStatus(); /* Clear any previous status */
+ 1291              		.loc 1 288 0
+ 1292 0026 FFF7FEFF 		bl	I2C_Wakeup
+ 289:BME280.c      ****             
+ 1293              		.loc 1 289 0
+ 1294 002a FFF7FEFF 		bl	I2C_MasterClearStatus
+ 292:BME280.c      ****             for(iter = 0; iter < BME280_MAX_ITER; iter++)
+ 1295              		.loc 1 292 0
+ 1296 002e 114B     		ldr	r3, .L61
+ 1297 0030 5878     		ldrb	r0, [r3, #1]	@ zero_extendqisi2
+ 1298 0032 07F10C01 		add	r1, r7, #12
+ 1299 0036 0023     		movs	r3, #0
+ 1300 0038 0222     		movs	r2, #2
+ 1301 003a FFF7FEFF 		bl	I2C_MasterWriteBuf
+ 293:BME280.c      ****             {
+ 1302              		.loc 1 293 0
+ 1303 003e 0023     		movs	r3, #0
+ 1304 0040 FB81     		strh	r3, [r7, #14]	@ movhi
+ 1305 0042 09E0     		b	.L54
+ 1306              	.L57:
+ 295:BME280.c      ****                 {
+ 1307              		.loc 1 295 0
+ 1308 0044 FFF7FEFF 		bl	I2C_MasterStatus
+ 1309 0048 0346     		mov	r3, r0
+ 1310 004a 03F00203 		and	r3, r3, #2
+ 1311 004e 002B     		cmp	r3, #0
+ 1312 0050 07D1     		bne	.L60
+ 293:BME280.c      ****             {
+ 1313              		.loc 1 293 0 discriminator 2
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\ccOsInVI.s 			page 30
+
+
+ 1314 0052 FB89     		ldrh	r3, [r7, #14]
+ 1315 0054 0133     		adds	r3, r3, #1
+ 1316 0056 FB81     		strh	r3, [r7, #14]	@ movhi
+ 1317              	.L54:
+ 293:BME280.c      ****             {
+ 1318              		.loc 1 293 0 is_stmt 0 discriminator 1
+ 1319 0058 FB89     		ldrh	r3, [r7, #14]
+ 1320 005a B3F5967F 		cmp	r3, #300
+ 1321 005e F1D3     		bcc	.L57
+ 1322 0060 00E0     		b	.L56
+ 1323              	.L60:
+ 299:BME280.c      ****                 }
+ 1324              		.loc 1 299 0 is_stmt 1
+ 1325 0062 00BF     		nop
+ 1326              	.L56:
+ 303:BME280.c      **** 
+ 1327              		.loc 1 303 0
+ 1328 0064 FFF7FEFF 		bl	I2C_Sleep
+ 305:BME280.c      **** 
+ 1329              		.loc 1 305 0
+ 1330 0068 00E0     		b	.L58
+ 1331              	.L59:
+ 309:BME280.c      **** 
+ 1332              		.loc 1 309 0
+ 1333 006a 00BF     		nop
+ 1334              	.L58:
+ 313:BME280.c      **** 	}
+ 314:BME280.c      **** }
+ 1335              		.loc 1 314 0 discriminator 1
+ 1336 006c 00BF     		nop
+ 1337 006e 1037     		adds	r7, r7, #16
+ 1338              		.cfi_def_cfa_offset 8
+ 1339 0070 BD46     		mov	sp, r7
+ 1340              		.cfi_def_cfa_register 13
+ 1341              		@ sp needed
+ 1342 0072 80BD     		pop	{r7, pc}
+ 1343              	.L62:
+ 1344              		.align	2
+ 1345              	.L61:
+ 1346 0074 00000000 		.word	bme280
+ 1347              		.cfi_endproc
+ 1348              	.LFE73:
+ 1349              		.size	BME280_writeRegister, .-BME280_writeRegister
+ 1350              		.text
+ 1351              	.Letext0:
+ 1352              		.file 2 "c:\\program files (x86)\\cypress\\psoc creator\\4.4\\psoc creator\\import\\gnu\\arm\\5.4.
+ 1353              		.file 3 "c:\\program files (x86)\\cypress\\psoc creator\\4.4\\psoc creator\\import\\gnu\\arm\\5.4.
+ 1354              		.file 4 "Generated_Source\\PSoC5/cytypes.h"
+ 1355              		.file 5 "BME280.h"
+ 1356              		.file 6 "Generated_Source\\PSoC5/core_cm3.h"
+ 1357              		.section	.debug_info,"",%progbits
+ 1358              	.Ldebug_info0:
+ 1359 0000 EB040000 		.4byte	0x4eb
+ 1360 0004 0400     		.2byte	0x4
+ 1361 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 1362 000a 04       		.byte	0x4
+ 1363 000b 01       		.uleb128 0x1
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\ccOsInVI.s 			page 31
+
+
+ 1364 000c B3000000 		.4byte	.LASF84
+ 1365 0010 0C       		.byte	0xc
+ 1366 0011 D7010000 		.4byte	.LASF85
+ 1367 0015 D9030000 		.4byte	.LASF86
+ 1368 0019 00000000 		.4byte	.Ldebug_ranges0+0
+ 1369 001d 00000000 		.4byte	0
+ 1370 0021 00000000 		.4byte	.Ldebug_line0
+ 1371 0025 02       		.uleb128 0x2
+ 1372 0026 01       		.byte	0x1
+ 1373 0027 06       		.byte	0x6
+ 1374 0028 6D020000 		.4byte	.LASF0
+ 1375 002c 03       		.uleb128 0x3
+ 1376 002d 2E020000 		.4byte	.LASF2
+ 1377 0031 02       		.byte	0x2
+ 1378 0032 1D       		.byte	0x1d
+ 1379 0033 37000000 		.4byte	0x37
+ 1380 0037 02       		.uleb128 0x2
+ 1381 0038 01       		.byte	0x1
+ 1382 0039 08       		.byte	0x8
+ 1383 003a 5F020000 		.4byte	.LASF1
+ 1384 003e 03       		.uleb128 0x3
+ 1385 003f BC030000 		.4byte	.LASF3
+ 1386 0043 02       		.byte	0x2
+ 1387 0044 29       		.byte	0x29
+ 1388 0045 49000000 		.4byte	0x49
+ 1389 0049 02       		.uleb128 0x2
+ 1390 004a 02       		.byte	0x2
+ 1391 004b 05       		.byte	0x5
+ 1392 004c 94000000 		.4byte	.LASF4
+ 1393 0050 03       		.uleb128 0x3
+ 1394 0051 54010000 		.4byte	.LASF5
+ 1395 0055 02       		.byte	0x2
+ 1396 0056 2B       		.byte	0x2b
+ 1397 0057 5B000000 		.4byte	0x5b
+ 1398 005b 02       		.uleb128 0x2
+ 1399 005c 02       		.byte	0x2
+ 1400 005d 07       		.byte	0x7
+ 1401 005e CE020000 		.4byte	.LASF6
+ 1402 0062 03       		.uleb128 0x3
+ 1403 0063 B2030000 		.4byte	.LASF7
+ 1404 0067 02       		.byte	0x2
+ 1405 0068 3F       		.byte	0x3f
+ 1406 0069 6D000000 		.4byte	0x6d
+ 1407 006d 02       		.uleb128 0x2
+ 1408 006e 04       		.byte	0x4
+ 1409 006f 05       		.byte	0x5
+ 1410 0070 FB020000 		.4byte	.LASF8
+ 1411 0074 03       		.uleb128 0x3
+ 1412 0075 A7030000 		.4byte	.LASF9
+ 1413 0079 02       		.byte	0x2
+ 1414 007a 41       		.byte	0x41
+ 1415 007b 7F000000 		.4byte	0x7f
+ 1416 007f 02       		.uleb128 0x2
+ 1417 0080 04       		.byte	0x4
+ 1418 0081 07       		.byte	0x7
+ 1419 0082 6B030000 		.4byte	.LASF10
+ 1420 0086 03       		.uleb128 0x3
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\ccOsInVI.s 			page 32
+
+
+ 1421 0087 0A020000 		.4byte	.LASF11
+ 1422 008b 02       		.byte	0x2
+ 1423 008c 59       		.byte	0x59
+ 1424 008d 91000000 		.4byte	0x91
+ 1425 0091 02       		.uleb128 0x2
+ 1426 0092 08       		.byte	0x8
+ 1427 0093 05       		.byte	0x5
+ 1428 0094 41010000 		.4byte	.LASF12
+ 1429 0098 02       		.uleb128 0x2
+ 1430 0099 08       		.byte	0x8
+ 1431 009a 07       		.byte	0x7
+ 1432 009b 79020000 		.4byte	.LASF13
+ 1433 009f 04       		.uleb128 0x4
+ 1434 00a0 04       		.byte	0x4
+ 1435 00a1 05       		.byte	0x5
+ 1436 00a2 696E7400 		.ascii	"int\000"
+ 1437 00a6 02       		.uleb128 0x2
+ 1438 00a7 04       		.byte	0x4
+ 1439 00a8 07       		.byte	0x7
+ 1440 00a9 9F020000 		.4byte	.LASF14
+ 1441 00ad 03       		.uleb128 0x3
+ 1442 00ae 93010000 		.4byte	.LASF15
+ 1443 00b2 03       		.byte	0x3
+ 1444 00b3 18       		.byte	0x18
+ 1445 00b4 2C000000 		.4byte	0x2c
+ 1446 00b8 03       		.uleb128 0x3
+ 1447 00b9 0C030000 		.4byte	.LASF16
+ 1448 00bd 03       		.byte	0x3
+ 1449 00be 20       		.byte	0x20
+ 1450 00bf 3E000000 		.4byte	0x3e
+ 1451 00c3 03       		.uleb128 0x3
+ 1452 00c4 AC020000 		.4byte	.LASF17
+ 1453 00c8 03       		.byte	0x3
+ 1454 00c9 24       		.byte	0x24
+ 1455 00ca 50000000 		.4byte	0x50
+ 1456 00ce 03       		.uleb128 0x3
+ 1457 00cf 04030000 		.4byte	.LASF18
+ 1458 00d3 03       		.byte	0x3
+ 1459 00d4 2C       		.byte	0x2c
+ 1460 00d5 62000000 		.4byte	0x62
+ 1461 00d9 03       		.uleb128 0x3
+ 1462 00da 96020000 		.4byte	.LASF19
+ 1463 00de 03       		.byte	0x3
+ 1464 00df 30       		.byte	0x30
+ 1465 00e0 74000000 		.4byte	0x74
+ 1466 00e4 03       		.uleb128 0x3
+ 1467 00e5 74010000 		.4byte	.LASF20
+ 1468 00e9 03       		.byte	0x3
+ 1469 00ea 38       		.byte	0x38
+ 1470 00eb 86000000 		.4byte	0x86
+ 1471 00ef 05       		.uleb128 0x5
+ 1472 00f0 A9010000 		.4byte	.LASF21
+ 1473 00f4 04       		.byte	0x4
+ 1474 00f5 9201     		.2byte	0x192
+ 1475 00f7 37000000 		.4byte	0x37
+ 1476 00fb 05       		.uleb128 0x5
+ 1477 00fc 85010000 		.4byte	.LASF22
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\ccOsInVI.s 			page 33
+
+
+ 1478 0100 04       		.byte	0x4
+ 1479 0101 9301     		.2byte	0x193
+ 1480 0103 5B000000 		.4byte	0x5b
+ 1481 0107 02       		.uleb128 0x2
+ 1482 0108 04       		.byte	0x4
+ 1483 0109 04       		.byte	0x4
+ 1484 010a BB010000 		.4byte	.LASF23
+ 1485 010e 02       		.uleb128 0x2
+ 1486 010f 08       		.byte	0x8
+ 1487 0110 04       		.byte	0x4
+ 1488 0111 7D030000 		.4byte	.LASF24
+ 1489 0115 02       		.uleb128 0x2
+ 1490 0116 01       		.byte	0x1
+ 1491 0117 08       		.byte	0x8
+ 1492 0118 E1020000 		.4byte	.LASF25
+ 1493 011c 02       		.uleb128 0x2
+ 1494 011d 08       		.byte	0x8
+ 1495 011e 04       		.byte	0x4
+ 1496 011f 38020000 		.4byte	.LASF26
+ 1497 0123 02       		.uleb128 0x2
+ 1498 0124 04       		.byte	0x4
+ 1499 0125 07       		.byte	0x7
+ 1500 0126 A5000000 		.4byte	.LASF27
+ 1501 012a 06       		.uleb128 0x6
+ 1502 012b 08       		.byte	0x8
+ 1503 012c 05       		.byte	0x5
+ 1504 012d 56       		.byte	0x56
+ 1505 012e 93010000 		.4byte	0x193
+ 1506 0132 07       		.uleb128 0x7
+ 1507 0133 99030000 		.4byte	.LASF28
+ 1508 0137 05       		.byte	0x5
+ 1509 0138 58       		.byte	0x58
+ 1510 0139 AD000000 		.4byte	0xad
+ 1511 013d 00       		.byte	0
+ 1512 013e 07       		.uleb128 0x7
+ 1513 013f 37000000 		.4byte	.LASF29
+ 1514 0143 05       		.byte	0x5
+ 1515 0144 59       		.byte	0x59
+ 1516 0145 AD000000 		.4byte	0xad
+ 1517 0149 01       		.byte	0x1
+ 1518 014a 07       		.uleb128 0x7
+ 1519 014b 29000000 		.4byte	.LASF30
+ 1520 014f 05       		.byte	0x5
+ 1521 0150 5A       		.byte	0x5a
+ 1522 0151 AD000000 		.4byte	0xad
+ 1523 0155 02       		.byte	0x2
+ 1524 0156 07       		.uleb128 0x7
+ 1525 0157 E0010000 		.4byte	.LASF31
+ 1526 015b 05       		.byte	0x5
+ 1527 015c 5C       		.byte	0x5c
+ 1528 015d AD000000 		.4byte	0xad
+ 1529 0161 03       		.byte	0x3
+ 1530 0162 07       		.uleb128 0x7
+ 1531 0163 12040000 		.4byte	.LASF32
+ 1532 0167 05       		.byte	0x5
+ 1533 0168 5D       		.byte	0x5d
+ 1534 0169 AD000000 		.4byte	0xad
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\ccOsInVI.s 			page 34
+
+
+ 1535 016d 04       		.byte	0x4
+ 1536 016e 07       		.uleb128 0x7
+ 1537 016f 3E040000 		.4byte	.LASF33
+ 1538 0173 05       		.byte	0x5
+ 1539 0174 5E       		.byte	0x5e
+ 1540 0175 AD000000 		.4byte	0xad
+ 1541 0179 05       		.byte	0x5
+ 1542 017a 07       		.uleb128 0x7
+ 1543 017b 5F000000 		.4byte	.LASF34
+ 1544 017f 05       		.byte	0x5
+ 1545 0180 5F       		.byte	0x5f
+ 1546 0181 AD000000 		.4byte	0xad
+ 1547 0185 06       		.byte	0x6
+ 1548 0186 07       		.uleb128 0x7
+ 1549 0187 00000000 		.4byte	.LASF35
+ 1550 018b 05       		.byte	0x5
+ 1551 018c 60       		.byte	0x60
+ 1552 018d AD000000 		.4byte	0xad
+ 1553 0191 07       		.byte	0x7
+ 1554 0192 00       		.byte	0
+ 1555 0193 03       		.uleb128 0x3
+ 1556 0194 22040000 		.4byte	.LASF36
+ 1557 0198 05       		.byte	0x5
+ 1558 0199 63       		.byte	0x63
+ 1559 019a 2A010000 		.4byte	0x12a
+ 1560 019e 06       		.uleb128 0x6
+ 1561 019f 18       		.byte	0x18
+ 1562 01a0 05       		.byte	0x5
+ 1563 01a1 67       		.byte	0x67
+ 1564 01a2 37020000 		.4byte	0x237
+ 1565 01a6 07       		.uleb128 0x7
+ 1566 01a7 84030000 		.4byte	.LASF37
+ 1567 01ab 05       		.byte	0x5
+ 1568 01ac 68       		.byte	0x68
+ 1569 01ad C3000000 		.4byte	0xc3
+ 1570 01b1 00       		.byte	0
+ 1571 01b2 07       		.uleb128 0x7
+ 1572 01b3 8B030000 		.4byte	.LASF38
+ 1573 01b7 05       		.byte	0x5
+ 1574 01b8 69       		.byte	0x69
+ 1575 01b9 B8000000 		.4byte	0xb8
+ 1576 01bd 02       		.byte	0x2
+ 1577 01be 07       		.uleb128 0x7
+ 1578 01bf 92030000 		.4byte	.LASF39
+ 1579 01c3 05       		.byte	0x5
+ 1580 01c4 6A       		.byte	0x6a
+ 1581 01c5 B8000000 		.4byte	0xb8
+ 1582 01c9 04       		.byte	0x4
+ 1583 01ca 07       		.uleb128 0x7
+ 1584 01cb 20030000 		.4byte	.LASF40
+ 1585 01cf 05       		.byte	0x5
+ 1586 01d0 6C       		.byte	0x6c
+ 1587 01d1 C3000000 		.4byte	0xc3
+ 1588 01d5 06       		.byte	0x6
+ 1589 01d6 07       		.uleb128 0x7
+ 1590 01d7 8C010000 		.4byte	.LASF41
+ 1591 01db 05       		.byte	0x5
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\ccOsInVI.s 			page 35
+
+
+ 1592 01dc 6D       		.byte	0x6d
+ 1593 01dd B8000000 		.4byte	0xb8
+ 1594 01e1 08       		.byte	0x8
+ 1595 01e2 07       		.uleb128 0x7
+ 1596 01e3 58020000 		.4byte	.LASF42
+ 1597 01e7 05       		.byte	0x5
+ 1598 01e8 6E       		.byte	0x6e
+ 1599 01e9 B8000000 		.4byte	0xb8
+ 1600 01ed 0A       		.byte	0xa
+ 1601 01ee 07       		.uleb128 0x7
+ 1602 01ef 35030000 		.4byte	.LASF43
+ 1603 01f3 05       		.byte	0x5
+ 1604 01f4 6F       		.byte	0x6f
+ 1605 01f5 B8000000 		.4byte	0xb8
+ 1606 01f9 0C       		.byte	0xc
+ 1607 01fa 07       		.uleb128 0x7
+ 1608 01fb 3C030000 		.4byte	.LASF44
+ 1609 01ff 05       		.byte	0x5
+ 1610 0200 70       		.byte	0x70
+ 1611 0201 B8000000 		.4byte	0xb8
+ 1612 0205 0E       		.byte	0xe
+ 1613 0206 07       		.uleb128 0x7
+ 1614 0207 43030000 		.4byte	.LASF45
+ 1615 020b 05       		.byte	0x5
+ 1616 020c 71       		.byte	0x71
+ 1617 020d B8000000 		.4byte	0xb8
+ 1618 0211 10       		.byte	0x10
+ 1619 0212 07       		.uleb128 0x7
+ 1620 0213 4A030000 		.4byte	.LASF46
+ 1621 0217 05       		.byte	0x5
+ 1622 0218 72       		.byte	0x72
+ 1623 0219 B8000000 		.4byte	0xb8
+ 1624 021d 12       		.byte	0x12
+ 1625 021e 07       		.uleb128 0x7
+ 1626 021f 51030000 		.4byte	.LASF47
+ 1627 0223 05       		.byte	0x5
+ 1628 0224 73       		.byte	0x73
+ 1629 0225 B8000000 		.4byte	0xb8
+ 1630 0229 14       		.byte	0x14
+ 1631 022a 07       		.uleb128 0x7
+ 1632 022b 58030000 		.4byte	.LASF48
+ 1633 022f 05       		.byte	0x5
+ 1634 0230 74       		.byte	0x74
+ 1635 0231 B8000000 		.4byte	0xb8
+ 1636 0235 16       		.byte	0x16
+ 1637 0236 00       		.byte	0
+ 1638 0237 03       		.uleb128 0x3
+ 1639 0238 17000000 		.4byte	.LASF49
+ 1640 023c 05       		.byte	0x5
+ 1641 023d 78       		.byte	0x78
+ 1642 023e 9E010000 		.4byte	0x19e
+ 1643 0242 06       		.uleb128 0x6
+ 1644 0243 2C       		.byte	0x2c
+ 1645 0244 05       		.byte	0x5
+ 1646 0245 7C       		.byte	0x7c
+ 1647 0246 87020000 		.4byte	0x287
+ 1648 024a 07       		.uleb128 0x7
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\ccOsInVI.s 			page 36
+
+
+ 1649 024b C1010000 		.4byte	.LASF50
+ 1650 024f 05       		.byte	0x5
+ 1651 0250 7E       		.byte	0x7e
+ 1652 0251 93010000 		.4byte	0x193
+ 1653 0255 00       		.byte	0
+ 1654 0256 07       		.uleb128 0x7
+ 1655 0257 22020000 		.4byte	.LASF51
+ 1656 025b 05       		.byte	0x5
+ 1657 025c 7F       		.byte	0x7f
+ 1658 025d 37020000 		.4byte	0x237
+ 1659 0261 08       		.byte	0x8
+ 1660 0262 07       		.uleb128 0x7
+ 1661 0263 1B020000 		.4byte	.LASF52
+ 1662 0267 05       		.byte	0x5
+ 1663 0268 80       		.byte	0x80
+ 1664 0269 CE000000 		.4byte	0xce
+ 1665 026d 20       		.byte	0x20
+ 1666 026e 07       		.uleb128 0x7
+ 1667 026f 52040000 		.4byte	.LASF53
+ 1668 0273 05       		.byte	0x5
+ 1669 0274 81       		.byte	0x81
+ 1670 0275 07010000 		.4byte	0x107
+ 1671 0279 24       		.byte	0x24
+ 1672 027a 07       		.uleb128 0x7
+ 1673 027b 27030000 		.4byte	.LASF54
+ 1674 027f 05       		.byte	0x5
+ 1675 0280 82       		.byte	0x82
+ 1676 0281 07010000 		.4byte	0x107
+ 1677 0285 28       		.byte	0x28
+ 1678 0286 00       		.byte	0
+ 1679 0287 03       		.uleb128 0x3
+ 1680 0288 9E000000 		.4byte	.LASF55
+ 1681 028c 05       		.byte	0x5
+ 1682 028d 84       		.byte	0x84
+ 1683 028e 42020000 		.4byte	0x242
+ 1684 0292 08       		.uleb128 0x8
+ 1685 0293 CA010000 		.4byte	.LASF56
+ 1686 0297 01       		.byte	0x1
+ 1687 0298 36       		.byte	0x36
+ 1688 0299 00000000 		.4byte	.LFB63
+ 1689 029d 10000000 		.4byte	.LFE63-.LFB63
+ 1690 02a1 01       		.uleb128 0x1
+ 1691 02a2 9C       		.byte	0x9c
+ 1692 02a3 08       		.uleb128 0x8
+ 1693 02a4 5F030000 		.4byte	.LASF57
+ 1694 02a8 01       		.byte	0x1
+ 1695 02a9 3B       		.byte	0x3b
+ 1696 02aa 00000000 		.4byte	.LFB64
+ 1697 02ae 0C000000 		.4byte	.LFE64-.LFB64
+ 1698 02b2 01       		.uleb128 0x1
+ 1699 02b3 9C       		.byte	0x9c
+ 1700 02b4 09       		.uleb128 0x9
+ 1701 02b5 14030000 		.4byte	.LASF77
+ 1702 02b9 01       		.byte	0x1
+ 1703 02ba 48       		.byte	0x48
+ 1704 02bb AD000000 		.4byte	0xad
+ 1705 02bf 00000000 		.4byte	.LFB65
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\ccOsInVI.s 			page 37
+
+
+ 1706 02c3 30020000 		.4byte	.LFE65-.LFB65
+ 1707 02c7 01       		.uleb128 0x1
+ 1708 02c8 9C       		.byte	0x9c
+ 1709 02c9 EA020000 		.4byte	0x2ea
+ 1710 02cd 0A       		.uleb128 0xa
+ 1711 02ce 9B010000 		.4byte	.LASF58
+ 1712 02d2 01       		.byte	0x1
+ 1713 02d3 4B       		.byte	0x4b
+ 1714 02d4 AD000000 		.4byte	0xad
+ 1715 02d8 02       		.uleb128 0x2
+ 1716 02d9 91       		.byte	0x91
+ 1717 02da 6F       		.sleb128 -17
+ 1718 02db 0A       		.uleb128 0xa
+ 1719 02dc 5F010000 		.4byte	.LASF59
+ 1720 02e0 01       		.byte	0x1
+ 1721 02e1 4B       		.byte	0x4b
+ 1722 02e2 AD000000 		.4byte	0xad
+ 1723 02e6 02       		.uleb128 0x2
+ 1724 02e7 91       		.byte	0x91
+ 1725 02e8 6E       		.sleb128 -18
+ 1726 02e9 00       		.byte	0
+ 1727 02ea 08       		.uleb128 0x8
+ 1728 02eb C6030000 		.4byte	.LASF60
+ 1729 02ef 01       		.byte	0x1
+ 1730 02f0 7B       		.byte	0x7b
+ 1731 02f1 00000000 		.4byte	.LFB66
+ 1732 02f5 10000000 		.4byte	.LFE66-.LFB66
+ 1733 02f9 01       		.uleb128 0x1
+ 1734 02fa 9C       		.byte	0x9c
+ 1735 02fb 0B       		.uleb128 0xb
+ 1736 02fc B5020000 		.4byte	.LASF65
+ 1737 0300 01       		.byte	0x1
+ 1738 0301 86       		.byte	0x86
+ 1739 0302 07010000 		.4byte	0x107
+ 1740 0306 00000000 		.4byte	.LFB67
+ 1741 030a BC030000 		.4byte	.LFE67-.LFB67
+ 1742 030e 01       		.uleb128 0x1
+ 1743 030f 9C       		.byte	0x9c
+ 1744 0310 4D030000 		.4byte	0x34d
+ 1745 0314 0A       		.uleb128 0xa
+ 1746 0315 6E010000 		.4byte	.LASF61
+ 1747 0319 01       		.byte	0x1
+ 1748 031a 8B       		.byte	0x8b
+ 1749 031b CE000000 		.4byte	0xce
+ 1750 031f 02       		.uleb128 0x2
+ 1751 0320 91       		.byte	0x91
+ 1752 0321 5C       		.sleb128 -36
+ 1753 0322 0A       		.uleb128 0xa
+ 1754 0323 AE000000 		.4byte	.LASF62
+ 1755 0327 01       		.byte	0x1
+ 1756 0328 8D       		.byte	0x8d
+ 1757 0329 E4000000 		.4byte	0xe4
+ 1758 032d 02       		.uleb128 0x2
+ 1759 032e 91       		.byte	0x91
+ 1760 032f 50       		.sleb128 -48
+ 1761 0330 0A       		.uleb128 0xa
+ 1762 0331 4F010000 		.4byte	.LASF63
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\ccOsInVI.s 			page 38
+
+
+ 1763 0335 01       		.byte	0x1
+ 1764 0336 8D       		.byte	0x8d
+ 1765 0337 E4000000 		.4byte	0xe4
+ 1766 033b 02       		.uleb128 0x2
+ 1767 033c 91       		.byte	0x91
+ 1768 033d 48       		.sleb128 -56
+ 1769 033e 0A       		.uleb128 0xa
+ 1770 033f 90020000 		.4byte	.LASF64
+ 1771 0343 01       		.byte	0x1
+ 1772 0344 8D       		.byte	0x8d
+ 1773 0345 E4000000 		.4byte	0xe4
+ 1774 0349 02       		.uleb128 0x2
+ 1775 034a 91       		.byte	0x91
+ 1776 034b 40       		.sleb128 -64
+ 1777 034c 00       		.byte	0
+ 1778 034d 0B       		.uleb128 0xb
+ 1779 034e 75000000 		.4byte	.LASF66
+ 1780 0352 01       		.byte	0x1
+ 1781 0353 A3       		.byte	0xa3
+ 1782 0354 07010000 		.4byte	0x107
+ 1783 0358 00000000 		.4byte	.LFB68
+ 1784 035c 80000000 		.4byte	.LFE68-.LFB68
+ 1785 0360 01       		.uleb128 0x1
+ 1786 0361 9C       		.byte	0x9c
+ 1787 0362 75030000 		.4byte	0x375
+ 1788 0366 0A       		.uleb128 0xa
+ 1789 0367 31040000 		.4byte	.LASF67
+ 1790 036b 01       		.byte	0x1
+ 1791 036c A5       		.byte	0xa5
+ 1792 036d 07010000 		.4byte	0x107
+ 1793 0371 02       		.uleb128 0x2
+ 1794 0372 91       		.byte	0x91
+ 1795 0373 6C       		.sleb128 -20
+ 1796 0374 00       		.byte	0
+ 1797 0375 0B       		.uleb128 0xb
+ 1798 0376 42000000 		.4byte	.LASF68
+ 1799 037a 01       		.byte	0x1
+ 1800 037b AC       		.byte	0xac
+ 1801 037c 07010000 		.4byte	0x107
+ 1802 0380 00000000 		.4byte	.LFB69
+ 1803 0384 48000000 		.4byte	.LFE69-.LFB69
+ 1804 0388 01       		.uleb128 0x1
+ 1805 0389 9C       		.byte	0x9c
+ 1806 038a 9D030000 		.4byte	0x39d
+ 1807 038e 0A       		.uleb128 0xa
+ 1808 038f 31040000 		.4byte	.LASF67
+ 1809 0393 01       		.byte	0x1
+ 1810 0394 AE       		.byte	0xae
+ 1811 0395 07010000 		.4byte	0x107
+ 1812 0399 02       		.uleb128 0x2
+ 1813 039a 91       		.byte	0x91
+ 1814 039b 6C       		.sleb128 -20
+ 1815 039c 00       		.byte	0
+ 1816 039d 0B       		.uleb128 0xb
+ 1817 039e E8010000 		.4byte	.LASF69
+ 1818 03a2 01       		.byte	0x1
+ 1819 03a3 BE       		.byte	0xbe
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\ccOsInVI.s 			page 39
+
+
+ 1820 03a4 07010000 		.4byte	0x107
+ 1821 03a8 00000000 		.4byte	.LFB70
+ 1822 03ac C8000000 		.4byte	.LFE70-.LFB70
+ 1823 03b0 01       		.uleb128 0x1
+ 1824 03b1 9C       		.byte	0x9c
+ 1825 03b2 EF030000 		.4byte	0x3ef
+ 1826 03b6 0A       		.uleb128 0xa
+ 1827 03b7 D3030000 		.4byte	.LASF70
+ 1828 03bb 01       		.byte	0x1
+ 1829 03bc C4       		.byte	0xc4
+ 1830 03bd CE000000 		.4byte	0xce
+ 1831 03c1 02       		.uleb128 0x2
+ 1832 03c2 91       		.byte	0x91
+ 1833 03c3 6C       		.sleb128 -20
+ 1834 03c4 0A       		.uleb128 0xa
+ 1835 03c5 AE000000 		.4byte	.LASF62
+ 1836 03c9 01       		.byte	0x1
+ 1837 03ca C7       		.byte	0xc7
+ 1838 03cb E4000000 		.4byte	0xe4
+ 1839 03cf 02       		.uleb128 0x2
+ 1840 03d0 91       		.byte	0x91
+ 1841 03d1 60       		.sleb128 -32
+ 1842 03d2 0A       		.uleb128 0xa
+ 1843 03d3 4F010000 		.4byte	.LASF63
+ 1844 03d7 01       		.byte	0x1
+ 1845 03d8 C7       		.byte	0xc7
+ 1846 03d9 E4000000 		.4byte	0xe4
+ 1847 03dd 02       		.uleb128 0x2
+ 1848 03de 91       		.byte	0x91
+ 1849 03df 58       		.sleb128 -40
+ 1850 03e0 0A       		.uleb128 0xa
+ 1851 03e1 1B040000 		.4byte	.LASF71
+ 1852 03e5 01       		.byte	0x1
+ 1853 03e6 CD       		.byte	0xcd
+ 1854 03e7 07010000 		.4byte	0x107
+ 1855 03eb 02       		.uleb128 0x2
+ 1856 03ec 91       		.byte	0x91
+ 1857 03ed 54       		.sleb128 -44
+ 1858 03ee 00       		.byte	0
+ 1859 03ef 0B       		.uleb128 0xb
+ 1860 03f0 F9010000 		.4byte	.LASF72
+ 1861 03f4 01       		.byte	0x1
+ 1862 03f5 D5       		.byte	0xd5
+ 1863 03f6 07010000 		.4byte	0x107
+ 1864 03fa 00000000 		.4byte	.LFB71
+ 1865 03fe 40000000 		.4byte	.LFE71-.LFB71
+ 1866 0402 01       		.uleb128 0x1
+ 1867 0403 9C       		.byte	0x9c
+ 1868 0404 17040000 		.4byte	0x417
+ 1869 0408 0A       		.uleb128 0xa
+ 1870 0409 1B040000 		.4byte	.LASF71
+ 1871 040d 01       		.byte	0x1
+ 1872 040e D7       		.byte	0xd7
+ 1873 040f 07010000 		.4byte	0x107
+ 1874 0413 02       		.uleb128 0x2
+ 1875 0414 91       		.byte	0x91
+ 1876 0415 74       		.sleb128 -12
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\ccOsInVI.s 			page 40
+
+
+ 1877 0416 00       		.byte	0
+ 1878 0417 0B       		.uleb128 0xb
+ 1879 0418 44020000 		.4byte	.LASF73
+ 1880 041c 01       		.byte	0x1
+ 1881 041d E2       		.byte	0xe2
+ 1882 041e AD000000 		.4byte	0xad
+ 1883 0422 00000000 		.4byte	.LFB72
+ 1884 0426 A4000000 		.4byte	.LFE72-.LFB72
+ 1885 042a 01       		.uleb128 0x1
+ 1886 042b 9C       		.byte	0x9c
+ 1887 042c 69040000 		.4byte	0x469
+ 1888 0430 0C       		.uleb128 0xc
+ 1889 0431 14020000 		.4byte	.LASF79
+ 1890 0435 01       		.byte	0x1
+ 1891 0436 E2       		.byte	0xe2
+ 1892 0437 AD000000 		.4byte	0xad
+ 1893 043b 02       		.uleb128 0x2
+ 1894 043c 91       		.byte	0x91
+ 1895 043d 6F       		.sleb128 -17
+ 1896 043e 0A       		.uleb128 0xa
+ 1897 043f 10000000 		.4byte	.LASF74
+ 1898 0443 01       		.byte	0x1
+ 1899 0444 E5       		.byte	0xe5
+ 1900 0445 AD000000 		.4byte	0xad
+ 1901 0449 02       		.uleb128 0x2
+ 1902 044a 91       		.byte	0x91
+ 1903 044b 74       		.sleb128 -12
+ 1904 044c 0A       		.uleb128 0xa
+ 1905 044d 7C010000 		.4byte	.LASF75
+ 1906 0451 01       		.byte	0x1
+ 1907 0452 E6       		.byte	0xe6
+ 1908 0453 AD000000 		.4byte	0xad
+ 1909 0457 02       		.uleb128 0x2
+ 1910 0458 91       		.byte	0x91
+ 1911 0459 75       		.sleb128 -11
+ 1912 045a 0A       		.uleb128 0xa
+ 1913 045b B6010000 		.4byte	.LASF76
+ 1914 045f 01       		.byte	0x1
+ 1915 0460 E8       		.byte	0xe8
+ 1916 0461 FB000000 		.4byte	0xfb
+ 1917 0465 02       		.uleb128 0x2
+ 1918 0466 91       		.byte	0x91
+ 1919 0467 76       		.sleb128 -10
+ 1920 0468 00       		.byte	0
+ 1921 0469 0D       		.uleb128 0xd
+ 1922 046a E6020000 		.4byte	.LASF78
+ 1923 046e 01       		.byte	0x1
+ 1924 046f 1701     		.2byte	0x117
+ 1925 0471 00000000 		.4byte	.LFB73
+ 1926 0475 78000000 		.4byte	.LFE73-.LFB73
+ 1927 0479 01       		.uleb128 0x1
+ 1928 047a 9C       		.byte	0x9c
+ 1929 047b BC040000 		.4byte	0x4bc
+ 1930 047f 0E       		.uleb128 0xe
+ 1931 0480 14020000 		.4byte	.LASF79
+ 1932 0484 01       		.byte	0x1
+ 1933 0485 1701     		.2byte	0x117
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\ccOsInVI.s 			page 41
+
+
+ 1934 0487 AD000000 		.4byte	0xad
+ 1935 048b 02       		.uleb128 0x2
+ 1936 048c 91       		.byte	0x91
+ 1937 048d 6F       		.sleb128 -17
+ 1938 048e 0E       		.uleb128 0xe
+ 1939 048f 30030000 		.4byte	.LASF80
+ 1940 0493 01       		.byte	0x1
+ 1941 0494 1701     		.2byte	0x117
+ 1942 0496 AD000000 		.4byte	0xad
+ 1943 049a 02       		.uleb128 0x2
+ 1944 049b 91       		.byte	0x91
+ 1945 049c 6E       		.sleb128 -18
+ 1946 049d 0F       		.uleb128 0xf
+ 1947 049e AF010000 		.4byte	.LASF81
+ 1948 04a2 01       		.byte	0x1
+ 1949 04a3 1901     		.2byte	0x119
+ 1950 04a5 BC040000 		.4byte	0x4bc
+ 1951 04a9 02       		.uleb128 0x2
+ 1952 04aa 91       		.byte	0x91
+ 1953 04ab 74       		.sleb128 -12
+ 1954 04ac 0F       		.uleb128 0xf
+ 1955 04ad B6010000 		.4byte	.LASF76
+ 1956 04b1 01       		.byte	0x1
+ 1957 04b2 1A01     		.2byte	0x11a
+ 1958 04b4 FB000000 		.4byte	0xfb
+ 1959 04b8 02       		.uleb128 0x2
+ 1960 04b9 91       		.byte	0x91
+ 1961 04ba 76       		.sleb128 -10
+ 1962 04bb 00       		.byte	0
+ 1963 04bc 10       		.uleb128 0x10
+ 1964 04bd EF000000 		.4byte	0xef
+ 1965 04c1 CC040000 		.4byte	0x4cc
+ 1966 04c5 11       		.uleb128 0x11
+ 1967 04c6 23010000 		.4byte	0x123
+ 1968 04ca 01       		.byte	0x1
+ 1969 04cb 00       		.byte	0
+ 1970 04cc 12       		.uleb128 0x12
+ 1971 04cd 45040000 		.4byte	.LASF82
+ 1972 04d1 06       		.byte	0x6
+ 1973 04d2 1207     		.2byte	0x712
+ 1974 04d4 D8040000 		.4byte	0x4d8
+ 1975 04d8 13       		.uleb128 0x13
+ 1976 04d9 CE000000 		.4byte	0xce
+ 1977 04dd 14       		.uleb128 0x14
+ 1978 04de 6E000000 		.4byte	.LASF83
+ 1979 04e2 01       		.byte	0x1
+ 1980 04e3 22       		.byte	0x22
+ 1981 04e4 87020000 		.4byte	0x287
+ 1982 04e8 05       		.uleb128 0x5
+ 1983 04e9 03       		.byte	0x3
+ 1984 04ea 00000000 		.4byte	bme280
+ 1985 04ee 00       		.byte	0
+ 1986              		.section	.debug_abbrev,"",%progbits
+ 1987              	.Ldebug_abbrev0:
+ 1988 0000 01       		.uleb128 0x1
+ 1989 0001 11       		.uleb128 0x11
+ 1990 0002 01       		.byte	0x1
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\ccOsInVI.s 			page 42
+
+
+ 1991 0003 25       		.uleb128 0x25
+ 1992 0004 0E       		.uleb128 0xe
+ 1993 0005 13       		.uleb128 0x13
+ 1994 0006 0B       		.uleb128 0xb
+ 1995 0007 03       		.uleb128 0x3
+ 1996 0008 0E       		.uleb128 0xe
+ 1997 0009 1B       		.uleb128 0x1b
+ 1998 000a 0E       		.uleb128 0xe
+ 1999 000b 55       		.uleb128 0x55
+ 2000 000c 17       		.uleb128 0x17
+ 2001 000d 11       		.uleb128 0x11
+ 2002 000e 01       		.uleb128 0x1
+ 2003 000f 10       		.uleb128 0x10
+ 2004 0010 17       		.uleb128 0x17
+ 2005 0011 00       		.byte	0
+ 2006 0012 00       		.byte	0
+ 2007 0013 02       		.uleb128 0x2
+ 2008 0014 24       		.uleb128 0x24
+ 2009 0015 00       		.byte	0
+ 2010 0016 0B       		.uleb128 0xb
+ 2011 0017 0B       		.uleb128 0xb
+ 2012 0018 3E       		.uleb128 0x3e
+ 2013 0019 0B       		.uleb128 0xb
+ 2014 001a 03       		.uleb128 0x3
+ 2015 001b 0E       		.uleb128 0xe
+ 2016 001c 00       		.byte	0
+ 2017 001d 00       		.byte	0
+ 2018 001e 03       		.uleb128 0x3
+ 2019 001f 16       		.uleb128 0x16
+ 2020 0020 00       		.byte	0
+ 2021 0021 03       		.uleb128 0x3
+ 2022 0022 0E       		.uleb128 0xe
+ 2023 0023 3A       		.uleb128 0x3a
+ 2024 0024 0B       		.uleb128 0xb
+ 2025 0025 3B       		.uleb128 0x3b
+ 2026 0026 0B       		.uleb128 0xb
+ 2027 0027 49       		.uleb128 0x49
+ 2028 0028 13       		.uleb128 0x13
+ 2029 0029 00       		.byte	0
+ 2030 002a 00       		.byte	0
+ 2031 002b 04       		.uleb128 0x4
+ 2032 002c 24       		.uleb128 0x24
+ 2033 002d 00       		.byte	0
+ 2034 002e 0B       		.uleb128 0xb
+ 2035 002f 0B       		.uleb128 0xb
+ 2036 0030 3E       		.uleb128 0x3e
+ 2037 0031 0B       		.uleb128 0xb
+ 2038 0032 03       		.uleb128 0x3
+ 2039 0033 08       		.uleb128 0x8
+ 2040 0034 00       		.byte	0
+ 2041 0035 00       		.byte	0
+ 2042 0036 05       		.uleb128 0x5
+ 2043 0037 16       		.uleb128 0x16
+ 2044 0038 00       		.byte	0
+ 2045 0039 03       		.uleb128 0x3
+ 2046 003a 0E       		.uleb128 0xe
+ 2047 003b 3A       		.uleb128 0x3a
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\ccOsInVI.s 			page 43
+
+
+ 2048 003c 0B       		.uleb128 0xb
+ 2049 003d 3B       		.uleb128 0x3b
+ 2050 003e 05       		.uleb128 0x5
+ 2051 003f 49       		.uleb128 0x49
+ 2052 0040 13       		.uleb128 0x13
+ 2053 0041 00       		.byte	0
+ 2054 0042 00       		.byte	0
+ 2055 0043 06       		.uleb128 0x6
+ 2056 0044 13       		.uleb128 0x13
+ 2057 0045 01       		.byte	0x1
+ 2058 0046 0B       		.uleb128 0xb
+ 2059 0047 0B       		.uleb128 0xb
+ 2060 0048 3A       		.uleb128 0x3a
+ 2061 0049 0B       		.uleb128 0xb
+ 2062 004a 3B       		.uleb128 0x3b
+ 2063 004b 0B       		.uleb128 0xb
+ 2064 004c 01       		.uleb128 0x1
+ 2065 004d 13       		.uleb128 0x13
+ 2066 004e 00       		.byte	0
+ 2067 004f 00       		.byte	0
+ 2068 0050 07       		.uleb128 0x7
+ 2069 0051 0D       		.uleb128 0xd
+ 2070 0052 00       		.byte	0
+ 2071 0053 03       		.uleb128 0x3
+ 2072 0054 0E       		.uleb128 0xe
+ 2073 0055 3A       		.uleb128 0x3a
+ 2074 0056 0B       		.uleb128 0xb
+ 2075 0057 3B       		.uleb128 0x3b
+ 2076 0058 0B       		.uleb128 0xb
+ 2077 0059 49       		.uleb128 0x49
+ 2078 005a 13       		.uleb128 0x13
+ 2079 005b 38       		.uleb128 0x38
+ 2080 005c 0B       		.uleb128 0xb
+ 2081 005d 00       		.byte	0
+ 2082 005e 00       		.byte	0
+ 2083 005f 08       		.uleb128 0x8
+ 2084 0060 2E       		.uleb128 0x2e
+ 2085 0061 00       		.byte	0
+ 2086 0062 3F       		.uleb128 0x3f
+ 2087 0063 19       		.uleb128 0x19
+ 2088 0064 03       		.uleb128 0x3
+ 2089 0065 0E       		.uleb128 0xe
+ 2090 0066 3A       		.uleb128 0x3a
+ 2091 0067 0B       		.uleb128 0xb
+ 2092 0068 3B       		.uleb128 0x3b
+ 2093 0069 0B       		.uleb128 0xb
+ 2094 006a 11       		.uleb128 0x11
+ 2095 006b 01       		.uleb128 0x1
+ 2096 006c 12       		.uleb128 0x12
+ 2097 006d 06       		.uleb128 0x6
+ 2098 006e 40       		.uleb128 0x40
+ 2099 006f 18       		.uleb128 0x18
+ 2100 0070 9642     		.uleb128 0x2116
+ 2101 0072 19       		.uleb128 0x19
+ 2102 0073 00       		.byte	0
+ 2103 0074 00       		.byte	0
+ 2104 0075 09       		.uleb128 0x9
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\ccOsInVI.s 			page 44
+
+
+ 2105 0076 2E       		.uleb128 0x2e
+ 2106 0077 01       		.byte	0x1
+ 2107 0078 3F       		.uleb128 0x3f
+ 2108 0079 19       		.uleb128 0x19
+ 2109 007a 03       		.uleb128 0x3
+ 2110 007b 0E       		.uleb128 0xe
+ 2111 007c 3A       		.uleb128 0x3a
+ 2112 007d 0B       		.uleb128 0xb
+ 2113 007e 3B       		.uleb128 0x3b
+ 2114 007f 0B       		.uleb128 0xb
+ 2115 0080 49       		.uleb128 0x49
+ 2116 0081 13       		.uleb128 0x13
+ 2117 0082 11       		.uleb128 0x11
+ 2118 0083 01       		.uleb128 0x1
+ 2119 0084 12       		.uleb128 0x12
+ 2120 0085 06       		.uleb128 0x6
+ 2121 0086 40       		.uleb128 0x40
+ 2122 0087 18       		.uleb128 0x18
+ 2123 0088 9642     		.uleb128 0x2116
+ 2124 008a 19       		.uleb128 0x19
+ 2125 008b 01       		.uleb128 0x1
+ 2126 008c 13       		.uleb128 0x13
+ 2127 008d 00       		.byte	0
+ 2128 008e 00       		.byte	0
+ 2129 008f 0A       		.uleb128 0xa
+ 2130 0090 34       		.uleb128 0x34
+ 2131 0091 00       		.byte	0
+ 2132 0092 03       		.uleb128 0x3
+ 2133 0093 0E       		.uleb128 0xe
+ 2134 0094 3A       		.uleb128 0x3a
+ 2135 0095 0B       		.uleb128 0xb
+ 2136 0096 3B       		.uleb128 0x3b
+ 2137 0097 0B       		.uleb128 0xb
+ 2138 0098 49       		.uleb128 0x49
+ 2139 0099 13       		.uleb128 0x13
+ 2140 009a 02       		.uleb128 0x2
+ 2141 009b 18       		.uleb128 0x18
+ 2142 009c 00       		.byte	0
+ 2143 009d 00       		.byte	0
+ 2144 009e 0B       		.uleb128 0xb
+ 2145 009f 2E       		.uleb128 0x2e
+ 2146 00a0 01       		.byte	0x1
+ 2147 00a1 3F       		.uleb128 0x3f
+ 2148 00a2 19       		.uleb128 0x19
+ 2149 00a3 03       		.uleb128 0x3
+ 2150 00a4 0E       		.uleb128 0xe
+ 2151 00a5 3A       		.uleb128 0x3a
+ 2152 00a6 0B       		.uleb128 0xb
+ 2153 00a7 3B       		.uleb128 0x3b
+ 2154 00a8 0B       		.uleb128 0xb
+ 2155 00a9 27       		.uleb128 0x27
+ 2156 00aa 19       		.uleb128 0x19
+ 2157 00ab 49       		.uleb128 0x49
+ 2158 00ac 13       		.uleb128 0x13
+ 2159 00ad 11       		.uleb128 0x11
+ 2160 00ae 01       		.uleb128 0x1
+ 2161 00af 12       		.uleb128 0x12
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\ccOsInVI.s 			page 45
+
+
+ 2162 00b0 06       		.uleb128 0x6
+ 2163 00b1 40       		.uleb128 0x40
+ 2164 00b2 18       		.uleb128 0x18
+ 2165 00b3 9642     		.uleb128 0x2116
+ 2166 00b5 19       		.uleb128 0x19
+ 2167 00b6 01       		.uleb128 0x1
+ 2168 00b7 13       		.uleb128 0x13
+ 2169 00b8 00       		.byte	0
+ 2170 00b9 00       		.byte	0
+ 2171 00ba 0C       		.uleb128 0xc
+ 2172 00bb 05       		.uleb128 0x5
+ 2173 00bc 00       		.byte	0
+ 2174 00bd 03       		.uleb128 0x3
+ 2175 00be 0E       		.uleb128 0xe
+ 2176 00bf 3A       		.uleb128 0x3a
+ 2177 00c0 0B       		.uleb128 0xb
+ 2178 00c1 3B       		.uleb128 0x3b
+ 2179 00c2 0B       		.uleb128 0xb
+ 2180 00c3 49       		.uleb128 0x49
+ 2181 00c4 13       		.uleb128 0x13
+ 2182 00c5 02       		.uleb128 0x2
+ 2183 00c6 18       		.uleb128 0x18
+ 2184 00c7 00       		.byte	0
+ 2185 00c8 00       		.byte	0
+ 2186 00c9 0D       		.uleb128 0xd
+ 2187 00ca 2E       		.uleb128 0x2e
+ 2188 00cb 01       		.byte	0x1
+ 2189 00cc 3F       		.uleb128 0x3f
+ 2190 00cd 19       		.uleb128 0x19
+ 2191 00ce 03       		.uleb128 0x3
+ 2192 00cf 0E       		.uleb128 0xe
+ 2193 00d0 3A       		.uleb128 0x3a
+ 2194 00d1 0B       		.uleb128 0xb
+ 2195 00d2 3B       		.uleb128 0x3b
+ 2196 00d3 05       		.uleb128 0x5
+ 2197 00d4 27       		.uleb128 0x27
+ 2198 00d5 19       		.uleb128 0x19
+ 2199 00d6 11       		.uleb128 0x11
+ 2200 00d7 01       		.uleb128 0x1
+ 2201 00d8 12       		.uleb128 0x12
+ 2202 00d9 06       		.uleb128 0x6
+ 2203 00da 40       		.uleb128 0x40
+ 2204 00db 18       		.uleb128 0x18
+ 2205 00dc 9642     		.uleb128 0x2116
+ 2206 00de 19       		.uleb128 0x19
+ 2207 00df 01       		.uleb128 0x1
+ 2208 00e0 13       		.uleb128 0x13
+ 2209 00e1 00       		.byte	0
+ 2210 00e2 00       		.byte	0
+ 2211 00e3 0E       		.uleb128 0xe
+ 2212 00e4 05       		.uleb128 0x5
+ 2213 00e5 00       		.byte	0
+ 2214 00e6 03       		.uleb128 0x3
+ 2215 00e7 0E       		.uleb128 0xe
+ 2216 00e8 3A       		.uleb128 0x3a
+ 2217 00e9 0B       		.uleb128 0xb
+ 2218 00ea 3B       		.uleb128 0x3b
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\ccOsInVI.s 			page 46
+
+
+ 2219 00eb 05       		.uleb128 0x5
+ 2220 00ec 49       		.uleb128 0x49
+ 2221 00ed 13       		.uleb128 0x13
+ 2222 00ee 02       		.uleb128 0x2
+ 2223 00ef 18       		.uleb128 0x18
+ 2224 00f0 00       		.byte	0
+ 2225 00f1 00       		.byte	0
+ 2226 00f2 0F       		.uleb128 0xf
+ 2227 00f3 34       		.uleb128 0x34
+ 2228 00f4 00       		.byte	0
+ 2229 00f5 03       		.uleb128 0x3
+ 2230 00f6 0E       		.uleb128 0xe
+ 2231 00f7 3A       		.uleb128 0x3a
+ 2232 00f8 0B       		.uleb128 0xb
+ 2233 00f9 3B       		.uleb128 0x3b
+ 2234 00fa 05       		.uleb128 0x5
+ 2235 00fb 49       		.uleb128 0x49
+ 2236 00fc 13       		.uleb128 0x13
+ 2237 00fd 02       		.uleb128 0x2
+ 2238 00fe 18       		.uleb128 0x18
+ 2239 00ff 00       		.byte	0
+ 2240 0100 00       		.byte	0
+ 2241 0101 10       		.uleb128 0x10
+ 2242 0102 01       		.uleb128 0x1
+ 2243 0103 01       		.byte	0x1
+ 2244 0104 49       		.uleb128 0x49
+ 2245 0105 13       		.uleb128 0x13
+ 2246 0106 01       		.uleb128 0x1
+ 2247 0107 13       		.uleb128 0x13
+ 2248 0108 00       		.byte	0
+ 2249 0109 00       		.byte	0
+ 2250 010a 11       		.uleb128 0x11
+ 2251 010b 21       		.uleb128 0x21
+ 2252 010c 00       		.byte	0
+ 2253 010d 49       		.uleb128 0x49
+ 2254 010e 13       		.uleb128 0x13
+ 2255 010f 2F       		.uleb128 0x2f
+ 2256 0110 0B       		.uleb128 0xb
+ 2257 0111 00       		.byte	0
+ 2258 0112 00       		.byte	0
+ 2259 0113 12       		.uleb128 0x12
+ 2260 0114 34       		.uleb128 0x34
+ 2261 0115 00       		.byte	0
+ 2262 0116 03       		.uleb128 0x3
+ 2263 0117 0E       		.uleb128 0xe
+ 2264 0118 3A       		.uleb128 0x3a
+ 2265 0119 0B       		.uleb128 0xb
+ 2266 011a 3B       		.uleb128 0x3b
+ 2267 011b 05       		.uleb128 0x5
+ 2268 011c 49       		.uleb128 0x49
+ 2269 011d 13       		.uleb128 0x13
+ 2270 011e 3F       		.uleb128 0x3f
+ 2271 011f 19       		.uleb128 0x19
+ 2272 0120 3C       		.uleb128 0x3c
+ 2273 0121 19       		.uleb128 0x19
+ 2274 0122 00       		.byte	0
+ 2275 0123 00       		.byte	0
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\ccOsInVI.s 			page 47
+
+
+ 2276 0124 13       		.uleb128 0x13
+ 2277 0125 35       		.uleb128 0x35
+ 2278 0126 00       		.byte	0
+ 2279 0127 49       		.uleb128 0x49
+ 2280 0128 13       		.uleb128 0x13
+ 2281 0129 00       		.byte	0
+ 2282 012a 00       		.byte	0
+ 2283 012b 14       		.uleb128 0x14
+ 2284 012c 34       		.uleb128 0x34
+ 2285 012d 00       		.byte	0
+ 2286 012e 03       		.uleb128 0x3
+ 2287 012f 0E       		.uleb128 0xe
+ 2288 0130 3A       		.uleb128 0x3a
+ 2289 0131 0B       		.uleb128 0xb
+ 2290 0132 3B       		.uleb128 0x3b
+ 2291 0133 0B       		.uleb128 0xb
+ 2292 0134 49       		.uleb128 0x49
+ 2293 0135 13       		.uleb128 0x13
+ 2294 0136 3F       		.uleb128 0x3f
+ 2295 0137 19       		.uleb128 0x19
+ 2296 0138 02       		.uleb128 0x2
+ 2297 0139 18       		.uleb128 0x18
+ 2298 013a 00       		.byte	0
+ 2299 013b 00       		.byte	0
+ 2300 013c 00       		.byte	0
+ 2301              		.section	.debug_aranges,"",%progbits
+ 2302 0000 6C000000 		.4byte	0x6c
+ 2303 0004 0200     		.2byte	0x2
+ 2304 0006 00000000 		.4byte	.Ldebug_info0
+ 2305 000a 04       		.byte	0x4
+ 2306 000b 00       		.byte	0
+ 2307 000c 0000     		.2byte	0
+ 2308 000e 0000     		.2byte	0
+ 2309 0010 00000000 		.4byte	.LFB63
+ 2310 0014 10000000 		.4byte	.LFE63-.LFB63
+ 2311 0018 00000000 		.4byte	.LFB64
+ 2312 001c 0C000000 		.4byte	.LFE64-.LFB64
+ 2313 0020 00000000 		.4byte	.LFB65
+ 2314 0024 30020000 		.4byte	.LFE65-.LFB65
+ 2315 0028 00000000 		.4byte	.LFB66
+ 2316 002c 10000000 		.4byte	.LFE66-.LFB66
+ 2317 0030 00000000 		.4byte	.LFB67
+ 2318 0034 BC030000 		.4byte	.LFE67-.LFB67
+ 2319 0038 00000000 		.4byte	.LFB68
+ 2320 003c 80000000 		.4byte	.LFE68-.LFB68
+ 2321 0040 00000000 		.4byte	.LFB69
+ 2322 0044 48000000 		.4byte	.LFE69-.LFB69
+ 2323 0048 00000000 		.4byte	.LFB70
+ 2324 004c C8000000 		.4byte	.LFE70-.LFB70
+ 2325 0050 00000000 		.4byte	.LFB71
+ 2326 0054 40000000 		.4byte	.LFE71-.LFB71
+ 2327 0058 00000000 		.4byte	.LFB72
+ 2328 005c A4000000 		.4byte	.LFE72-.LFB72
+ 2329 0060 00000000 		.4byte	.LFB73
+ 2330 0064 78000000 		.4byte	.LFE73-.LFB73
+ 2331 0068 00000000 		.4byte	0
+ 2332 006c 00000000 		.4byte	0
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\ccOsInVI.s 			page 48
+
+
+ 2333              		.section	.debug_ranges,"",%progbits
+ 2334              	.Ldebug_ranges0:
+ 2335 0000 00000000 		.4byte	.LFB63
+ 2336 0004 10000000 		.4byte	.LFE63
+ 2337 0008 00000000 		.4byte	.LFB64
+ 2338 000c 0C000000 		.4byte	.LFE64
+ 2339 0010 00000000 		.4byte	.LFB65
+ 2340 0014 30020000 		.4byte	.LFE65
+ 2341 0018 00000000 		.4byte	.LFB66
+ 2342 001c 10000000 		.4byte	.LFE66
+ 2343 0020 00000000 		.4byte	.LFB67
+ 2344 0024 BC030000 		.4byte	.LFE67
+ 2345 0028 00000000 		.4byte	.LFB68
+ 2346 002c 80000000 		.4byte	.LFE68
+ 2347 0030 00000000 		.4byte	.LFB69
+ 2348 0034 48000000 		.4byte	.LFE69
+ 2349 0038 00000000 		.4byte	.LFB70
+ 2350 003c C8000000 		.4byte	.LFE70
+ 2351 0040 00000000 		.4byte	.LFB71
+ 2352 0044 40000000 		.4byte	.LFE71
+ 2353 0048 00000000 		.4byte	.LFB72
+ 2354 004c A4000000 		.4byte	.LFE72
+ 2355 0050 00000000 		.4byte	.LFB73
+ 2356 0054 78000000 		.4byte	.LFE73
+ 2357 0058 00000000 		.4byte	0
+ 2358 005c 00000000 		.4byte	0
+ 2359              		.section	.debug_line,"",%progbits
+ 2360              	.Ldebug_line0:
+ 2361 0000 C3020000 		.section	.debug_str,"MS",%progbits,1
+ 2361      02005A01 
+ 2361      00000201 
+ 2361      FB0E0D00 
+ 2361      01010101 
+ 2362              	.LASF35:
+ 2363 0000 70726573 		.ascii	"pressOverSample\000"
+ 2363      734F7665 
+ 2363      7253616D 
+ 2363      706C6500 
+ 2364              	.LASF74:
+ 2365 0010 72657375 		.ascii	"result\000"
+ 2365      6C7400
+ 2366              	.LASF49:
+ 2367 0017 53656E73 		.ascii	"SensorCalibration\000"
+ 2367      6F724361 
+ 2367      6C696272 
+ 2367      6174696F 
+ 2367      6E00
+ 2368              	.LASF30:
+ 2369 0029 63686970 		.ascii	"chipSelectPin\000"
+ 2369      53656C65 
+ 2369      63745069 
+ 2369      6E00
+ 2370              	.LASF29:
+ 2371 0037 49324341 		.ascii	"I2CAddress\000"
+ 2371      64647265 
+ 2371      737300
+ 2372              	.LASF68:
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\ccOsInVI.s 			page 49
+
+
+ 2373 0042 424D4532 		.ascii	"BME280_readFloatAltitudeFeet\000"
+ 2373      38305F72 
+ 2373      65616446 
+ 2373      6C6F6174 
+ 2373      416C7469 
+ 2374              	.LASF34:
+ 2375 005f 74656D70 		.ascii	"tempOverSample\000"
+ 2375      4F766572 
+ 2375      53616D70 
+ 2375      6C6500
+ 2376              	.LASF83:
+ 2377 006e 626D6532 		.ascii	"bme280\000"
+ 2377      383000
+ 2378              	.LASF66:
+ 2379 0075 424D4532 		.ascii	"BME280_readFloatAltitudeMeters\000"
+ 2379      38305F72 
+ 2379      65616446 
+ 2379      6C6F6174 
+ 2379      416C7469 
+ 2380              	.LASF4:
+ 2381 0094 73686F72 		.ascii	"short int\000"
+ 2381      7420696E 
+ 2381      7400
+ 2382              	.LASF55:
+ 2383 009e 424D4532 		.ascii	"BME280\000"
+ 2383      383000
+ 2384              	.LASF27:
+ 2385 00a5 73697A65 		.ascii	"sizetype\000"
+ 2385      74797065 
+ 2385      00
+ 2386              	.LASF62:
+ 2387 00ae 76617231 		.ascii	"var1\000"
+ 2387      00
+ 2388              	.LASF84:
+ 2389 00b3 474E5520 		.ascii	"GNU C11 5.4.1 20160609 (release) [ARM/embedded-5-br"
+ 2389      43313120 
+ 2389      352E342E 
+ 2389      31203230 
+ 2389      31363036 
+ 2390 00e6 616E6368 		.ascii	"anch revision 237715] -mcpu=cortex-m3 -mthumb -g -O"
+ 2390      20726576 
+ 2390      6973696F 
+ 2390      6E203233 
+ 2390      37373135 
+ 2391 0119 30202D66 		.ascii	"0 -ffunction-sections -ffat-lto-objects\000"
+ 2391      66756E63 
+ 2391      74696F6E 
+ 2391      2D736563 
+ 2391      74696F6E 
+ 2392              	.LASF12:
+ 2393 0141 6C6F6E67 		.ascii	"long long int\000"
+ 2393      206C6F6E 
+ 2393      6720696E 
+ 2393      7400
+ 2394              	.LASF63:
+ 2395 014f 76617232 		.ascii	"var2\000"
+ 2395      00
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\ccOsInVI.s 			page 50
+
+
+ 2396              	.LASF5:
+ 2397 0154 5F5F7569 		.ascii	"__uint16_t\000"
+ 2397      6E743136 
+ 2397      5F7400
+ 2398              	.LASF59:
+ 2399 015f 64657669 		.ascii	"device_address\000"
+ 2399      63655F61 
+ 2399      64647265 
+ 2399      737300
+ 2400              	.LASF61:
+ 2401 016e 6164635F 		.ascii	"adc_P\000"
+ 2401      5000
+ 2402              	.LASF20:
+ 2403 0174 696E7436 		.ascii	"int64_t\000"
+ 2403      345F7400 
+ 2404              	.LASF75:
+ 2405 017c 6E756D42 		.ascii	"numBytes\000"
+ 2405      79746573 
+ 2405      00
+ 2406              	.LASF22:
+ 2407 0185 75696E74 		.ascii	"uint16\000"
+ 2407      313600
+ 2408              	.LASF41:
+ 2409 018c 6469675F 		.ascii	"dig_P2\000"
+ 2409      503200
+ 2410              	.LASF15:
+ 2411 0193 75696E74 		.ascii	"uint8_t\000"
+ 2411      385F7400 
+ 2412              	.LASF58:
+ 2413 019b 64617461 		.ascii	"data_to_write\000"
+ 2413      5F746F5F 
+ 2413      77726974 
+ 2413      6500
+ 2414              	.LASF21:
+ 2415 01a9 75696E74 		.ascii	"uint8\000"
+ 2415      3800
+ 2416              	.LASF81:
+ 2417 01af 7061636B 		.ascii	"packet\000"
+ 2417      657400
+ 2418              	.LASF76:
+ 2419 01b6 69746572 		.ascii	"iter\000"
+ 2419      00
+ 2420              	.LASF23:
+ 2421 01bb 666C6F61 		.ascii	"float\000"
+ 2421      7400
+ 2422              	.LASF50:
+ 2423 01c1 73657474 		.ascii	"settings\000"
+ 2423      696E6773 
+ 2423      00
+ 2424              	.LASF56:
+ 2425 01ca 424D4532 		.ascii	"BME280_start\000"
+ 2425      38305F73 
+ 2425      74617274 
+ 2425      00
+ 2426              	.LASF85:
+ 2427 01d7 424D4532 		.ascii	"BME280.c\000"
+ 2427      38302E63 
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\ccOsInVI.s 			page 51
+
+
+ 2427      00
+ 2428              	.LASF31:
+ 2429 01e0 72756E4D 		.ascii	"runMode\000"
+ 2429      6F646500 
+ 2430              	.LASF69:
+ 2431 01e8 424D4532 		.ascii	"BME280_readTempC\000"
+ 2431      38305F72 
+ 2431      65616454 
+ 2431      656D7043 
+ 2431      00
+ 2432              	.LASF72:
+ 2433 01f9 424D4532 		.ascii	"BME280_readTempF\000"
+ 2433      38305F72 
+ 2433      65616454 
+ 2433      656D7046 
+ 2433      00
+ 2434              	.LASF11:
+ 2435 020a 5F5F696E 		.ascii	"__int64_t\000"
+ 2435      7436345F 
+ 2435      7400
+ 2436              	.LASF79:
+ 2437 0214 6F666673 		.ascii	"offset\000"
+ 2437      657400
+ 2438              	.LASF52:
+ 2439 021b 745F6669 		.ascii	"t_fine\000"
+ 2439      6E6500
+ 2440              	.LASF51:
+ 2441 0222 63616C69 		.ascii	"calibration\000"
+ 2441      62726174 
+ 2441      696F6E00 
+ 2442              	.LASF2:
+ 2443 022e 5F5F7569 		.ascii	"__uint8_t\000"
+ 2443      6E74385F 
+ 2443      7400
+ 2444              	.LASF26:
+ 2445 0238 6C6F6E67 		.ascii	"long double\000"
+ 2445      20646F75 
+ 2445      626C6500 
+ 2446              	.LASF73:
+ 2447 0244 424D4532 		.ascii	"BME280_readRegister\000"
+ 2447      38305F72 
+ 2447      65616452 
+ 2447      65676973 
+ 2447      74657200 
+ 2448              	.LASF42:
+ 2449 0258 6469675F 		.ascii	"dig_P3\000"
+ 2449      503300
+ 2450              	.LASF1:
+ 2451 025f 756E7369 		.ascii	"unsigned char\000"
+ 2451      676E6564 
+ 2451      20636861 
+ 2451      7200
+ 2452              	.LASF0:
+ 2453 026d 7369676E 		.ascii	"signed char\000"
+ 2453      65642063 
+ 2453      68617200 
+ 2454              	.LASF13:
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\ccOsInVI.s 			page 52
+
+
+ 2455 0279 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 2455      206C6F6E 
+ 2455      6720756E 
+ 2455      7369676E 
+ 2455      65642069 
+ 2456              	.LASF64:
+ 2457 0290 705F6163 		.ascii	"p_acc\000"
+ 2457      6300
+ 2458              	.LASF19:
+ 2459 0296 75696E74 		.ascii	"uint32_t\000"
+ 2459      33325F74 
+ 2459      00
+ 2460              	.LASF14:
+ 2461 029f 756E7369 		.ascii	"unsigned int\000"
+ 2461      676E6564 
+ 2461      20696E74 
+ 2461      00
+ 2462              	.LASF17:
+ 2463 02ac 75696E74 		.ascii	"uint16_t\000"
+ 2463      31365F74 
+ 2463      00
+ 2464              	.LASF65:
+ 2465 02b5 424D4532 		.ascii	"BME280_readFloatPressure\000"
+ 2465      38305F72 
+ 2465      65616446 
+ 2465      6C6F6174 
+ 2465      50726573 
+ 2466              	.LASF6:
+ 2467 02ce 73686F72 		.ascii	"short unsigned int\000"
+ 2467      7420756E 
+ 2467      7369676E 
+ 2467      65642069 
+ 2467      6E7400
+ 2468              	.LASF25:
+ 2469 02e1 63686172 		.ascii	"char\000"
+ 2469      00
+ 2470              	.LASF78:
+ 2471 02e6 424D4532 		.ascii	"BME280_writeRegister\000"
+ 2471      38305F77 
+ 2471      72697465 
+ 2471      52656769 
+ 2471      73746572 
+ 2472              	.LASF8:
+ 2473 02fb 6C6F6E67 		.ascii	"long int\000"
+ 2473      20696E74 
+ 2473      00
+ 2474              	.LASF18:
+ 2475 0304 696E7433 		.ascii	"int32_t\000"
+ 2475      325F7400 
+ 2476              	.LASF16:
+ 2477 030c 696E7431 		.ascii	"int16_t\000"
+ 2477      365F7400 
+ 2478              	.LASF77:
+ 2479 0314 424D4532 		.ascii	"BME280_init\000"
+ 2479      38305F69 
+ 2479      6E697400 
+ 2480              	.LASF40:
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\ccOsInVI.s 			page 53
+
+
+ 2481 0320 6469675F 		.ascii	"dig_P1\000"
+ 2481      503100
+ 2482              	.LASF54:
+ 2483 0327 70726573 		.ascii	"press_Pa\000"
+ 2483      735F5061 
+ 2483      00
+ 2484              	.LASF80:
+ 2485 0330 64617461 		.ascii	"data\000"
+ 2485      00
+ 2486              	.LASF43:
+ 2487 0335 6469675F 		.ascii	"dig_P4\000"
+ 2487      503400
+ 2488              	.LASF44:
+ 2489 033c 6469675F 		.ascii	"dig_P5\000"
+ 2489      503500
+ 2490              	.LASF45:
+ 2491 0343 6469675F 		.ascii	"dig_P6\000"
+ 2491      503600
+ 2492              	.LASF46:
+ 2493 034a 6469675F 		.ascii	"dig_P7\000"
+ 2493      503700
+ 2494              	.LASF47:
+ 2495 0351 6469675F 		.ascii	"dig_P8\000"
+ 2495      503800
+ 2496              	.LASF48:
+ 2497 0358 6469675F 		.ascii	"dig_P9\000"
+ 2497      503900
+ 2498              	.LASF57:
+ 2499 035f 424D4532 		.ascii	"BME280_stop\000"
+ 2499      38305F73 
+ 2499      746F7000 
+ 2500              	.LASF10:
+ 2501 036b 6C6F6E67 		.ascii	"long unsigned int\000"
+ 2501      20756E73 
+ 2501      69676E65 
+ 2501      6420696E 
+ 2501      7400
+ 2502              	.LASF24:
+ 2503 037d 646F7562 		.ascii	"double\000"
+ 2503      6C6500
+ 2504              	.LASF37:
+ 2505 0384 6469675F 		.ascii	"dig_T1\000"
+ 2505      543100
+ 2506              	.LASF38:
+ 2507 038b 6469675F 		.ascii	"dig_T2\000"
+ 2507      543200
+ 2508              	.LASF39:
+ 2509 0392 6469675F 		.ascii	"dig_T3\000"
+ 2509      543300
+ 2510              	.LASF28:
+ 2511 0399 636F6D6D 		.ascii	"commInterface\000"
+ 2511      496E7465 
+ 2511      72666163 
+ 2511      6500
+ 2512              	.LASF9:
+ 2513 03a7 5F5F7569 		.ascii	"__uint32_t\000"
+ 2513      6E743332 
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\ccOsInVI.s 			page 54
+
+
+ 2513      5F7400
+ 2514              	.LASF7:
+ 2515 03b2 5F5F696E 		.ascii	"__int32_t\000"
+ 2515      7433325F 
+ 2515      7400
+ 2516              	.LASF3:
+ 2517 03bc 5F5F696E 		.ascii	"__int16_t\000"
+ 2517      7431365F 
+ 2517      7400
+ 2518              	.LASF60:
+ 2519 03c6 424D4532 		.ascii	"BME280_reset\000"
+ 2519      38305F72 
+ 2519      65736574 
+ 2519      00
+ 2520              	.LASF70:
+ 2521 03d3 6164635F 		.ascii	"adc_T\000"
+ 2521      5400
+ 2522              	.LASF86:
+ 2523 03d9 433A5C55 		.ascii	"C:\\Users\\Arisvis\\Desktop\\BME280 + Bluetooth\\BM"
+ 2523      73657273 
+ 2523      5C417269 
+ 2523      73766973 
+ 2523      5C446573 
+ 2524 0407 45323830 		.ascii	"E280.cydsn\000"
+ 2524      2E637964 
+ 2524      736E00
+ 2525              	.LASF32:
+ 2526 0412 74537461 		.ascii	"tStandby\000"
+ 2526      6E646279 
+ 2526      00
+ 2527              	.LASF71:
+ 2528 041b 6F757470 		.ascii	"output\000"
+ 2528      757400
+ 2529              	.LASF36:
+ 2530 0422 53656E73 		.ascii	"SensorSettings\000"
+ 2530      6F725365 
+ 2530      7474696E 
+ 2530      677300
+ 2531              	.LASF67:
+ 2532 0431 68656967 		.ascii	"heightOutput\000"
+ 2532      68744F75 
+ 2532      74707574 
+ 2532      00
+ 2533              	.LASF33:
+ 2534 043e 66696C74 		.ascii	"filter\000"
+ 2534      657200
+ 2535              	.LASF82:
+ 2536 0445 49544D5F 		.ascii	"ITM_RxBuffer\000"
+ 2536      52784275 
+ 2536      66666572 
+ 2536      00
+ 2537              	.LASF53:
+ 2538 0452 74656D70 		.ascii	"temp_C\000"
+ 2538      5F4300
+ 2539              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 5.4.1 20160609 (release) [ARM/embedded-5-bran

@@ -1,0 +1,3215 @@
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\cc4xzKPt.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 6
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.syntax unified
+  15              		.file	"BMP280.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.global	bmp280
+  20              		.data
+  21              		.align	2
+  22              		.type	bmp280, %object
+  23              		.size	bmp280, 44
+  24              	bmp280:
+  25 0000 00       		.byte	0
+  26 0001 76       		.byte	118
+  27 0002 0A       		.byte	10
+  28 0003 03       		.byte	3
+  29 0004 0000     		.space	2
+  30 0006 02       		.byte	2
+  31 0007 05       		.byte	5
+  32 0008 00000000 		.space	24
+  32      00000000 
+  32      00000000 
+  32      00000000 
+  32      00000000 
+  33 0020 00000000 		.word	0
+  34 0024 003C1CC6 		.word	-971228160
+  35 0028 003C1CC6 		.word	-971228160
+  36              		.section	.text.BMP280_start,"ax",%progbits
+  37              		.align	2
+  38              		.global	BMP280_start
+  39              		.thumb
+  40              		.thumb_func
+  41              		.type	BMP280_start, %function
+  42              	BMP280_start:
+  43              	.LFB56:
+  44              		.file 1 "BMP280.c"
+   1:BMP280.c      **** /* ========================================
+   2:BMP280.c      ****  *
+   3:BMP280.c      **** Library created by Fabricio Arismendi Svistoñuk,
+   4:BMP280.c      **** for operation of the BMP280 temperature and Pressure sensor
+   5:BMP280.c      **** under the PSoC 5lp platform (not compatible with BME280 or BMP180).
+   6:BMP280.c      **** 
+   7:BMP280.c      **** To be used with the BME280 sensor, it is necessary to modify the registers.
+   8:BMP280.c      ****  *
+   9:BMP280.c      ****  * ========================================
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\cc4xzKPt.s 			page 2
+
+
+  10:BMP280.c      **** */
+  11:BMP280.c      **** 
+  12:BMP280.c      **** #include "BMP280.h"
+  13:BMP280.c      **** #include <math.h>
+  14:BMP280.c      **** 
+  15:BMP280.c      **** 
+  16:BMP280.c      **** //****************************************************************************//
+  17:BMP280.c      **** //
+  18:BMP280.c      **** //  Settings and configuration
+  19:BMP280.c      **** //
+  20:BMP280.c      **** //****************************************************************************//
+  21:BMP280.c      **** 
+  22:BMP280.c      **** //Construct with these default settings if nothing is specified
+  23:BMP280.c      **** BMP280 bmp280 = {
+  24:BMP280.c      ****     .settings = {
+  25:BMP280.c      ****         //Select interface mode
+  26:BMP280.c      ****         .commInterface  = BMP280_I2C_MODE,
+  27:BMP280.c      ****     	//Select address for I2C.  Does nothing for SPI            
+  28:BMP280.c      ****         .I2CAddress     = 0x76,
+  29:BMP280.c      ****     	//Select CS pin for SPI.  Does nothing for I2C            
+  30:BMP280.c      ****         .chipSelectPin  = 10,
+  31:BMP280.c      ****         .runMode        = 3,
+  32:BMP280.c      ****         .tempOverSample = 2,
+  33:BMP280.c      ****         .pressOverSample= 5,
+  34:BMP280.c      **** 
+  35:BMP280.c      ****         },
+  36:BMP280.c      ****     .calibration = {},
+  37:BMP280.c      ****     .t_fine = 0,
+  38:BMP280.c      ****     .temp_C     = -9999,
+  39:BMP280.c      ****     .press_Pa   = -9999,
+  40:BMP280.c      **** 
+  41:BMP280.c      **** };
+  42:BMP280.c      **** 
+  43:BMP280.c      **** void BMP280_start() {
+  45              		.loc 1 43 0
+  46              		.cfi_startproc
+  47              		@ args = 0, pretend = 0, frame = 0
+  48              		@ frame_needed = 1, uses_anonymous_args = 0
+  49 0000 80B5     		push	{r7, lr}
+  50              		.cfi_def_cfa_offset 8
+  51              		.cfi_offset 7, -8
+  52              		.cfi_offset 14, -4
+  53 0002 00AF     		add	r7, sp, #0
+  54              		.cfi_def_cfa_register 7
+  44:BMP280.c      ****     I2C_Start();
+  55              		.loc 1 44 0
+  56 0004 FFF7FEFF 		bl	I2C_Start
+  45:BMP280.c      ****     I2C_Sleep();
+  57              		.loc 1 45 0
+  58 0008 FFF7FEFF 		bl	I2C_Sleep
+  46:BMP280.c      **** }
+  59              		.loc 1 46 0
+  60 000c 00BF     		nop
+  61 000e 80BD     		pop	{r7, pc}
+  62              		.cfi_endproc
+  63              	.LFE56:
+  64              		.size	BMP280_start, .-BMP280_start
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\cc4xzKPt.s 			page 3
+
+
+  65              		.section	.text.BMP280_stop,"ax",%progbits
+  66              		.align	2
+  67              		.global	BMP280_stop
+  68              		.thumb
+  69              		.thumb_func
+  70              		.type	BMP280_stop, %function
+  71              	BMP280_stop:
+  72              	.LFB57:
+  47:BMP280.c      **** 
+  48:BMP280.c      **** void BMP280_stop() {
+  73              		.loc 1 48 0
+  74              		.cfi_startproc
+  75              		@ args = 0, pretend = 0, frame = 0
+  76              		@ frame_needed = 1, uses_anonymous_args = 0
+  77 0000 80B5     		push	{r7, lr}
+  78              		.cfi_def_cfa_offset 8
+  79              		.cfi_offset 7, -8
+  80              		.cfi_offset 14, -4
+  81 0002 00AF     		add	r7, sp, #0
+  82              		.cfi_def_cfa_register 7
+  49:BMP280.c      ****     I2C_Stop();
+  83              		.loc 1 49 0
+  84 0004 FFF7FEFF 		bl	I2C_Stop
+  50:BMP280.c      **** }
+  85              		.loc 1 50 0
+  86 0008 00BF     		nop
+  87 000a 80BD     		pop	{r7, pc}
+  88              		.cfi_endproc
+  89              	.LFE57:
+  90              		.size	BMP280_stop, .-BMP280_stop
+  91              		.section	.text.BMP280_init,"ax",%progbits
+  92              		.align	2
+  93              		.global	BMP280_init
+  94              		.thumb
+  95              		.thumb_func
+  96              		.type	BMP280_init, %function
+  97              	BMP280_init:
+  98              	.LFB58:
+  51:BMP280.c      **** 
+  52:BMP280.c      **** //****************************************************************************//
+  53:BMP280.c      **** //
+  54:BMP280.c      **** //  Configuration section
+  55:BMP280.c      **** //
+  56:BMP280.c      **** //  This uses the stored SensorSettings to start the IMU
+  57:BMP280.c      **** //  Use statements such as "mySensor.settings.commInterface = SPI_MODE;" to 
+  58:BMP280.c      **** //  configure before calling .begin();
+  59:BMP280.c      **** //
+  60:BMP280.c      **** //****************************************************************************//
+  61:BMP280.c      **** uint8_t BMP280_init()
+  62:BMP280.c      **** {
+  99              		.loc 1 62 0
+ 100              		.cfi_startproc
+ 101              		@ args = 0, pretend = 0, frame = 8
+ 102              		@ frame_needed = 1, uses_anonymous_args = 0
+ 103 0000 90B5     		push	{r4, r7, lr}
+ 104              		.cfi_def_cfa_offset 12
+ 105              		.cfi_offset 4, -12
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\cc4xzKPt.s 			page 4
+
+
+ 106              		.cfi_offset 7, -8
+ 107              		.cfi_offset 14, -4
+ 108 0002 83B0     		sub	sp, sp, #12
+ 109              		.cfi_def_cfa_offset 24
+ 110 0004 00AF     		add	r7, sp, #0
+ 111              		.cfi_def_cfa_register 7
+  63:BMP280.c      **** 	//Check the settings structure values to determine how to setup the device
+  64:BMP280.c      **** 	uint8_t data_to_write = 0, device_address;  //Temporary variable
+ 112              		.loc 1 64 0
+ 113 0006 0023     		movs	r3, #0
+ 114 0008 FB71     		strb	r3, [r7, #7]
+  65:BMP280.c      **** 	I2C_Start();
+ 115              		.loc 1 65 0
+ 116 000a FFF7FEFF 		bl	I2C_Start
+  66:BMP280.c      ****     I2C_Sleep();
+ 117              		.loc 1 66 0
+ 118 000e FFF7FEFF 		bl	I2C_Sleep
+  67:BMP280.c      ****     
+  68:BMP280.c      **** 	//Reading all compensation data, range 0x88:A1, 0xE1:E7
+  69:BMP280.c      **** 	bmp280.calibration.dig_T1 = ((uint16_t)((BMP280_readRegister(BMP280_DIG_T1_MSB_REG) << 8) + BMP280
+ 119              		.loc 1 69 0
+ 120 0012 8920     		movs	r0, #137
+ 121 0014 FFF7FEFF 		bl	BMP280_readRegister
+ 122 0018 0346     		mov	r3, r0
+ 123 001a 9BB2     		uxth	r3, r3
+ 124 001c 1B02     		lsls	r3, r3, #8
+ 125 001e 9CB2     		uxth	r4, r3
+ 126 0020 8820     		movs	r0, #136
+ 127 0022 FFF7FEFF 		bl	BMP280_readRegister
+ 128 0026 0346     		mov	r3, r0
+ 129 0028 9BB2     		uxth	r3, r3
+ 130 002a 2344     		add	r3, r3, r4
+ 131 002c 9AB2     		uxth	r2, r3
+ 132 002e 7F4B     		ldr	r3, .L5
+ 133 0030 1A81     		strh	r2, [r3, #8]	@ movhi
+  70:BMP280.c      **** 	bmp280.calibration.dig_T2 = ((int16_t)((BMP280_readRegister(BMP280_DIG_T2_MSB_REG) << 8) + BMP280_
+ 134              		.loc 1 70 0
+ 135 0032 8B20     		movs	r0, #139
+ 136 0034 FFF7FEFF 		bl	BMP280_readRegister
+ 137 0038 0346     		mov	r3, r0
+ 138 003a 9BB2     		uxth	r3, r3
+ 139 003c 1B02     		lsls	r3, r3, #8
+ 140 003e 9CB2     		uxth	r4, r3
+ 141 0040 8A20     		movs	r0, #138
+ 142 0042 FFF7FEFF 		bl	BMP280_readRegister
+ 143 0046 0346     		mov	r3, r0
+ 144 0048 9BB2     		uxth	r3, r3
+ 145 004a 2344     		add	r3, r3, r4
+ 146 004c 9BB2     		uxth	r3, r3
+ 147 004e 1AB2     		sxth	r2, r3
+ 148 0050 764B     		ldr	r3, .L5
+ 149 0052 5A81     		strh	r2, [r3, #10]	@ movhi
+  71:BMP280.c      **** 	bmp280.calibration.dig_T3 = ((int16_t)((BMP280_readRegister(BMP280_DIG_T3_MSB_REG) << 8) + BMP280_
+ 150              		.loc 1 71 0
+ 151 0054 8D20     		movs	r0, #141
+ 152 0056 FFF7FEFF 		bl	BMP280_readRegister
+ 153 005a 0346     		mov	r3, r0
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\cc4xzKPt.s 			page 5
+
+
+ 154 005c 9BB2     		uxth	r3, r3
+ 155 005e 1B02     		lsls	r3, r3, #8
+ 156 0060 9CB2     		uxth	r4, r3
+ 157 0062 8C20     		movs	r0, #140
+ 158 0064 FFF7FEFF 		bl	BMP280_readRegister
+ 159 0068 0346     		mov	r3, r0
+ 160 006a 9BB2     		uxth	r3, r3
+ 161 006c 2344     		add	r3, r3, r4
+ 162 006e 9BB2     		uxth	r3, r3
+ 163 0070 1AB2     		sxth	r2, r3
+ 164 0072 6E4B     		ldr	r3, .L5
+ 165 0074 9A81     		strh	r2, [r3, #12]	@ movhi
+  72:BMP280.c      **** 
+  73:BMP280.c      **** 	bmp280.calibration.dig_P1 = ((uint16_t)((BMP280_readRegister(BMP280_DIG_P1_MSB_REG) << 8) + BMP280
+ 166              		.loc 1 73 0
+ 167 0076 8F20     		movs	r0, #143
+ 168 0078 FFF7FEFF 		bl	BMP280_readRegister
+ 169 007c 0346     		mov	r3, r0
+ 170 007e 9BB2     		uxth	r3, r3
+ 171 0080 1B02     		lsls	r3, r3, #8
+ 172 0082 9CB2     		uxth	r4, r3
+ 173 0084 8E20     		movs	r0, #142
+ 174 0086 FFF7FEFF 		bl	BMP280_readRegister
+ 175 008a 0346     		mov	r3, r0
+ 176 008c 9BB2     		uxth	r3, r3
+ 177 008e 2344     		add	r3, r3, r4
+ 178 0090 9AB2     		uxth	r2, r3
+ 179 0092 664B     		ldr	r3, .L5
+ 180 0094 DA81     		strh	r2, [r3, #14]	@ movhi
+  74:BMP280.c      **** 	bmp280.calibration.dig_P2 = ((int16_t)((BMP280_readRegister(BMP280_DIG_P2_MSB_REG) << 8) + BMP280_
+ 181              		.loc 1 74 0
+ 182 0096 9120     		movs	r0, #145
+ 183 0098 FFF7FEFF 		bl	BMP280_readRegister
+ 184 009c 0346     		mov	r3, r0
+ 185 009e 9BB2     		uxth	r3, r3
+ 186 00a0 1B02     		lsls	r3, r3, #8
+ 187 00a2 9CB2     		uxth	r4, r3
+ 188 00a4 9020     		movs	r0, #144
+ 189 00a6 FFF7FEFF 		bl	BMP280_readRegister
+ 190 00aa 0346     		mov	r3, r0
+ 191 00ac 9BB2     		uxth	r3, r3
+ 192 00ae 2344     		add	r3, r3, r4
+ 193 00b0 9BB2     		uxth	r3, r3
+ 194 00b2 1AB2     		sxth	r2, r3
+ 195 00b4 5D4B     		ldr	r3, .L5
+ 196 00b6 1A82     		strh	r2, [r3, #16]	@ movhi
+  75:BMP280.c      **** 	bmp280.calibration.dig_P3 = ((int16_t)((BMP280_readRegister(BMP280_DIG_P3_MSB_REG) << 8) + BMP280_
+ 197              		.loc 1 75 0
+ 198 00b8 9320     		movs	r0, #147
+ 199 00ba FFF7FEFF 		bl	BMP280_readRegister
+ 200 00be 0346     		mov	r3, r0
+ 201 00c0 9BB2     		uxth	r3, r3
+ 202 00c2 1B02     		lsls	r3, r3, #8
+ 203 00c4 9CB2     		uxth	r4, r3
+ 204 00c6 9220     		movs	r0, #146
+ 205 00c8 FFF7FEFF 		bl	BMP280_readRegister
+ 206 00cc 0346     		mov	r3, r0
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\cc4xzKPt.s 			page 6
+
+
+ 207 00ce 9BB2     		uxth	r3, r3
+ 208 00d0 2344     		add	r3, r3, r4
+ 209 00d2 9BB2     		uxth	r3, r3
+ 210 00d4 1AB2     		sxth	r2, r3
+ 211 00d6 554B     		ldr	r3, .L5
+ 212 00d8 5A82     		strh	r2, [r3, #18]	@ movhi
+  76:BMP280.c      **** 	bmp280.calibration.dig_P4 = ((int16_t)((BMP280_readRegister(BMP280_DIG_P4_MSB_REG) << 8) + BMP280_
+ 213              		.loc 1 76 0
+ 214 00da 9520     		movs	r0, #149
+ 215 00dc FFF7FEFF 		bl	BMP280_readRegister
+ 216 00e0 0346     		mov	r3, r0
+ 217 00e2 9BB2     		uxth	r3, r3
+ 218 00e4 1B02     		lsls	r3, r3, #8
+ 219 00e6 9CB2     		uxth	r4, r3
+ 220 00e8 9420     		movs	r0, #148
+ 221 00ea FFF7FEFF 		bl	BMP280_readRegister
+ 222 00ee 0346     		mov	r3, r0
+ 223 00f0 9BB2     		uxth	r3, r3
+ 224 00f2 2344     		add	r3, r3, r4
+ 225 00f4 9BB2     		uxth	r3, r3
+ 226 00f6 1AB2     		sxth	r2, r3
+ 227 00f8 4C4B     		ldr	r3, .L5
+ 228 00fa 9A82     		strh	r2, [r3, #20]	@ movhi
+  77:BMP280.c      **** 	bmp280.calibration.dig_P5 = ((int16_t)((BMP280_readRegister(BMP280_DIG_P5_MSB_REG) << 8) + BMP280_
+ 229              		.loc 1 77 0
+ 230 00fc 9720     		movs	r0, #151
+ 231 00fe FFF7FEFF 		bl	BMP280_readRegister
+ 232 0102 0346     		mov	r3, r0
+ 233 0104 9BB2     		uxth	r3, r3
+ 234 0106 1B02     		lsls	r3, r3, #8
+ 235 0108 9CB2     		uxth	r4, r3
+ 236 010a 9620     		movs	r0, #150
+ 237 010c FFF7FEFF 		bl	BMP280_readRegister
+ 238 0110 0346     		mov	r3, r0
+ 239 0112 9BB2     		uxth	r3, r3
+ 240 0114 2344     		add	r3, r3, r4
+ 241 0116 9BB2     		uxth	r3, r3
+ 242 0118 1AB2     		sxth	r2, r3
+ 243 011a 444B     		ldr	r3, .L5
+ 244 011c DA82     		strh	r2, [r3, #22]	@ movhi
+  78:BMP280.c      **** 	bmp280.calibration.dig_P6 = ((int16_t)((BMP280_readRegister(BMP280_DIG_P6_MSB_REG) << 8) + BMP280_
+ 245              		.loc 1 78 0
+ 246 011e 9920     		movs	r0, #153
+ 247 0120 FFF7FEFF 		bl	BMP280_readRegister
+ 248 0124 0346     		mov	r3, r0
+ 249 0126 9BB2     		uxth	r3, r3
+ 250 0128 1B02     		lsls	r3, r3, #8
+ 251 012a 9CB2     		uxth	r4, r3
+ 252 012c 9820     		movs	r0, #152
+ 253 012e FFF7FEFF 		bl	BMP280_readRegister
+ 254 0132 0346     		mov	r3, r0
+ 255 0134 9BB2     		uxth	r3, r3
+ 256 0136 2344     		add	r3, r3, r4
+ 257 0138 9BB2     		uxth	r3, r3
+ 258 013a 1AB2     		sxth	r2, r3
+ 259 013c 3B4B     		ldr	r3, .L5
+ 260 013e 1A83     		strh	r2, [r3, #24]	@ movhi
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\cc4xzKPt.s 			page 7
+
+
+  79:BMP280.c      **** 	bmp280.calibration.dig_P7 = ((int16_t)((BMP280_readRegister(BMP280_DIG_P7_MSB_REG) << 8) + BMP280_
+ 261              		.loc 1 79 0
+ 262 0140 9B20     		movs	r0, #155
+ 263 0142 FFF7FEFF 		bl	BMP280_readRegister
+ 264 0146 0346     		mov	r3, r0
+ 265 0148 9BB2     		uxth	r3, r3
+ 266 014a 1B02     		lsls	r3, r3, #8
+ 267 014c 9CB2     		uxth	r4, r3
+ 268 014e 9A20     		movs	r0, #154
+ 269 0150 FFF7FEFF 		bl	BMP280_readRegister
+ 270 0154 0346     		mov	r3, r0
+ 271 0156 9BB2     		uxth	r3, r3
+ 272 0158 2344     		add	r3, r3, r4
+ 273 015a 9BB2     		uxth	r3, r3
+ 274 015c 1AB2     		sxth	r2, r3
+ 275 015e 334B     		ldr	r3, .L5
+ 276 0160 5A83     		strh	r2, [r3, #26]	@ movhi
+  80:BMP280.c      **** 	bmp280.calibration.dig_P8 = ((int16_t)((BMP280_readRegister(BMP280_DIG_P8_MSB_REG) << 8) + BMP280_
+ 277              		.loc 1 80 0
+ 278 0162 9D20     		movs	r0, #157
+ 279 0164 FFF7FEFF 		bl	BMP280_readRegister
+ 280 0168 0346     		mov	r3, r0
+ 281 016a 9BB2     		uxth	r3, r3
+ 282 016c 1B02     		lsls	r3, r3, #8
+ 283 016e 9CB2     		uxth	r4, r3
+ 284 0170 9C20     		movs	r0, #156
+ 285 0172 FFF7FEFF 		bl	BMP280_readRegister
+ 286 0176 0346     		mov	r3, r0
+ 287 0178 9BB2     		uxth	r3, r3
+ 288 017a 2344     		add	r3, r3, r4
+ 289 017c 9BB2     		uxth	r3, r3
+ 290 017e 1AB2     		sxth	r2, r3
+ 291 0180 2A4B     		ldr	r3, .L5
+ 292 0182 9A83     		strh	r2, [r3, #28]	@ movhi
+  81:BMP280.c      **** 	bmp280.calibration.dig_P9 = ((int16_t)((BMP280_readRegister(BMP280_DIG_P9_MSB_REG) << 8) + BMP280_
+ 293              		.loc 1 81 0
+ 294 0184 9F20     		movs	r0, #159
+ 295 0186 FFF7FEFF 		bl	BMP280_readRegister
+ 296 018a 0346     		mov	r3, r0
+ 297 018c 9BB2     		uxth	r3, r3
+ 298 018e 1B02     		lsls	r3, r3, #8
+ 299 0190 9CB2     		uxth	r4, r3
+ 300 0192 9E20     		movs	r0, #158
+ 301 0194 FFF7FEFF 		bl	BMP280_readRegister
+ 302 0198 0346     		mov	r3, r0
+ 303 019a 9BB2     		uxth	r3, r3
+ 304 019c 2344     		add	r3, r3, r4
+ 305 019e 9BB2     		uxth	r3, r3
+ 306 01a0 1AB2     		sxth	r2, r3
+ 307 01a2 224B     		ldr	r3, .L5
+ 308 01a4 DA83     		strh	r2, [r3, #30]	@ movhi
+  82:BMP280.c      **** 
+  83:BMP280.c      **** 
+  84:BMP280.c      **** 
+  85:BMP280.c      **** 	//Set the oversampling control words.
+  86:BMP280.c      **** 	//config will only be writeable in sleep mode, so first insure that.
+  87:BMP280.c      **** 	BMP280_writeRegister(BMP280_CTRL_MEAS_REG, 0x00);
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\cc4xzKPt.s 			page 8
+
+
+ 309              		.loc 1 87 0
+ 310 01a6 0021     		movs	r1, #0
+ 311 01a8 F420     		movs	r0, #244
+ 312 01aa FFF7FEFF 		bl	BMP280_writeRegister
+  88:BMP280.c      **** 	
+  89:BMP280.c      **** 	//Set the config word
+  90:BMP280.c      **** 	data_to_write = (bmp280.settings.tStandby << 0x5) & 0xE0;
+ 313              		.loc 1 90 0
+ 314 01ae 1F4B     		ldr	r3, .L5
+ 315 01b0 1B79     		ldrb	r3, [r3, #4]	@ zero_extendqisi2
+ 316 01b2 5B01     		lsls	r3, r3, #5
+ 317 01b4 FB71     		strb	r3, [r7, #7]
+  91:BMP280.c      **** 	data_to_write |= (bmp280.settings.filter << 0x02) & 0x1C;
+ 318              		.loc 1 91 0
+ 319 01b6 1D4B     		ldr	r3, .L5
+ 320 01b8 5B79     		ldrb	r3, [r3, #5]	@ zero_extendqisi2
+ 321 01ba 9B00     		lsls	r3, r3, #2
+ 322 01bc 5BB2     		sxtb	r3, r3
+ 323 01be 03F01C03 		and	r3, r3, #28
+ 324 01c2 5AB2     		sxtb	r2, r3
+ 325 01c4 97F90730 		ldrsb	r3, [r7, #7]
+ 326 01c8 1343     		orrs	r3, r3, r2
+ 327 01ca 5BB2     		sxtb	r3, r3
+ 328 01cc FB71     		strb	r3, [r7, #7]
+  92:BMP280.c      **** 	BMP280_writeRegister(BMP280_CONFIG_REG, data_to_write);
+ 329              		.loc 1 92 0
+ 330 01ce FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+ 331 01d0 1946     		mov	r1, r3
+ 332 01d2 F520     		movs	r0, #245
+ 333 01d4 FFF7FEFF 		bl	BMP280_writeRegister
+  93:BMP280.c      **** 	
+  94:BMP280.c      **** 
+  95:BMP280.c      **** 	
+  96:BMP280.c      **** 	//set ctrl_meas
+  97:BMP280.c      **** 	//First, set temp oversampling
+  98:BMP280.c      **** 	data_to_write = (bmp280.settings.tempOverSample << 0x05) & 0xE0;
+ 334              		.loc 1 98 0
+ 335 01d8 144B     		ldr	r3, .L5
+ 336 01da 9B79     		ldrb	r3, [r3, #6]	@ zero_extendqisi2
+ 337 01dc 5B01     		lsls	r3, r3, #5
+ 338 01de FB71     		strb	r3, [r7, #7]
+  99:BMP280.c      **** 	//Next, pressure oversampling
+ 100:BMP280.c      **** 	data_to_write |= (bmp280.settings.pressOverSample << 0x02) & 0x1C;
+ 339              		.loc 1 100 0
+ 340 01e0 124B     		ldr	r3, .L5
+ 341 01e2 DB79     		ldrb	r3, [r3, #7]	@ zero_extendqisi2
+ 342 01e4 9B00     		lsls	r3, r3, #2
+ 343 01e6 5BB2     		sxtb	r3, r3
+ 344 01e8 03F01C03 		and	r3, r3, #28
+ 345 01ec 5AB2     		sxtb	r2, r3
+ 346 01ee 97F90730 		ldrsb	r3, [r7, #7]
+ 347 01f2 1343     		orrs	r3, r3, r2
+ 348 01f4 5BB2     		sxtb	r3, r3
+ 349 01f6 FB71     		strb	r3, [r7, #7]
+ 101:BMP280.c      **** 	//Last, set mode
+ 102:BMP280.c      **** 	data_to_write |= (bmp280.settings.runMode) & 0x03;
+ 350              		.loc 1 102 0
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\cc4xzKPt.s 			page 9
+
+
+ 351 01f8 0C4B     		ldr	r3, .L5
+ 352 01fa DB78     		ldrb	r3, [r3, #3]	@ zero_extendqisi2
+ 353 01fc 5BB2     		sxtb	r3, r3
+ 354 01fe 03F00303 		and	r3, r3, #3
+ 355 0202 5AB2     		sxtb	r2, r3
+ 356 0204 97F90730 		ldrsb	r3, [r7, #7]
+ 357 0208 1343     		orrs	r3, r3, r2
+ 358 020a 5BB2     		sxtb	r3, r3
+ 359 020c FB71     		strb	r3, [r7, #7]
+ 103:BMP280.c      **** 	//Load the byte
+ 104:BMP280.c      **** 	BMP280_writeRegister(BMP280_CTRL_MEAS_REG, data_to_write);
+ 360              		.loc 1 104 0
+ 361 020e FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+ 362 0210 1946     		mov	r1, r3
+ 363 0212 F420     		movs	r0, #244
+ 364 0214 FFF7FEFF 		bl	BMP280_writeRegister
+ 105:BMP280.c      **** 	
+ 106:BMP280.c      ****     // dataToWrite is a placeholder for the value we will return
+ 107:BMP280.c      **** 	device_address = BMP280_readRegister(0xD0);
+ 365              		.loc 1 107 0
+ 366 0218 D020     		movs	r0, #208
+ 367 021a FFF7FEFF 		bl	BMP280_readRegister
+ 368 021e 0346     		mov	r3, r0
+ 369 0220 BB71     		strb	r3, [r7, #6]
+ 108:BMP280.c      ****     return device_address;
+ 370              		.loc 1 108 0
+ 371 0222 BB79     		ldrb	r3, [r7, #6]	@ zero_extendqisi2
+ 109:BMP280.c      **** }
+ 372              		.loc 1 109 0
+ 373 0224 1846     		mov	r0, r3
+ 374 0226 0C37     		adds	r7, r7, #12
+ 375              		.cfi_def_cfa_offset 12
+ 376 0228 BD46     		mov	sp, r7
+ 377              		.cfi_def_cfa_register 13
+ 378              		@ sp needed
+ 379 022a 90BD     		pop	{r4, r7, pc}
+ 380              	.L6:
+ 381              		.align	2
+ 382              	.L5:
+ 383 022c 00000000 		.word	bmp280
+ 384              		.cfi_endproc
+ 385              	.LFE58:
+ 386              		.size	BMP280_init, .-BMP280_init
+ 387              		.section	.text.BMP280_reset,"ax",%progbits
+ 388              		.align	2
+ 389              		.global	BMP280_reset
+ 390              		.thumb
+ 391              		.thumb_func
+ 392              		.type	BMP280_reset, %function
+ 393              	BMP280_reset:
+ 394              	.LFB59:
+ 110:BMP280.c      **** 
+ 111:BMP280.c      **** 
+ 112:BMP280.c      **** void BMP280_reset()
+ 113:BMP280.c      **** {
+ 395              		.loc 1 113 0
+ 396              		.cfi_startproc
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\cc4xzKPt.s 			page 10
+
+
+ 397              		@ args = 0, pretend = 0, frame = 0
+ 398              		@ frame_needed = 1, uses_anonymous_args = 0
+ 399 0000 80B5     		push	{r7, lr}
+ 400              		.cfi_def_cfa_offset 8
+ 401              		.cfi_offset 7, -8
+ 402              		.cfi_offset 14, -4
+ 403 0002 00AF     		add	r7, sp, #0
+ 404              		.cfi_def_cfa_register 7
+ 114:BMP280.c      **** 	BMP280_writeRegister(BMP280_RST_REG, 0xB6);
+ 405              		.loc 1 114 0
+ 406 0004 B621     		movs	r1, #182
+ 407 0006 E020     		movs	r0, #224
+ 408 0008 FFF7FEFF 		bl	BMP280_writeRegister
+ 115:BMP280.c      **** 	
+ 116:BMP280.c      **** }
+ 409              		.loc 1 116 0
+ 410 000c 00BF     		nop
+ 411 000e 80BD     		pop	{r7, pc}
+ 412              		.cfi_endproc
+ 413              	.LFE59:
+ 414              		.size	BMP280_reset, .-BMP280_reset
+ 415              		.global	__aeabi_ldivmod
+ 416              		.global	__aeabi_l2f
+ 417              		.global	__aeabi_fdiv
+ 418              		.section	.text.BMP280_readFloatPressure,"ax",%progbits
+ 419              		.align	2
+ 420              		.global	BMP280_readFloatPressure
+ 421              		.thumb
+ 422              		.thumb_func
+ 423              		.type	BMP280_readFloatPressure, %function
+ 424              	BMP280_readFloatPressure:
+ 425              	.LFB60:
+ 117:BMP280.c      **** 
+ 118:BMP280.c      **** //****************************************************************************//
+ 119:BMP280.c      **** //
+ 120:BMP280.c      **** //  Pressure Section
+ 121:BMP280.c      **** //
+ 122:BMP280.c      **** //****************************************************************************//
+ 123:BMP280.c      **** float BMP280_readFloatPressure( void )
+ 124:BMP280.c      **** {
+ 426              		.loc 1 124 0
+ 427              		.cfi_startproc
+ 428              		@ args = 0, pretend = 0, frame = 136
+ 429              		@ frame_needed = 1, uses_anonymous_args = 0
+ 430 0000 2DE9B04F 		push	{r4, r5, r7, r8, r9, r10, fp, lr}
+ 431              		.cfi_def_cfa_offset 32
+ 432              		.cfi_offset 4, -32
+ 433              		.cfi_offset 5, -28
+ 434              		.cfi_offset 7, -24
+ 435              		.cfi_offset 8, -20
+ 436              		.cfi_offset 9, -16
+ 437              		.cfi_offset 10, -12
+ 438              		.cfi_offset 11, -8
+ 439              		.cfi_offset 14, -4
+ 440 0004 A2B0     		sub	sp, sp, #136
+ 441              		.cfi_def_cfa_offset 168
+ 442 0006 00AF     		add	r7, sp, #0
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\cc4xzKPt.s 			page 11
+
+
+ 443              		.cfi_def_cfa_register 7
+ 125:BMP280.c      **** 
+ 126:BMP280.c      **** 	// Returns pressure in Pa as unsigned 32 bit integer in Q24.8 format (24 integer bits and 8 fracti
+ 127:BMP280.c      **** 	// Output value of “24674867” represents 24674867/256 = 96386.2 Pa = 963.862 hPa
+ 128:BMP280.c      **** 	int32_t adc_P = ((uint32_t)BMP280_readRegister(BMP280_PRESSURE_MSB_REG) << 12) | ((uint32_t)BMP280
+ 444              		.loc 1 128 0
+ 445 0008 F720     		movs	r0, #247
+ 446 000a FFF7FEFF 		bl	BMP280_readRegister
+ 447 000e 0346     		mov	r3, r0
+ 448 0010 1C03     		lsls	r4, r3, #12
+ 449 0012 F820     		movs	r0, #248
+ 450 0014 FFF7FEFF 		bl	BMP280_readRegister
+ 451 0018 0346     		mov	r3, r0
+ 452 001a 1B01     		lsls	r3, r3, #4
+ 453 001c 1C43     		orrs	r4, r4, r3
+ 454 001e F920     		movs	r0, #249
+ 455 0020 FFF7FEFF 		bl	BMP280_readRegister
+ 456 0024 0346     		mov	r3, r0
+ 457 0026 1B09     		lsrs	r3, r3, #4
+ 458 0028 DBB2     		uxtb	r3, r3
+ 459 002a 03F00F03 		and	r3, r3, #15
+ 460 002e 2343     		orrs	r3, r3, r4
+ 461 0030 C7F88430 		str	r3, [r7, #132]
+ 129:BMP280.c      **** 	
+ 130:BMP280.c      **** 	int64_t var1, var2, p_acc;
+ 131:BMP280.c      **** 	var1 = ((int64_t) bmp280.t_fine) - 128000;
+ 462              		.loc 1 131 0
+ 463 0034 644B     		ldr	r3, .L11
+ 464 0036 1B6A     		ldr	r3, [r3, #32]
+ 465 0038 4FEAE374 		asr	r4, r3, #31
+ 466 003c B3F5FA33 		subs	r3, r3, #128000
+ 467 0040 44F1FF34 		adc	r4, r4, #-1
+ 468 0044 C7E91E34 		strd	r3, [r7, #120]
+ 132:BMP280.c      **** 	var2 = var1 * var1 * (int64_t) bmp280.calibration.dig_P6;
+ 469              		.loc 1 132 0
+ 470 0048 FA6F     		ldr	r2, [r7, #124]
+ 471 004a BB6F     		ldr	r3, [r7, #120]
+ 472 004c 03FB02F1 		mul	r1, r3, r2
+ 473 0050 FA6F     		ldr	r2, [r7, #124]
+ 474 0052 BB6F     		ldr	r3, [r7, #120]
+ 475 0054 03FB02F3 		mul	r3, r3, r2
+ 476 0058 CC18     		adds	r4, r1, r3
+ 477 005a BA6F     		ldr	r2, [r7, #120]
+ 478 005c BB6F     		ldr	r3, [r7, #120]
+ 479 005e A2FB0301 		umull	r0, r1, r2, r3
+ 480 0062 6318     		adds	r3, r4, r1
+ 481 0064 1946     		mov	r1, r3
+ 482 0066 584B     		ldr	r3, .L11
+ 483 0068 B3F91830 		ldrsh	r3, [r3, #24]
+ 484 006c 1BB2     		sxth	r3, r3
+ 485 006e 4FEAE374 		asr	r4, r3, #31
+ 486 0072 03FB01F5 		mul	r5, r3, r1
+ 487 0076 00FB04F2 		mul	r2, r0, r4
+ 488 007a 2A44     		add	r2, r2, r5
+ 489 007c A0FB0334 		umull	r3, r4, r0, r3
+ 490 0080 2244     		add	r2, r2, r4
+ 491 0082 1446     		mov	r4, r2
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\cc4xzKPt.s 			page 12
+
+
+ 492 0084 C7E91C34 		strd	r3, [r7, #112]
+ 493 0088 C7E91C34 		strd	r3, [r7, #112]
+ 133:BMP280.c      **** 	var2 = var2 + ((var1 * (int64_t) bmp280.calibration.dig_P5)<<17);
+ 494              		.loc 1 133 0
+ 495 008c 4E4B     		ldr	r3, .L11
+ 496 008e B3F91630 		ldrsh	r3, [r3, #22]
+ 497 0092 1BB2     		sxth	r3, r3
+ 498 0094 4FEAE374 		asr	r4, r3, #31
+ 499 0098 BA6F     		ldr	r2, [r7, #120]
+ 500 009a 04FB02F1 		mul	r1, r4, r2
+ 501 009e FA6F     		ldr	r2, [r7, #124]
+ 502 00a0 03FB02F2 		mul	r2, r3, r2
+ 503 00a4 1144     		add	r1, r1, r2
+ 504 00a6 BA6F     		ldr	r2, [r7, #120]
+ 505 00a8 A2FB0334 		umull	r3, r4, r2, r3
+ 506 00ac 0A19     		adds	r2, r1, r4
+ 507 00ae 1446     		mov	r4, r2
+ 508 00b0 4FEA4449 		lsl	r9, r4, #17
+ 509 00b4 49EAD339 		orr	r9, r9, r3, lsr #15
+ 510 00b8 4FEA4348 		lsl	r8, r3, #17
+ 511 00bc D7E91C34 		ldrd	r3, [r7, #112]
+ 512 00c0 13EB0803 		adds	r3, r3, r8
+ 513 00c4 44EB0904 		adc	r4, r4, r9
+ 514 00c8 C7E91C34 		strd	r3, [r7, #112]
+ 134:BMP280.c      **** 	var2 = var2 + (((int64_t) bmp280.calibration.dig_P4)<<35);
+ 515              		.loc 1 134 0
+ 516 00cc 3E4B     		ldr	r3, .L11
+ 517 00ce B3F91430 		ldrsh	r3, [r3, #20]
+ 518 00d2 1BB2     		sxth	r3, r3
+ 519 00d4 4FEAE374 		asr	r4, r3, #31
+ 520 00d8 DB00     		lsls	r3, r3, #3
+ 521 00da FB60     		str	r3, [r7, #12]
+ 522 00dc 0023     		movs	r3, #0
+ 523 00de BB60     		str	r3, [r7, #8]
+ 524 00e0 D7E91C34 		ldrd	r3, [r7, #112]
+ 525 00e4 D7E90212 		ldrd	r1, [r7, #8]
+ 526 00e8 C918     		adds	r1, r1, r3
+ 527 00ea 42EB0402 		adc	r2, r2, r4
+ 528 00ee 0B46     		mov	r3, r1
+ 529 00f0 1446     		mov	r4, r2
+ 530 00f2 C7E91C34 		strd	r3, [r7, #112]
+ 135:BMP280.c      **** 	var1 = ((var1 * var1 * (int64_t) bmp280.calibration.dig_P3)>>8) + ((var1 * (int64_t) bmp280.calibr
+ 531              		.loc 1 135 0
+ 532 00f6 FA6F     		ldr	r2, [r7, #124]
+ 533 00f8 BB6F     		ldr	r3, [r7, #120]
+ 534 00fa 03FB02F1 		mul	r1, r3, r2
+ 535 00fe FA6F     		ldr	r2, [r7, #124]
+ 536 0100 BB6F     		ldr	r3, [r7, #120]
+ 537 0102 03FB02F3 		mul	r3, r3, r2
+ 538 0106 CC18     		adds	r4, r1, r3
+ 539 0108 BA6F     		ldr	r2, [r7, #120]
+ 540 010a BB6F     		ldr	r3, [r7, #120]
+ 541 010c A2FB0301 		umull	r0, r1, r2, r3
+ 542 0110 6318     		adds	r3, r4, r1
+ 543 0112 1946     		mov	r1, r3
+ 544 0114 2C4B     		ldr	r3, .L11
+ 545 0116 B3F91230 		ldrsh	r3, [r3, #18]
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\cc4xzKPt.s 			page 13
+
+
+ 546 011a 1BB2     		sxth	r3, r3
+ 547 011c 4FEAE374 		asr	r4, r3, #31
+ 548 0120 03FB01F5 		mul	r5, r3, r1
+ 549 0124 00FB04F2 		mul	r2, r0, r4
+ 550 0128 2A44     		add	r2, r2, r5
+ 551 012a A0FB0334 		umull	r3, r4, r0, r3
+ 552 012e 2244     		add	r2, r2, r4
+ 553 0130 1446     		mov	r4, r2
+ 554 0132 1A0A     		lsrs	r2, r3, #8
+ 555 0134 3A66     		str	r2, [r7, #96]
+ 556 0136 3A6E     		ldr	r2, [r7, #96]
+ 557 0138 42EA0462 		orr	r2, r2, r4, lsl #24
+ 558 013c 3A66     		str	r2, [r7, #96]
+ 559 013e 2312     		asrs	r3, r4, #8
+ 560 0140 7B66     		str	r3, [r7, #100]
+ 561 0142 214B     		ldr	r3, .L11
+ 562 0144 B3F91030 		ldrsh	r3, [r3, #16]
+ 563 0148 1BB2     		sxth	r3, r3
+ 564 014a 4FEAE374 		asr	r4, r3, #31
+ 565 014e BA6F     		ldr	r2, [r7, #120]
+ 566 0150 04FB02F1 		mul	r1, r4, r2
+ 567 0154 FA6F     		ldr	r2, [r7, #124]
+ 568 0156 03FB02F2 		mul	r2, r3, r2
+ 569 015a 1144     		add	r1, r1, r2
+ 570 015c BA6F     		ldr	r2, [r7, #120]
+ 571 015e A2FB0334 		umull	r3, r4, r2, r3
+ 572 0162 0A19     		adds	r2, r1, r4
+ 573 0164 1446     		mov	r4, r2
+ 574 0166 4FEA043B 		lsl	fp, r4, #12
+ 575 016a 4BEA135B 		orr	fp, fp, r3, lsr #20
+ 576 016e 4FEA033A 		lsl	r10, r3, #12
+ 577 0172 D7E91834 		ldrd	r3, [r7, #96]
+ 578 0176 13EB0A03 		adds	r3, r3, r10
+ 579 017a 44EB0B04 		adc	r4, r4, fp
+ 580 017e C7E91E34 		strd	r3, [r7, #120]
+ 136:BMP280.c      **** 	var1 = (((((int64_t)1)<<47)+var1))*((int64_t) bmp280.calibration.dig_P1)>>33;
+ 581              		.loc 1 136 0
+ 582 0182 D7E91E34 		ldrd	r3, [r7, #120]
+ 583 0186 191C     		adds	r1, r3, #0
+ 584 0188 44F50042 		adc	r2, r4, #32768
+ 585 018c 0E4B     		ldr	r3, .L11
+ 586 018e DB89     		ldrh	r3, [r3, #14]
+ 587 0190 9BB2     		uxth	r3, r3
+ 588 0192 4FF00004 		mov	r4, #0
+ 589 0196 03FB02F5 		mul	r5, r3, r2
+ 590 019a 01FB04F0 		mul	r0, r1, r4
+ 591 019e 2844     		add	r0, r0, r5
+ 592 01a0 A1FB0334 		umull	r3, r4, r1, r3
+ 593 01a4 0219     		adds	r2, r0, r4
+ 594 01a6 1446     		mov	r4, r2
+ 595 01a8 6210     		asrs	r2, r4, #1
+ 596 01aa 3A60     		str	r2, [r7]
+ 597 01ac E317     		asrs	r3, r4, #31
+ 598 01ae 7B60     		str	r3, [r7, #4]
+ 599 01b0 D7E90034 		ldrd	r3, [r7]
+ 600 01b4 C7E91E34 		strd	r3, [r7, #120]
+ 137:BMP280.c      **** 	if (var1 == 0)
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\cc4xzKPt.s 			page 14
+
+
+ 601              		.loc 1 137 0
+ 602 01b8 D7E91E34 		ldrd	r3, [r7, #120]
+ 603 01bc 2343     		orrs	r3, r3, r4
+ 604 01be 05D1     		bne	.L9
+ 138:BMP280.c      **** 	{
+ 139:BMP280.c      **** 		return 0; // avoid exception caused by division by zero
+ 605              		.loc 1 139 0
+ 606 01c0 4FF00003 		mov	r3, #0
+ 607 01c4 F3E0     		b	.L10
+ 608              	.L12:
+ 609 01c6 00BF     		.align	2
+ 610              	.L11:
+ 611 01c8 00000000 		.word	bmp280
+ 612              	.L9:
+ 140:BMP280.c      **** 	}
+ 141:BMP280.c      **** 	p_acc = 1048576 - adc_P;
+ 613              		.loc 1 141 0
+ 614 01cc D7F88430 		ldr	r3, [r7, #132]
+ 615 01d0 C3F58013 		rsb	r3, r3, #1048576
+ 616 01d4 4FEAE374 		asr	r4, r3, #31
+ 617 01d8 C7E91A34 		strd	r3, [r7, #104]
+ 142:BMP280.c      **** 	p_acc = (((p_acc<<31) - var2)*3125)/var1;
+ 618              		.loc 1 142 0
+ 619 01dc D7E91A34 		ldrd	r3, [r7, #104]
+ 620 01e0 E207     		lsls	r2, r4, #31
+ 621 01e2 FA65     		str	r2, [r7, #92]
+ 622 01e4 FA6D     		ldr	r2, [r7, #92]
+ 623 01e6 42EA5302 		orr	r2, r2, r3, lsr #1
+ 624 01ea FA65     		str	r2, [r7, #92]
+ 625 01ec DB07     		lsls	r3, r3, #31
+ 626 01ee BB65     		str	r3, [r7, #88]
+ 627 01f0 D7E91C34 		ldrd	r3, [r7, #112]
+ 628 01f4 D7E91612 		ldrd	r1, [r7, #88]
+ 629 01f8 C91A     		subs	r1, r1, r3
+ 630 01fa 62EB0402 		sbc	r2, r2, r4
+ 631 01fe 0B46     		mov	r3, r1
+ 632 0200 1446     		mov	r4, r2
+ 633 0202 DB18     		adds	r3, r3, r3
+ 634 0204 44EB0404 		adc	r4, r4, r4
+ 635 0208 5B18     		adds	r3, r3, r1
+ 636 020a 44EB0204 		adc	r4, r4, r2
+ 637 020e A001     		lsls	r0, r4, #6
+ 638 0210 7863     		str	r0, [r7, #52]
+ 639 0212 786B     		ldr	r0, [r7, #52]
+ 640 0214 40EA9360 		orr	r0, r0, r3, lsr #26
+ 641 0218 7863     		str	r0, [r7, #52]
+ 642 021a 9801     		lsls	r0, r3, #6
+ 643 021c 3863     		str	r0, [r7, #48]
+ 644 021e D7E90C89 		ldrd	r8, [r7, #48]
+ 645 0222 18EB0308 		adds	r8, r8, r3
+ 646 0226 49EB0409 		adc	r9, r9, r4
+ 647 022a 4346     		mov	r3, r8
+ 648 022c 4C46     		mov	r4, r9
+ 649 022e A000     		lsls	r0, r4, #2
+ 650 0230 F862     		str	r0, [r7, #44]
+ 651 0232 F86A     		ldr	r0, [r7, #44]
+ 652 0234 40EA9370 		orr	r0, r0, r3, lsr #30
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\cc4xzKPt.s 			page 15
+
+
+ 653 0238 F862     		str	r0, [r7, #44]
+ 654 023a 9B00     		lsls	r3, r3, #2
+ 655 023c BB62     		str	r3, [r7, #40]
+ 656 023e D7E90A34 		ldrd	r3, [r7, #40]
+ 657 0242 5B18     		adds	r3, r3, r1
+ 658 0244 44EB0204 		adc	r4, r4, r2
+ 659 0248 A000     		lsls	r0, r4, #2
+ 660 024a 7862     		str	r0, [r7, #36]
+ 661 024c 786A     		ldr	r0, [r7, #36]
+ 662 024e 40EA9370 		orr	r0, r0, r3, lsr #30
+ 663 0252 7862     		str	r0, [r7, #36]
+ 664 0254 9B00     		lsls	r3, r3, #2
+ 665 0256 3B62     		str	r3, [r7, #32]
+ 666 0258 D7E90834 		ldrd	r3, [r7, #32]
+ 667 025c 13EB0108 		adds	r8, r3, r1
+ 668 0260 44EB0209 		adc	r9, r4, r2
+ 669 0264 4046     		mov	r0, r8
+ 670 0266 4946     		mov	r1, r9
+ 671 0268 D7E91E23 		ldrd	r2, [r7, #120]
+ 672 026c FFF7FEFF 		bl	__aeabi_ldivmod
+ 673 0270 0346     		mov	r3, r0
+ 674 0272 0C46     		mov	r4, r1
+ 675 0274 C7E91A34 		strd	r3, [r7, #104]
+ 143:BMP280.c      **** 	var1 = (((int64_t) bmp280.calibration.dig_P9) * (p_acc>>13) * (p_acc>>13)) >> 25;
+ 676              		.loc 1 143 0
+ 677 0278 4F4B     		ldr	r3, .L13
+ 678 027a B3F91E30 		ldrsh	r3, [r3, #30]
+ 679 027e 18B2     		sxth	r0, r3
+ 680 0280 4FEAE071 		asr	r1, r0, #31
+ 681 0284 D7E91A34 		ldrd	r3, [r7, #104]
+ 682 0288 5A0B     		lsrs	r2, r3, #13
+ 683 028a 3A65     		str	r2, [r7, #80]
+ 684 028c 3A6D     		ldr	r2, [r7, #80]
+ 685 028e 42EAC442 		orr	r2, r2, r4, lsl #19
+ 686 0292 3A65     		str	r2, [r7, #80]
+ 687 0294 6313     		asrs	r3, r4, #13
+ 688 0296 7B65     		str	r3, [r7, #84]
+ 689 0298 D7E91445 		ldrd	r4, [r7, #80]
+ 690 029c 2346     		mov	r3, r4
+ 691 029e 03FB01F2 		mul	r2, r3, r1
+ 692 02a2 2B46     		mov	r3, r5
+ 693 02a4 00FB03F3 		mul	r3, r0, r3
+ 694 02a8 1A44     		add	r2, r2, r3
+ 695 02aa 2346     		mov	r3, r4
+ 696 02ac A0FB0334 		umull	r3, r4, r0, r3
+ 697 02b0 2244     		add	r2, r2, r4
+ 698 02b2 1446     		mov	r4, r2
+ 699 02b4 D7E91A12 		ldrd	r1, [r7, #104]
+ 700 02b8 480B     		lsrs	r0, r1, #13
+ 701 02ba B864     		str	r0, [r7, #72]
+ 702 02bc B86C     		ldr	r0, [r7, #72]
+ 703 02be 40EAC240 		orr	r0, r0, r2, lsl #19
+ 704 02c2 B864     		str	r0, [r7, #72]
+ 705 02c4 5213     		asrs	r2, r2, #13
+ 706 02c6 FA64     		str	r2, [r7, #76]
+ 707 02c8 D7E91289 		ldrd	r8, [r7, #72]
+ 708 02cc 4246     		mov	r2, r8
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\cc4xzKPt.s 			page 16
+
+
+ 709 02ce 02FB04F1 		mul	r1, r2, r4
+ 710 02d2 4A46     		mov	r2, r9
+ 711 02d4 03FB02F2 		mul	r2, r3, r2
+ 712 02d8 0A44     		add	r2, r2, r1
+ 713 02da 4146     		mov	r1, r8
+ 714 02dc A3FB0134 		umull	r3, r4, r3, r1
+ 715 02e0 2244     		add	r2, r2, r4
+ 716 02e2 1446     		mov	r4, r2
+ 717 02e4 5A0E     		lsrs	r2, r3, #25
+ 718 02e6 BA61     		str	r2, [r7, #24]
+ 719 02e8 BA69     		ldr	r2, [r7, #24]
+ 720 02ea 42EAC412 		orr	r2, r2, r4, lsl #7
+ 721 02ee BA61     		str	r2, [r7, #24]
+ 722 02f0 6316     		asrs	r3, r4, #25
+ 723 02f2 FB61     		str	r3, [r7, #28]
+ 724 02f4 D7E90634 		ldrd	r3, [r7, #24]
+ 725 02f8 C7E91E34 		strd	r3, [r7, #120]
+ 144:BMP280.c      **** 	var2 = (((int64_t) bmp280.calibration.dig_P8) * p_acc) >> 19;
+ 726              		.loc 1 144 0
+ 727 02fc 2E4B     		ldr	r3, .L13
+ 728 02fe B3F91C30 		ldrsh	r3, [r3, #28]
+ 729 0302 1BB2     		sxth	r3, r3
+ 730 0304 4FEAE374 		asr	r4, r3, #31
+ 731 0308 BA6E     		ldr	r2, [r7, #104]
+ 732 030a 04FB02F1 		mul	r1, r4, r2
+ 733 030e FA6E     		ldr	r2, [r7, #108]
+ 734 0310 03FB02F2 		mul	r2, r3, r2
+ 735 0314 0A44     		add	r2, r2, r1
+ 736 0316 B96E     		ldr	r1, [r7, #104]
+ 737 0318 A1FB0334 		umull	r3, r4, r1, r3
+ 738 031c 2244     		add	r2, r2, r4
+ 739 031e 1446     		mov	r4, r2
+ 740 0320 DA0C     		lsrs	r2, r3, #19
+ 741 0322 3A61     		str	r2, [r7, #16]
+ 742 0324 3A69     		ldr	r2, [r7, #16]
+ 743 0326 42EA4432 		orr	r2, r2, r4, lsl #13
+ 744 032a 3A61     		str	r2, [r7, #16]
+ 745 032c E314     		asrs	r3, r4, #19
+ 746 032e 7B61     		str	r3, [r7, #20]
+ 747 0330 D7E90434 		ldrd	r3, [r7, #16]
+ 748 0334 C7E91C34 		strd	r3, [r7, #112]
+ 145:BMP280.c      **** 	p_acc = ((p_acc + var1 + var2) >> 8) + (((int64_t) bmp280.calibration.dig_P7)<<4);
+ 749              		.loc 1 145 0
+ 750 0338 D7E91A12 		ldrd	r1, [r7, #104]
+ 751 033c D7E91E34 		ldrd	r3, [r7, #120]
+ 752 0340 C918     		adds	r1, r1, r3
+ 753 0342 42EB0402 		adc	r2, r2, r4
+ 754 0346 D7E91C34 		ldrd	r3, [r7, #112]
+ 755 034a 5B18     		adds	r3, r3, r1
+ 756 034c 44EB0204 		adc	r4, r4, r2
+ 757 0350 1A0A     		lsrs	r2, r3, #8
+ 758 0352 3A64     		str	r2, [r7, #64]
+ 759 0354 3A6C     		ldr	r2, [r7, #64]
+ 760 0356 42EA0462 		orr	r2, r2, r4, lsl #24
+ 761 035a 3A64     		str	r2, [r7, #64]
+ 762 035c 2312     		asrs	r3, r4, #8
+ 763 035e 7B64     		str	r3, [r7, #68]
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\cc4xzKPt.s 			page 17
+
+
+ 764 0360 154B     		ldr	r3, .L13
+ 765 0362 B3F91A30 		ldrsh	r3, [r3, #26]
+ 766 0366 1BB2     		sxth	r3, r3
+ 767 0368 4FEAE374 		asr	r4, r3, #31
+ 768 036c 2201     		lsls	r2, r4, #4
+ 769 036e FA63     		str	r2, [r7, #60]
+ 770 0370 FA6B     		ldr	r2, [r7, #60]
+ 771 0372 42EA1372 		orr	r2, r2, r3, lsr #28
+ 772 0376 FA63     		str	r2, [r7, #60]
+ 773 0378 1B01     		lsls	r3, r3, #4
+ 774 037a BB63     		str	r3, [r7, #56]
+ 775 037c D7E91034 		ldrd	r3, [r7, #64]
+ 776 0380 D7E90E12 		ldrd	r1, [r7, #56]
+ 777 0384 5B18     		adds	r3, r3, r1
+ 778 0386 44EB0204 		adc	r4, r4, r2
+ 779 038a C7E91A34 		strd	r3, [r7, #104]
+ 146:BMP280.c      **** 	
+ 147:BMP280.c      ****     bmp280.press_Pa = (float)p_acc / 256.0;
+ 780              		.loc 1 147 0
+ 781 038e D7E91A01 		ldrd	r0, [r7, #104]
+ 782 0392 FFF7FEFF 		bl	__aeabi_l2f
+ 783 0396 0346     		mov	r3, r0
+ 784 0398 4FF08741 		mov	r1, #1132462080
+ 785 039c 1846     		mov	r0, r3
+ 786 039e FFF7FEFF 		bl	__aeabi_fdiv
+ 787 03a2 0346     		mov	r3, r0
+ 788 03a4 1A46     		mov	r2, r3
+ 789 03a6 044B     		ldr	r3, .L13
+ 790 03a8 9A62     		str	r2, [r3, #40]	@ float
+ 148:BMP280.c      ****     return bmp280.press_Pa;
+ 791              		.loc 1 148 0
+ 792 03aa 034B     		ldr	r3, .L13
+ 793 03ac 9B6A     		ldr	r3, [r3, #40]	@ float
+ 794              	.L10:
+ 149:BMP280.c      **** 	
+ 150:BMP280.c      **** }
+ 795              		.loc 1 150 0
+ 796 03ae 1846     		mov	r0, r3
+ 797 03b0 8837     		adds	r7, r7, #136
+ 798              		.cfi_def_cfa_offset 32
+ 799 03b2 BD46     		mov	sp, r7
+ 800              		.cfi_def_cfa_register 13
+ 801              		@ sp needed
+ 802 03b4 BDE8B08F 		pop	{r4, r5, r7, r8, r9, r10, fp, pc}
+ 803              	.L14:
+ 804              		.align	2
+ 805              	.L13:
+ 806 03b8 00000000 		.word	bmp280
+ 807              		.cfi_endproc
+ 808              	.LFE60:
+ 809              		.size	BMP280_readFloatPressure, .-BMP280_readFloatPressure
+ 810              		.global	__aeabi_f2d
+ 811              		.global	__aeabi_dsub
+ 812              		.global	__aeabi_dmul
+ 813              		.global	__aeabi_d2f
+ 814              		.section	.text.BMP280_readFloatAltitudeMeters,"ax",%progbits
+ 815              		.align	2
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\cc4xzKPt.s 			page 18
+
+
+ 816              		.global	BMP280_readFloatAltitudeMeters
+ 817              		.thumb
+ 818              		.thumb_func
+ 819              		.type	BMP280_readFloatAltitudeMeters, %function
+ 820              	BMP280_readFloatAltitudeMeters:
+ 821              	.LFB61:
+ 151:BMP280.c      **** 
+ 152:BMP280.c      **** float BMP280_readFloatAltitudeMeters( void )
+ 153:BMP280.c      **** {
+ 822              		.loc 1 153 0
+ 823              		.cfi_startproc
+ 824              		@ args = 0, pretend = 0, frame = 8
+ 825              		@ frame_needed = 1, uses_anonymous_args = 0
+ 826 0000 90B5     		push	{r4, r7, lr}
+ 827              		.cfi_def_cfa_offset 12
+ 828              		.cfi_offset 4, -12
+ 829              		.cfi_offset 7, -8
+ 830              		.cfi_offset 14, -4
+ 831 0002 83B0     		sub	sp, sp, #12
+ 832              		.cfi_def_cfa_offset 24
+ 833 0004 00AF     		add	r7, sp, #0
+ 834              		.cfi_def_cfa_register 7
+ 154:BMP280.c      **** 	float heightOutput = 0;
+ 835              		.loc 1 154 0
+ 836 0006 4FF00003 		mov	r3, #0
+ 837 000a 7B60     		str	r3, [r7, #4]	@ float
+ 155:BMP280.c      **** 	
+ 156:BMP280.c      **** 	heightOutput = ((float)-45846.2)*(pow(((float) BMP280_readFloatPressure()/(float) P_SURFACE), 0.19
+ 838              		.loc 1 156 0
+ 839 000c FFF7FEFF 		bl	BMP280_readFloatPressure
+ 840 0010 0346     		mov	r3, r0
+ 841 0012 1949     		ldr	r1, .L17+16
+ 842 0014 1846     		mov	r0, r3
+ 843 0016 FFF7FEFF 		bl	__aeabi_fdiv
+ 844 001a 0346     		mov	r3, r0
+ 845 001c 1846     		mov	r0, r3
+ 846 001e FFF7FEFF 		bl	__aeabi_f2d
+ 847 0022 11A3     		adr	r3, .L17
+ 848 0024 D3E90023 		ldrd	r2, [r3]
+ 849 0028 FFF7FEFF 		bl	pow
+ 850 002c 4FF00002 		mov	r2, #0
+ 851 0030 124B     		ldr	r3, .L17+20
+ 852 0032 FFF7FEFF 		bl	__aeabi_dsub
+ 853 0036 0346     		mov	r3, r0
+ 854 0038 0C46     		mov	r4, r1
+ 855 003a 1846     		mov	r0, r3
+ 856 003c 2146     		mov	r1, r4
+ 857 003e 0CA3     		adr	r3, .L17+8
+ 858 0040 D3E90023 		ldrd	r2, [r3]
+ 859 0044 FFF7FEFF 		bl	__aeabi_dmul
+ 860 0048 0346     		mov	r3, r0
+ 861 004a 0C46     		mov	r4, r1
+ 862 004c 1846     		mov	r0, r3
+ 863 004e 2146     		mov	r1, r4
+ 864 0050 FFF7FEFF 		bl	__aeabi_d2f
+ 865 0054 0346     		mov	r3, r0
+ 866 0056 7B60     		str	r3, [r7, #4]	@ float
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\cc4xzKPt.s 			page 19
+
+
+ 157:BMP280.c      **** 	return heightOutput;
+ 867              		.loc 1 157 0
+ 868 0058 7B68     		ldr	r3, [r7, #4]	@ float
+ 158:BMP280.c      **** 	
+ 159:BMP280.c      **** }
+ 869              		.loc 1 159 0
+ 870 005a 1846     		mov	r0, r3
+ 871 005c 0C37     		adds	r7, r7, #12
+ 872              		.cfi_def_cfa_offset 12
+ 873 005e BD46     		mov	sp, r7
+ 874              		.cfi_def_cfa_register 13
+ 875              		@ sp needed
+ 876 0060 90BD     		pop	{r4, r7, pc}
+ 877              	.L18:
+ 878 0062 00BFAFF3 		.align	3
+ 878      0080
+ 879              	.L17:
+ 880 0068 C5C551B9 		.word	-1185823291
+ 881 006c 895AC83F 		.word	1070094985
+ 882 0070 00000060 		.word	1610612736
+ 883 0074 C662E6C0 		.word	-1058643258
+ 884 0078 80E6C547 		.word	1204151936
+ 885 007c 0000F03F 		.word	1072693248
+ 886              		.cfi_endproc
+ 887              	.LFE61:
+ 888              		.size	BMP280_readFloatAltitudeMeters, .-BMP280_readFloatAltitudeMeters
+ 889              		.section	.text.BMP280_readFloatAltitudeFeet,"ax",%progbits
+ 890              		.align	2
+ 891              		.global	BMP280_readFloatAltitudeFeet
+ 892              		.thumb
+ 893              		.thumb_func
+ 894              		.type	BMP280_readFloatAltitudeFeet, %function
+ 895              	BMP280_readFloatAltitudeFeet:
+ 896              	.LFB62:
+ 160:BMP280.c      **** 
+ 161:BMP280.c      **** float BMP280_readFloatAltitudeFeet( void )
+ 162:BMP280.c      **** {
+ 897              		.loc 1 162 0
+ 898              		.cfi_startproc
+ 899              		@ args = 0, pretend = 0, frame = 8
+ 900              		@ frame_needed = 1, uses_anonymous_args = 0
+ 901 0000 90B5     		push	{r4, r7, lr}
+ 902              		.cfi_def_cfa_offset 12
+ 903              		.cfi_offset 4, -12
+ 904              		.cfi_offset 7, -8
+ 905              		.cfi_offset 14, -4
+ 906 0002 83B0     		sub	sp, sp, #12
+ 907              		.cfi_def_cfa_offset 24
+ 908 0004 00AF     		add	r7, sp, #0
+ 909              		.cfi_def_cfa_register 7
+ 163:BMP280.c      **** 	float heightOutput = 0;
+ 910              		.loc 1 163 0
+ 911 0006 4FF00003 		mov	r3, #0
+ 912 000a 7B60     		str	r3, [r7, #4]	@ float
+ 164:BMP280.c      **** 	
+ 165:BMP280.c      **** 	heightOutput = BMP280_readFloatAltitudeMeters() * 3.28084;
+ 913              		.loc 1 165 0
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\cc4xzKPt.s 			page 20
+
+
+ 914 000c FFF7FEFF 		bl	BMP280_readFloatAltitudeMeters
+ 915 0010 0346     		mov	r3, r0
+ 916 0012 1846     		mov	r0, r3
+ 917 0014 FFF7FEFF 		bl	__aeabi_f2d
+ 918 0018 09A3     		adr	r3, .L21
+ 919 001a D3E90023 		ldrd	r2, [r3]
+ 920 001e FFF7FEFF 		bl	__aeabi_dmul
+ 921 0022 0346     		mov	r3, r0
+ 922 0024 0C46     		mov	r4, r1
+ 923 0026 1846     		mov	r0, r3
+ 924 0028 2146     		mov	r1, r4
+ 925 002a FFF7FEFF 		bl	__aeabi_d2f
+ 926 002e 0346     		mov	r3, r0
+ 927 0030 7B60     		str	r3, [r7, #4]	@ float
+ 166:BMP280.c      **** 	return heightOutput;
+ 928              		.loc 1 166 0
+ 929 0032 7B68     		ldr	r3, [r7, #4]	@ float
+ 167:BMP280.c      **** 	
+ 168:BMP280.c      **** }
+ 930              		.loc 1 168 0
+ 931 0034 1846     		mov	r0, r3
+ 932 0036 0C37     		adds	r7, r7, #12
+ 933              		.cfi_def_cfa_offset 12
+ 934 0038 BD46     		mov	sp, r7
+ 935              		.cfi_def_cfa_register 13
+ 936              		@ sp needed
+ 937 003a 90BD     		pop	{r4, r7, pc}
+ 938              	.L22:
+ 939 003c AFF30080 		.align	3
+ 940              	.L21:
+ 941 0040 E544BB0A 		.word	180045029
+ 942 0044 293F0A40 		.word	1074413353
+ 943              		.cfi_endproc
+ 944              	.LFE62:
+ 945              		.size	BMP280_readFloatAltitudeFeet, .-BMP280_readFloatAltitudeFeet
+ 946              		.global	__aeabi_i2f
+ 947              		.section	.text.BMP280_readTempC,"ax",%progbits
+ 948              		.align	2
+ 949              		.global	BMP280_readTempC
+ 950              		.thumb
+ 951              		.thumb_func
+ 952              		.type	BMP280_readTempC, %function
+ 953              	BMP280_readTempC:
+ 954              	.LFB63:
+ 169:BMP280.c      **** 
+ 170:BMP280.c      **** 
+ 171:BMP280.c      **** 
+ 172:BMP280.c      **** 
+ 173:BMP280.c      **** //****************************************************************************//
+ 174:BMP280.c      **** //
+ 175:BMP280.c      **** //  Temperature Section
+ 176:BMP280.c      **** //
+ 177:BMP280.c      **** //****************************************************************************//
+ 178:BMP280.c      **** 
+ 179:BMP280.c      **** float BMP280_readTempC( void )
+ 180:BMP280.c      **** {
+ 955              		.loc 1 180 0
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\cc4xzKPt.s 			page 21
+
+
+ 956              		.cfi_startproc
+ 957              		@ args = 0, pretend = 0, frame = 32
+ 958              		@ frame_needed = 1, uses_anonymous_args = 0
+ 959 0000 90B5     		push	{r4, r7, lr}
+ 960              		.cfi_def_cfa_offset 12
+ 961              		.cfi_offset 4, -12
+ 962              		.cfi_offset 7, -8
+ 963              		.cfi_offset 14, -4
+ 964 0002 89B0     		sub	sp, sp, #36
+ 965              		.cfi_def_cfa_offset 48
+ 966 0004 00AF     		add	r7, sp, #0
+ 967              		.cfi_def_cfa_register 7
+ 181:BMP280.c      **** 	// Returns temperature in DegC, resolution is 0.01 DegC. Output value of “5123” equals 51.23 D
+ 182:BMP280.c      **** 	// t_fine carries fine temperature as global value
+ 183:BMP280.c      **** 
+ 184:BMP280.c      **** 	//get the reading (adc_T);
+ 185:BMP280.c      **** 	int32_t adc_T = ((uint32_t)BMP280_readRegister(BMP280_TEMPERATURE_MSB_REG) << 12) | ((uint32_t)BMP
+ 968              		.loc 1 185 0
+ 969 0006 FA20     		movs	r0, #250
+ 970 0008 FFF7FEFF 		bl	BMP280_readRegister
+ 971 000c 0346     		mov	r3, r0
+ 972 000e 1C03     		lsls	r4, r3, #12
+ 973 0010 FB20     		movs	r0, #251
+ 974 0012 FFF7FEFF 		bl	BMP280_readRegister
+ 975 0016 0346     		mov	r3, r0
+ 976 0018 1B01     		lsls	r3, r3, #4
+ 977 001a 1C43     		orrs	r4, r4, r3
+ 978 001c FC20     		movs	r0, #252
+ 979 001e FFF7FEFF 		bl	BMP280_readRegister
+ 980 0022 0346     		mov	r3, r0
+ 981 0024 1B09     		lsrs	r3, r3, #4
+ 982 0026 DBB2     		uxtb	r3, r3
+ 983 0028 03F00F03 		and	r3, r3, #15
+ 984 002c 2343     		orrs	r3, r3, r4
+ 985 002e FB61     		str	r3, [r7, #28]
+ 186:BMP280.c      **** 
+ 187:BMP280.c      **** 	//By datasheet, calibrate
+ 188:BMP280.c      **** 	int64_t var1, var2;
+ 189:BMP280.c      **** 
+ 190:BMP280.c      **** 	var1 = ((((adc_T>>3) - ((int32_t)bmp280.calibration.dig_T1<<1))) * ((int32_t)bmp280.calibration.di
+ 986              		.loc 1 190 0
+ 987 0030 FB69     		ldr	r3, [r7, #28]
+ 988 0032 DA10     		asrs	r2, r3, #3
+ 989 0034 224B     		ldr	r3, .L25
+ 990 0036 1B89     		ldrh	r3, [r3, #8]
+ 991 0038 5B00     		lsls	r3, r3, #1
+ 992 003a D31A     		subs	r3, r2, r3
+ 993 003c 204A     		ldr	r2, .L25
+ 994 003e B2F90A20 		ldrsh	r2, [r2, #10]
+ 995 0042 02FB03F3 		mul	r3, r2, r3
+ 996 0046 DB12     		asrs	r3, r3, #11
+ 997 0048 4FEAE374 		asr	r4, r3, #31
+ 998 004c C7E90434 		strd	r3, [r7, #16]
+ 191:BMP280.c      **** 	var2 = (((((adc_T>>4) - ((int32_t)bmp280.calibration.dig_T1)) * ((adc_T>>4) - ((int32_t)bmp280.cal
+ 999              		.loc 1 191 0
+ 1000 0050 FB69     		ldr	r3, [r7, #28]
+ 1001 0052 1B11     		asrs	r3, r3, #4
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\cc4xzKPt.s 			page 22
+
+
+ 1002 0054 1A4A     		ldr	r2, .L25
+ 1003 0056 1289     		ldrh	r2, [r2, #8]
+ 1004 0058 9B1A     		subs	r3, r3, r2
+ 1005 005a FA69     		ldr	r2, [r7, #28]
+ 1006 005c 1211     		asrs	r2, r2, #4
+ 1007 005e 1849     		ldr	r1, .L25
+ 1008 0060 0989     		ldrh	r1, [r1, #8]
+ 1009 0062 521A     		subs	r2, r2, r1
+ 1010 0064 02FB03F3 		mul	r3, r2, r3
+ 1011 0068 1B13     		asrs	r3, r3, #12
+ 1012 006a 154A     		ldr	r2, .L25
+ 1013 006c B2F90C20 		ldrsh	r2, [r2, #12]
+ 1014 0070 02FB03F3 		mul	r3, r2, r3
+ 1015 0074 9B13     		asrs	r3, r3, #14
+ 1016 0076 4FEAE374 		asr	r4, r3, #31
+ 1017 007a C7E90234 		strd	r3, [r7, #8]
+ 192:BMP280.c      **** 	
+ 193:BMP280.c      ****     bmp280.t_fine = var1 + var2;
+ 1018              		.loc 1 193 0
+ 1019 007e 3A69     		ldr	r2, [r7, #16]
+ 1020 0080 BB68     		ldr	r3, [r7, #8]
+ 1021 0082 1344     		add	r3, r3, r2
+ 1022 0084 1A46     		mov	r2, r3
+ 1023 0086 0E4B     		ldr	r3, .L25
+ 1024 0088 1A62     		str	r2, [r3, #32]
+ 194:BMP280.c      **** 	float output = (bmp280.t_fine * 5 + 128) >> 8;
+ 1025              		.loc 1 194 0
+ 1026 008a 0D4B     		ldr	r3, .L25
+ 1027 008c 1A6A     		ldr	r2, [r3, #32]
+ 1028 008e 1346     		mov	r3, r2
+ 1029 0090 9B00     		lsls	r3, r3, #2
+ 1030 0092 1344     		add	r3, r3, r2
+ 1031 0094 8033     		adds	r3, r3, #128
+ 1032 0096 1B12     		asrs	r3, r3, #8
+ 1033 0098 1846     		mov	r0, r3
+ 1034 009a FFF7FEFF 		bl	__aeabi_i2f
+ 1035 009e 0346     		mov	r3, r0
+ 1036 00a0 7B60     		str	r3, [r7, #4]	@ float
+ 195:BMP280.c      **** 
+ 196:BMP280.c      **** 	output = output / 100;
+ 1037              		.loc 1 196 0
+ 1038 00a2 0849     		ldr	r1, .L25+4
+ 1039 00a4 7868     		ldr	r0, [r7, #4]	@ float
+ 1040 00a6 FFF7FEFF 		bl	__aeabi_fdiv
+ 1041 00aa 0346     		mov	r3, r0
+ 1042 00ac 7B60     		str	r3, [r7, #4]	@ float
+ 197:BMP280.c      **** 	
+ 198:BMP280.c      ****     bmp280.temp_C = output;
+ 1043              		.loc 1 198 0
+ 1044 00ae 044A     		ldr	r2, .L25
+ 1045 00b0 7B68     		ldr	r3, [r7, #4]	@ float
+ 1046 00b2 5362     		str	r3, [r2, #36]	@ float
+ 199:BMP280.c      **** 	return bmp280.temp_C;
+ 1047              		.loc 1 199 0
+ 1048 00b4 024B     		ldr	r3, .L25
+ 1049 00b6 5B6A     		ldr	r3, [r3, #36]	@ float
+ 200:BMP280.c      **** }
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\cc4xzKPt.s 			page 23
+
+
+ 1050              		.loc 1 200 0
+ 1051 00b8 1846     		mov	r0, r3
+ 1052 00ba 2437     		adds	r7, r7, #36
+ 1053              		.cfi_def_cfa_offset 12
+ 1054 00bc BD46     		mov	sp, r7
+ 1055              		.cfi_def_cfa_register 13
+ 1056              		@ sp needed
+ 1057 00be 90BD     		pop	{r4, r7, pc}
+ 1058              	.L26:
+ 1059              		.align	2
+ 1060              	.L25:
+ 1061 00c0 00000000 		.word	bmp280
+ 1062 00c4 0000C842 		.word	1120403456
+ 1063              		.cfi_endproc
+ 1064              	.LFE63:
+ 1065              		.size	BMP280_readTempC, .-BMP280_readTempC
+ 1066              		.global	__aeabi_fmul
+ 1067              		.global	__aeabi_fadd
+ 1068              		.section	.text.BMP280_readTempF,"ax",%progbits
+ 1069              		.align	2
+ 1070              		.global	BMP280_readTempF
+ 1071              		.thumb
+ 1072              		.thumb_func
+ 1073              		.type	BMP280_readTempF, %function
+ 1074              	BMP280_readTempF:
+ 1075              	.LFB64:
+ 201:BMP280.c      **** 
+ 202:BMP280.c      **** float BMP280_readTempF( void )
+ 203:BMP280.c      **** {
+ 1076              		.loc 1 203 0
+ 1077              		.cfi_startproc
+ 1078              		@ args = 0, pretend = 0, frame = 8
+ 1079              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1080 0000 80B5     		push	{r7, lr}
+ 1081              		.cfi_def_cfa_offset 8
+ 1082              		.cfi_offset 7, -8
+ 1083              		.cfi_offset 14, -4
+ 1084 0002 82B0     		sub	sp, sp, #8
+ 1085              		.cfi_def_cfa_offset 16
+ 1086 0004 00AF     		add	r7, sp, #0
+ 1087              		.cfi_def_cfa_register 7
+ 204:BMP280.c      **** 	float output = BMP280_readTempC();
+ 1088              		.loc 1 204 0
+ 1089 0006 FFF7FEFF 		bl	BMP280_readTempC
+ 1090 000a 7860     		str	r0, [r7, #4]	@ float
+ 205:BMP280.c      **** 	output = (output * 9) / 5 + 32;
+ 1091              		.loc 1 205 0
+ 1092 000c 0A49     		ldr	r1, .L29
+ 1093 000e 7868     		ldr	r0, [r7, #4]	@ float
+ 1094 0010 FFF7FEFF 		bl	__aeabi_fmul
+ 1095 0014 0346     		mov	r3, r0
+ 1096 0016 0949     		ldr	r1, .L29+4
+ 1097 0018 1846     		mov	r0, r3
+ 1098 001a FFF7FEFF 		bl	__aeabi_fdiv
+ 1099 001e 0346     		mov	r3, r0
+ 1100 0020 4FF08441 		mov	r1, #1107296256
+ 1101 0024 1846     		mov	r0, r3
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\cc4xzKPt.s 			page 24
+
+
+ 1102 0026 FFF7FEFF 		bl	__aeabi_fadd
+ 1103 002a 0346     		mov	r3, r0
+ 1104 002c 7B60     		str	r3, [r7, #4]	@ float
+ 206:BMP280.c      **** 
+ 207:BMP280.c      **** 	return output;
+ 1105              		.loc 1 207 0
+ 1106 002e 7B68     		ldr	r3, [r7, #4]	@ float
+ 208:BMP280.c      **** }
+ 1107              		.loc 1 208 0
+ 1108 0030 1846     		mov	r0, r3
+ 1109 0032 0837     		adds	r7, r7, #8
+ 1110              		.cfi_def_cfa_offset 8
+ 1111 0034 BD46     		mov	sp, r7
+ 1112              		.cfi_def_cfa_register 13
+ 1113              		@ sp needed
+ 1114 0036 80BD     		pop	{r7, pc}
+ 1115              	.L30:
+ 1116              		.align	2
+ 1117              	.L29:
+ 1118 0038 00001041 		.word	1091567616
+ 1119 003c 0000A040 		.word	1084227584
+ 1120              		.cfi_endproc
+ 1121              	.LFE64:
+ 1122              		.size	BMP280_readTempF, .-BMP280_readTempF
+ 1123              		.section	.text.BMP280_readRegister,"ax",%progbits
+ 1124              		.align	2
+ 1125              		.global	BMP280_readRegister
+ 1126              		.thumb
+ 1127              		.thumb_func
+ 1128              		.type	BMP280_readRegister, %function
+ 1129              	BMP280_readRegister:
+ 1130              	.LFB65:
+ 209:BMP280.c      **** 
+ 210:BMP280.c      **** //****************************************************************************//
+ 211:BMP280.c      **** //
+ 212:BMP280.c      **** //  Utility
+ 213:BMP280.c      **** //
+ 214:BMP280.c      **** //****************************************************************************//
+ 215:BMP280.c      **** uint8_t BMP280_readRegister(uint8_t offset)
+ 216:BMP280.c      **** {
+ 1131              		.loc 1 216 0
+ 1132              		.cfi_startproc
+ 1133              		@ args = 0, pretend = 0, frame = 16
+ 1134              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1135 0000 80B5     		push	{r7, lr}
+ 1136              		.cfi_def_cfa_offset 8
+ 1137              		.cfi_offset 7, -8
+ 1138              		.cfi_offset 14, -4
+ 1139 0002 84B0     		sub	sp, sp, #16
+ 1140              		.cfi_def_cfa_offset 24
+ 1141 0004 00AF     		add	r7, sp, #0
+ 1142              		.cfi_def_cfa_register 7
+ 1143 0006 0346     		mov	r3, r0
+ 1144 0008 FB71     		strb	r3, [r7, #7]
+ 217:BMP280.c      **** 	//Return value
+ 218:BMP280.c      **** 	uint8_t result;
+ 219:BMP280.c      **** 	uint8_t numBytes = 1;
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\cc4xzKPt.s 			page 25
+
+
+ 1145              		.loc 1 219 0
+ 1146 000a 0123     		movs	r3, #1
+ 1147 000c 7B73     		strb	r3, [r7, #13]
+ 220:BMP280.c      ****     
+ 221:BMP280.c      ****     uint16  iter;
+ 222:BMP280.c      ****     
+ 223:BMP280.c      **** 	switch (bmp280.settings.commInterface) {
+ 1148              		.loc 1 223 0
+ 1149 000e 244B     		ldr	r3, .L48
+ 1150 0010 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 1151 0012 002B     		cmp	r3, #0
+ 1152 0014 02D0     		beq	.L33
+ 1153 0016 012B     		cmp	r3, #1
+ 1154 0018 3CD0     		beq	.L45
+ 224:BMP280.c      **** 
+ 225:BMP280.c      ****     	case BMP280_I2C_MODE:
+ 226:BMP280.c      ****             I2C_Wakeup();
+ 227:BMP280.c      ****             I2C_MasterClearStatus(); /* Clear any previous status */
+ 228:BMP280.c      ****             
+ 229:BMP280.c      ****             // Write to register
+ 230:BMP280.c      ****             I2C_MasterWriteBuf(bmp280.settings.I2CAddress, (uint8 *) &offset, 1, I2C_MODE_COMPLETE_
+ 231:BMP280.c      ****             for(iter = 0; iter < BMP280_MAX_ITER; iter++)
+ 232:BMP280.c      ****             {
+ 233:BMP280.c      ****                 if(0u != (I2C_MasterStatus() & I2C_MSTAT_WR_CMPLT))
+ 234:BMP280.c      ****                 {
+ 235:BMP280.c      ****                     /* Transfer complete. Check Master status to make sure that transfer
+ 236:BMP280.c      ****                     completed without errors. */
+ 237:BMP280.c      ****                     break;
+ 238:BMP280.c      ****                 }
+ 239:BMP280.c      ****             }        
+ 240:BMP280.c      ****             
+ 241:BMP280.c      ****             // Read Buffer        
+ 242:BMP280.c      ****             I2C_MasterReadBuf(bmp280.settings.I2CAddress, &result, numBytes, I2C_MODE_COMPLETE_XFER
+ 243:BMP280.c      ****             
+ 244:BMP280.c      ****             for(iter = 0; iter < BMP280_MAX_ITER; iter++){
+ 245:BMP280.c      ****                 if(0u != (I2C_MasterStatus() & I2C_MSTAT_RD_CMPLT))
+ 246:BMP280.c      ****                 {
+ 247:BMP280.c      ****                     /* Transfer complete. Check Master status to make sure that transfer
+ 248:BMP280.c      ****                     completed without errors. */
+ 249:BMP280.c      ****                     break;
+ 250:BMP280.c      ****                 }
+ 251:BMP280.c      ****                 
+ 252:BMP280.c      ****             }
+ 253:BMP280.c      ****             I2C_Sleep();
+ 254:BMP280.c      **** 
+ 255:BMP280.c      ****     		break;
+ 256:BMP280.c      **** 
+ 257:BMP280.c      ****     	case BMP280_SPI_MODE:
+ 258:BMP280.c      ****     		// TODO
+ 259:BMP280.c      ****     		break;
+ 260:BMP280.c      **** 
+ 261:BMP280.c      ****     	default:
+ 262:BMP280.c      ****     		break;
+ 1155              		.loc 1 262 0
+ 1156 001a 3CE0     		b	.L43
+ 1157              	.L33:
+ 226:BMP280.c      ****             I2C_MasterClearStatus(); /* Clear any previous status */
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\cc4xzKPt.s 			page 26
+
+
+ 1158              		.loc 1 226 0
+ 1159 001c FFF7FEFF 		bl	I2C_Wakeup
+ 227:BMP280.c      ****             
+ 1160              		.loc 1 227 0
+ 1161 0020 FFF7FEFF 		bl	I2C_MasterClearStatus
+ 230:BMP280.c      ****             for(iter = 0; iter < BMP280_MAX_ITER; iter++)
+ 1162              		.loc 1 230 0
+ 1163 0024 1E4B     		ldr	r3, .L48
+ 1164 0026 5878     		ldrb	r0, [r3, #1]	@ zero_extendqisi2
+ 1165 0028 F91D     		adds	r1, r7, #7
+ 1166 002a 0023     		movs	r3, #0
+ 1167 002c 0122     		movs	r2, #1
+ 1168 002e FFF7FEFF 		bl	I2C_MasterWriteBuf
+ 231:BMP280.c      ****             {
+ 1169              		.loc 1 231 0
+ 1170 0032 0023     		movs	r3, #0
+ 1171 0034 FB81     		strh	r3, [r7, #14]	@ movhi
+ 1172 0036 09E0     		b	.L35
+ 1173              	.L38:
+ 233:BMP280.c      ****                 {
+ 1174              		.loc 1 233 0
+ 1175 0038 FFF7FEFF 		bl	I2C_MasterStatus
+ 1176 003c 0346     		mov	r3, r0
+ 1177 003e 03F00203 		and	r3, r3, #2
+ 1178 0042 002B     		cmp	r3, #0
+ 1179 0044 07D1     		bne	.L46
+ 231:BMP280.c      ****             {
+ 1180              		.loc 1 231 0 discriminator 2
+ 1181 0046 FB89     		ldrh	r3, [r7, #14]
+ 1182 0048 0133     		adds	r3, r3, #1
+ 1183 004a FB81     		strh	r3, [r7, #14]	@ movhi
+ 1184              	.L35:
+ 231:BMP280.c      ****             {
+ 1185              		.loc 1 231 0 is_stmt 0 discriminator 1
+ 1186 004c FB89     		ldrh	r3, [r7, #14]
+ 1187 004e B3F5967F 		cmp	r3, #300
+ 1188 0052 F1D3     		bcc	.L38
+ 1189 0054 00E0     		b	.L37
+ 1190              	.L46:
+ 237:BMP280.c      ****                 }
+ 1191              		.loc 1 237 0 is_stmt 1
+ 1192 0056 00BF     		nop
+ 1193              	.L37:
+ 242:BMP280.c      ****             
+ 1194              		.loc 1 242 0
+ 1195 0058 114B     		ldr	r3, .L48
+ 1196 005a 5878     		ldrb	r0, [r3, #1]	@ zero_extendqisi2
+ 1197 005c 7A7B     		ldrb	r2, [r7, #13]	@ zero_extendqisi2
+ 1198 005e 07F10C01 		add	r1, r7, #12
+ 1199 0062 0023     		movs	r3, #0
+ 1200 0064 FFF7FEFF 		bl	I2C_MasterReadBuf
+ 244:BMP280.c      ****                 if(0u != (I2C_MasterStatus() & I2C_MSTAT_RD_CMPLT))
+ 1201              		.loc 1 244 0
+ 1202 0068 0023     		movs	r3, #0
+ 1203 006a FB81     		strh	r3, [r7, #14]	@ movhi
+ 1204 006c 09E0     		b	.L39
+ 1205              	.L42:
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\cc4xzKPt.s 			page 27
+
+
+ 245:BMP280.c      ****                 {
+ 1206              		.loc 1 245 0
+ 1207 006e FFF7FEFF 		bl	I2C_MasterStatus
+ 1208 0072 0346     		mov	r3, r0
+ 1209 0074 03F00103 		and	r3, r3, #1
+ 1210 0078 002B     		cmp	r3, #0
+ 1211 007a 07D1     		bne	.L47
+ 244:BMP280.c      ****                 if(0u != (I2C_MasterStatus() & I2C_MSTAT_RD_CMPLT))
+ 1212              		.loc 1 244 0 discriminator 2
+ 1213 007c FB89     		ldrh	r3, [r7, #14]
+ 1214 007e 0133     		adds	r3, r3, #1
+ 1215 0080 FB81     		strh	r3, [r7, #14]	@ movhi
+ 1216              	.L39:
+ 244:BMP280.c      ****                 if(0u != (I2C_MasterStatus() & I2C_MSTAT_RD_CMPLT))
+ 1217              		.loc 1 244 0 is_stmt 0 discriminator 1
+ 1218 0082 FB89     		ldrh	r3, [r7, #14]
+ 1219 0084 B3F5967F 		cmp	r3, #300
+ 1220 0088 F1D3     		bcc	.L42
+ 1221 008a 00E0     		b	.L41
+ 1222              	.L47:
+ 249:BMP280.c      ****                 }
+ 1223              		.loc 1 249 0 is_stmt 1
+ 1224 008c 00BF     		nop
+ 1225              	.L41:
+ 253:BMP280.c      **** 
+ 1226              		.loc 1 253 0
+ 1227 008e FFF7FEFF 		bl	I2C_Sleep
+ 255:BMP280.c      **** 
+ 1228              		.loc 1 255 0
+ 1229 0092 00E0     		b	.L43
+ 1230              	.L45:
+ 259:BMP280.c      **** 
+ 1231              		.loc 1 259 0
+ 1232 0094 00BF     		nop
+ 1233              	.L43:
+ 263:BMP280.c      **** 	}
+ 264:BMP280.c      **** 	return result;
+ 1234              		.loc 1 264 0
+ 1235 0096 3B7B     		ldrb	r3, [r7, #12]	@ zero_extendqisi2
+ 265:BMP280.c      **** }
+ 1236              		.loc 1 265 0
+ 1237 0098 1846     		mov	r0, r3
+ 1238 009a 1037     		adds	r7, r7, #16
+ 1239              		.cfi_def_cfa_offset 8
+ 1240 009c BD46     		mov	sp, r7
+ 1241              		.cfi_def_cfa_register 13
+ 1242              		@ sp needed
+ 1243 009e 80BD     		pop	{r7, pc}
+ 1244              	.L49:
+ 1245              		.align	2
+ 1246              	.L48:
+ 1247 00a0 00000000 		.word	bmp280
+ 1248              		.cfi_endproc
+ 1249              	.LFE65:
+ 1250              		.size	BMP280_readRegister, .-BMP280_readRegister
+ 1251              		.section	.text.BMP280_writeRegister,"ax",%progbits
+ 1252              		.align	2
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\cc4xzKPt.s 			page 28
+
+
+ 1253              		.global	BMP280_writeRegister
+ 1254              		.thumb
+ 1255              		.thumb_func
+ 1256              		.type	BMP280_writeRegister, %function
+ 1257              	BMP280_writeRegister:
+ 1258              	.LFB66:
+ 266:BMP280.c      **** 
+ 267:BMP280.c      **** 
+ 268:BMP280.c      **** void BMP280_writeRegister(uint8_t offset, uint8_t data)
+ 269:BMP280.c      **** {
+ 1259              		.loc 1 269 0
+ 1260              		.cfi_startproc
+ 1261              		@ args = 0, pretend = 0, frame = 16
+ 1262              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1263 0000 80B5     		push	{r7, lr}
+ 1264              		.cfi_def_cfa_offset 8
+ 1265              		.cfi_offset 7, -8
+ 1266              		.cfi_offset 14, -4
+ 1267 0002 84B0     		sub	sp, sp, #16
+ 1268              		.cfi_def_cfa_offset 24
+ 1269 0004 00AF     		add	r7, sp, #0
+ 1270              		.cfi_def_cfa_register 7
+ 1271 0006 0346     		mov	r3, r0
+ 1272 0008 0A46     		mov	r2, r1
+ 1273 000a FB71     		strb	r3, [r7, #7]
+ 1274 000c 1346     		mov	r3, r2
+ 1275 000e BB71     		strb	r3, [r7, #6]
+ 270:BMP280.c      ****     uint8 packet[] = {offset, data};
+ 1276              		.loc 1 270 0
+ 1277 0010 FB79     		ldrb	r3, [r7, #7]
+ 1278 0012 3B73     		strb	r3, [r7, #12]
+ 1279 0014 BB79     		ldrb	r3, [r7, #6]
+ 1280 0016 7B73     		strb	r3, [r7, #13]
+ 271:BMP280.c      ****     uint16 iter;
+ 272:BMP280.c      ****     
+ 273:BMP280.c      **** 	switch (bmp280.settings.commInterface)
+ 1281              		.loc 1 273 0
+ 1282 0018 164B     		ldr	r3, .L61
+ 1283 001a 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 1284 001c 002B     		cmp	r3, #0
+ 1285 001e 02D0     		beq	.L52
+ 1286 0020 012B     		cmp	r3, #1
+ 1287 0022 22D0     		beq	.L59
+ 274:BMP280.c      **** 	{
+ 275:BMP280.c      ****     	case BMP280_I2C_MODE:
+ 276:BMP280.c      ****     		//Write the byte
+ 277:BMP280.c      ****             I2C_Wakeup();
+ 278:BMP280.c      ****             I2C_MasterClearStatus(); /* Clear any previous status */
+ 279:BMP280.c      ****             
+ 280:BMP280.c      ****             // Write to register
+ 281:BMP280.c      ****             I2C_MasterWriteBuf(bmp280.settings.I2CAddress, (uint8 *) &packet, 2, I2C_MODE_COMPLETE_
+ 282:BMP280.c      ****             for(iter = 0; iter < BMP280_MAX_ITER; iter++)
+ 283:BMP280.c      ****             {
+ 284:BMP280.c      ****                 if(0u != (I2C_MasterStatus() & I2C_MSTAT_WR_CMPLT))
+ 285:BMP280.c      ****                 {
+ 286:BMP280.c      ****                     // Transfer complete. Check Master status to make sure that transfer
+ 287:BMP280.c      ****                     //completed without errors. 
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\cc4xzKPt.s 			page 29
+
+
+ 288:BMP280.c      ****                     break;               
+ 289:BMP280.c      ****                 }
+ 290:BMP280.c      ****             }          
+ 291:BMP280.c      ****             
+ 292:BMP280.c      ****             I2C_Sleep();        
+ 293:BMP280.c      **** 
+ 294:BMP280.c      ****     		break;
+ 295:BMP280.c      **** 
+ 296:BMP280.c      ****     	case BMP280_SPI_MODE:
+ 297:BMP280.c      ****     		//TODO
+ 298:BMP280.c      ****     		break;
+ 299:BMP280.c      **** 
+ 300:BMP280.c      ****     	default:
+ 301:BMP280.c      ****     		break;
+ 1288              		.loc 1 301 0
+ 1289 0024 22E0     		b	.L58
+ 1290              	.L52:
+ 277:BMP280.c      ****             I2C_MasterClearStatus(); /* Clear any previous status */
+ 1291              		.loc 1 277 0
+ 1292 0026 FFF7FEFF 		bl	I2C_Wakeup
+ 278:BMP280.c      ****             
+ 1293              		.loc 1 278 0
+ 1294 002a FFF7FEFF 		bl	I2C_MasterClearStatus
+ 281:BMP280.c      ****             for(iter = 0; iter < BMP280_MAX_ITER; iter++)
+ 1295              		.loc 1 281 0
+ 1296 002e 114B     		ldr	r3, .L61
+ 1297 0030 5878     		ldrb	r0, [r3, #1]	@ zero_extendqisi2
+ 1298 0032 07F10C01 		add	r1, r7, #12
+ 1299 0036 0023     		movs	r3, #0
+ 1300 0038 0222     		movs	r2, #2
+ 1301 003a FFF7FEFF 		bl	I2C_MasterWriteBuf
+ 282:BMP280.c      ****             {
+ 1302              		.loc 1 282 0
+ 1303 003e 0023     		movs	r3, #0
+ 1304 0040 FB81     		strh	r3, [r7, #14]	@ movhi
+ 1305 0042 09E0     		b	.L54
+ 1306              	.L57:
+ 284:BMP280.c      ****                 {
+ 1307              		.loc 1 284 0
+ 1308 0044 FFF7FEFF 		bl	I2C_MasterStatus
+ 1309 0048 0346     		mov	r3, r0
+ 1310 004a 03F00203 		and	r3, r3, #2
+ 1311 004e 002B     		cmp	r3, #0
+ 1312 0050 07D1     		bne	.L60
+ 282:BMP280.c      ****             {
+ 1313              		.loc 1 282 0 discriminator 2
+ 1314 0052 FB89     		ldrh	r3, [r7, #14]
+ 1315 0054 0133     		adds	r3, r3, #1
+ 1316 0056 FB81     		strh	r3, [r7, #14]	@ movhi
+ 1317              	.L54:
+ 282:BMP280.c      ****             {
+ 1318              		.loc 1 282 0 is_stmt 0 discriminator 1
+ 1319 0058 FB89     		ldrh	r3, [r7, #14]
+ 1320 005a B3F5967F 		cmp	r3, #300
+ 1321 005e F1D3     		bcc	.L57
+ 1322 0060 00E0     		b	.L56
+ 1323              	.L60:
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\cc4xzKPt.s 			page 30
+
+
+ 288:BMP280.c      ****                 }
+ 1324              		.loc 1 288 0 is_stmt 1
+ 1325 0062 00BF     		nop
+ 1326              	.L56:
+ 292:BMP280.c      **** 
+ 1327              		.loc 1 292 0
+ 1328 0064 FFF7FEFF 		bl	I2C_Sleep
+ 294:BMP280.c      **** 
+ 1329              		.loc 1 294 0
+ 1330 0068 00E0     		b	.L58
+ 1331              	.L59:
+ 298:BMP280.c      **** 
+ 1332              		.loc 1 298 0
+ 1333 006a 00BF     		nop
+ 1334              	.L58:
+ 302:BMP280.c      **** 	}
+ 303:BMP280.c      **** }
+ 1335              		.loc 1 303 0 discriminator 1
+ 1336 006c 00BF     		nop
+ 1337 006e 1037     		adds	r7, r7, #16
+ 1338              		.cfi_def_cfa_offset 8
+ 1339 0070 BD46     		mov	sp, r7
+ 1340              		.cfi_def_cfa_register 13
+ 1341              		@ sp needed
+ 1342 0072 80BD     		pop	{r7, pc}
+ 1343              	.L62:
+ 1344              		.align	2
+ 1345              	.L61:
+ 1346 0074 00000000 		.word	bmp280
+ 1347              		.cfi_endproc
+ 1348              	.LFE66:
+ 1349              		.size	BMP280_writeRegister, .-BMP280_writeRegister
+ 1350              		.text
+ 1351              	.Letext0:
+ 1352              		.file 2 "c:\\program files (x86)\\cypress\\psoc creator\\4.4\\psoc creator\\import\\gnu\\arm\\5.4.
+ 1353              		.file 3 "c:\\program files (x86)\\cypress\\psoc creator\\4.4\\psoc creator\\import\\gnu\\arm\\5.4.
+ 1354              		.file 4 "Generated_Source\\PSoC5/cytypes.h"
+ 1355              		.file 5 "BMP280.h"
+ 1356              		.file 6 "Generated_Source\\PSoC5/core_cm3.h"
+ 1357              		.section	.debug_info,"",%progbits
+ 1358              	.Ldebug_info0:
+ 1359 0000 E9040000 		.4byte	0x4e9
+ 1360 0004 0400     		.2byte	0x4
+ 1361 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 1362 000a 04       		.byte	0x4
+ 1363 000b 01       		.uleb128 0x1
+ 1364 000c 9C000000 		.4byte	.LASF84
+ 1365 0010 0C       		.byte	0xc
+ 1366 0011 90010000 		.4byte	.LASF85
+ 1367 0015 20040000 		.4byte	.LASF86
+ 1368 0019 00000000 		.4byte	.Ldebug_ranges0+0
+ 1369 001d 00000000 		.4byte	0
+ 1370 0021 00000000 		.4byte	.Ldebug_line0
+ 1371 0025 02       		.uleb128 0x2
+ 1372 0026 01       		.byte	0x1
+ 1373 0027 06       		.byte	0x6
+ 1374 0028 66020000 		.4byte	.LASF0
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\cc4xzKPt.s 			page 31
+
+
+ 1375 002c 03       		.uleb128 0x3
+ 1376 002d 11020000 		.4byte	.LASF2
+ 1377 0031 02       		.byte	0x2
+ 1378 0032 1D       		.byte	0x1d
+ 1379 0033 37000000 		.4byte	0x37
+ 1380 0037 02       		.uleb128 0x2
+ 1381 0038 01       		.byte	0x1
+ 1382 0039 08       		.byte	0x8
+ 1383 003a 3B020000 		.4byte	.LASF1
+ 1384 003e 03       		.uleb128 0x3
+ 1385 003f B7030000 		.4byte	.LASF3
+ 1386 0043 02       		.byte	0x2
+ 1387 0044 29       		.byte	0x29
+ 1388 0045 49000000 		.4byte	0x49
+ 1389 0049 02       		.uleb128 0x2
+ 1390 004a 02       		.byte	0x2
+ 1391 004b 05       		.byte	0x5
+ 1392 004c 7C000000 		.4byte	.LASF4
+ 1393 0050 03       		.uleb128 0x3
+ 1394 0051 34010000 		.4byte	.LASF5
+ 1395 0055 02       		.byte	0x2
+ 1396 0056 2B       		.byte	0x2b
+ 1397 0057 5B000000 		.4byte	0x5b
+ 1398 005b 02       		.uleb128 0x2
+ 1399 005c 02       		.byte	0x2
+ 1400 005d 07       		.byte	0x7
+ 1401 005e E8020000 		.4byte	.LASF6
+ 1402 0062 03       		.uleb128 0x3
+ 1403 0063 AD030000 		.4byte	.LASF7
+ 1404 0067 02       		.byte	0x2
+ 1405 0068 3F       		.byte	0x3f
+ 1406 0069 6D000000 		.4byte	0x6d
+ 1407 006d 02       		.uleb128 0x2
+ 1408 006e 04       		.byte	0x4
+ 1409 006f 05       		.byte	0x5
+ 1410 0070 E4010000 		.4byte	.LASF8
+ 1411 0074 03       		.uleb128 0x3
+ 1412 0075 A2030000 		.4byte	.LASF9
+ 1413 0079 02       		.byte	0x2
+ 1414 007a 41       		.byte	0x41
+ 1415 007b 7F000000 		.4byte	0x7f
+ 1416 007f 02       		.uleb128 0x2
+ 1417 0080 04       		.byte	0x4
+ 1418 0081 07       		.byte	0x7
+ 1419 0082 55030000 		.4byte	.LASF10
+ 1420 0086 03       		.uleb128 0x3
+ 1421 0087 ED010000 		.4byte	.LASF11
+ 1422 008b 02       		.byte	0x2
+ 1423 008c 59       		.byte	0x59
+ 1424 008d 91000000 		.4byte	0x91
+ 1425 0091 02       		.uleb128 0x2
+ 1426 0092 08       		.byte	0x8
+ 1427 0093 05       		.byte	0x5
+ 1428 0094 C7010000 		.4byte	.LASF12
+ 1429 0098 02       		.uleb128 0x2
+ 1430 0099 08       		.byte	0x8
+ 1431 009a 07       		.byte	0x7
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\cc4xzKPt.s 			page 32
+
+
+ 1432 009b 72020000 		.4byte	.LASF13
+ 1433 009f 04       		.uleb128 0x4
+ 1434 00a0 04       		.byte	0x4
+ 1435 00a1 05       		.byte	0x5
+ 1436 00a2 696E7400 		.ascii	"int\000"
+ 1437 00a6 02       		.uleb128 0x2
+ 1438 00a7 04       		.byte	0x4
+ 1439 00a8 07       		.byte	0x7
+ 1440 00a9 98020000 		.4byte	.LASF14
+ 1441 00ad 03       		.uleb128 0x3
+ 1442 00ae 73010000 		.4byte	.LASF15
+ 1443 00b2 03       		.byte	0x3
+ 1444 00b3 18       		.byte	0x18
+ 1445 00b4 2C000000 		.4byte	0x2c
+ 1446 00b8 03       		.uleb128 0x3
+ 1447 00b9 08030000 		.4byte	.LASF16
+ 1448 00bd 03       		.byte	0x3
+ 1449 00be 20       		.byte	0x20
+ 1450 00bf 3E000000 		.4byte	0x3e
+ 1451 00c3 03       		.uleb128 0x3
+ 1452 00c4 A5020000 		.4byte	.LASF17
+ 1453 00c8 03       		.byte	0x3
+ 1454 00c9 24       		.byte	0x24
+ 1455 00ca 50000000 		.4byte	0x50
+ 1456 00ce 03       		.uleb128 0x3
+ 1457 00cf 00030000 		.4byte	.LASF18
+ 1458 00d3 03       		.byte	0x3
+ 1459 00d4 2C       		.byte	0x2c
+ 1460 00d5 62000000 		.4byte	0x62
+ 1461 00d9 03       		.uleb128 0x3
+ 1462 00da 8F020000 		.4byte	.LASF19
+ 1463 00de 03       		.byte	0x3
+ 1464 00df 30       		.byte	0x30
+ 1465 00e0 74000000 		.4byte	0x74
+ 1466 00e4 03       		.uleb128 0x3
+ 1467 00e5 54010000 		.4byte	.LASF20
+ 1468 00e9 03       		.byte	0x3
+ 1469 00ea 38       		.byte	0x38
+ 1470 00eb 86000000 		.4byte	0x86
+ 1471 00ef 03       		.uleb128 0x3
+ 1472 00f0 10030000 		.4byte	.LASF21
+ 1473 00f4 04       		.byte	0x4
+ 1474 00f5 A1       		.byte	0xa1
+ 1475 00f6 37000000 		.4byte	0x37
+ 1476 00fa 03       		.uleb128 0x3
+ 1477 00fb 65010000 		.4byte	.LASF22
+ 1478 00ff 04       		.byte	0x4
+ 1479 0100 A2       		.byte	0xa2
+ 1480 0101 5B000000 		.4byte	0x5b
+ 1481 0105 02       		.uleb128 0x2
+ 1482 0106 04       		.byte	0x4
+ 1483 0107 04       		.byte	0x4
+ 1484 0108 B8010000 		.4byte	.LASF23
+ 1485 010c 02       		.uleb128 0x2
+ 1486 010d 08       		.byte	0x8
+ 1487 010e 04       		.byte	0x4
+ 1488 010f 78030000 		.4byte	.LASF24
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\cc4xzKPt.s 			page 33
+
+
+ 1489 0113 02       		.uleb128 0x2
+ 1490 0114 01       		.byte	0x1
+ 1491 0115 08       		.byte	0x8
+ 1492 0116 FB020000 		.4byte	.LASF25
+ 1493 011a 02       		.uleb128 0x2
+ 1494 011b 08       		.byte	0x8
+ 1495 011c 04       		.byte	0x4
+ 1496 011d 28020000 		.4byte	.LASF26
+ 1497 0121 02       		.uleb128 0x2
+ 1498 0122 04       		.byte	0x4
+ 1499 0123 07       		.byte	0x7
+ 1500 0124 86000000 		.4byte	.LASF27
+ 1501 0128 05       		.uleb128 0x5
+ 1502 0129 08       		.byte	0x8
+ 1503 012a 05       		.byte	0x5
+ 1504 012b 4A       		.byte	0x4a
+ 1505 012c 91010000 		.4byte	0x191
+ 1506 0130 06       		.uleb128 0x6
+ 1507 0131 94030000 		.4byte	.LASF28
+ 1508 0135 05       		.byte	0x5
+ 1509 0136 4C       		.byte	0x4c
+ 1510 0137 AD000000 		.4byte	0xad
+ 1511 013b 00       		.byte	0
+ 1512 013c 06       		.uleb128 0x6
+ 1513 013d 56000000 		.4byte	.LASF29
+ 1514 0141 05       		.byte	0x5
+ 1515 0142 4D       		.byte	0x4d
+ 1516 0143 AD000000 		.4byte	0xad
+ 1517 0147 01       		.byte	0x1
+ 1518 0148 06       		.uleb128 0x6
+ 1519 0149 48000000 		.4byte	.LASF30
+ 1520 014d 05       		.byte	0x5
+ 1521 014e 4E       		.byte	0x4e
+ 1522 014f AD000000 		.4byte	0xad
+ 1523 0153 02       		.byte	0x2
+ 1524 0154 06       		.uleb128 0x6
+ 1525 0155 D5010000 		.4byte	.LASF31
+ 1526 0159 05       		.byte	0x5
+ 1527 015a 50       		.byte	0x50
+ 1528 015b AD000000 		.4byte	0xad
+ 1529 015f 03       		.byte	0x3
+ 1530 0160 06       		.uleb128 0x6
+ 1531 0161 CC030000 		.4byte	.LASF32
+ 1532 0165 05       		.byte	0x5
+ 1533 0166 51       		.byte	0x51
+ 1534 0167 AD000000 		.4byte	0xad
+ 1535 016b 04       		.byte	0x4
+ 1536 016c 06       		.uleb128 0x6
+ 1537 016d F8030000 		.4byte	.LASF33
+ 1538 0171 05       		.byte	0x5
+ 1539 0172 52       		.byte	0x52
+ 1540 0173 AD000000 		.4byte	0xad
+ 1541 0177 05       		.byte	0x5
+ 1542 0178 06       		.uleb128 0x6
+ 1543 0179 61000000 		.4byte	.LASF34
+ 1544 017d 05       		.byte	0x5
+ 1545 017e 53       		.byte	0x53
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\cc4xzKPt.s 			page 34
+
+
+ 1546 017f AD000000 		.4byte	0xad
+ 1547 0183 06       		.byte	0x6
+ 1548 0184 06       		.uleb128 0x6
+ 1549 0185 1F000000 		.4byte	.LASF35
+ 1550 0189 05       		.byte	0x5
+ 1551 018a 54       		.byte	0x54
+ 1552 018b AD000000 		.4byte	0xad
+ 1553 018f 07       		.byte	0x7
+ 1554 0190 00       		.byte	0
+ 1555 0191 03       		.uleb128 0x3
+ 1556 0192 DC030000 		.4byte	.LASF36
+ 1557 0196 05       		.byte	0x5
+ 1558 0197 57       		.byte	0x57
+ 1559 0198 28010000 		.4byte	0x128
+ 1560 019c 05       		.uleb128 0x5
+ 1561 019d 18       		.byte	0x18
+ 1562 019e 05       		.byte	0x5
+ 1563 019f 5B       		.byte	0x5b
+ 1564 01a0 35020000 		.4byte	0x235
+ 1565 01a4 06       		.uleb128 0x6
+ 1566 01a5 7F030000 		.4byte	.LASF37
+ 1567 01a9 05       		.byte	0x5
+ 1568 01aa 5C       		.byte	0x5c
+ 1569 01ab C3000000 		.4byte	0xc3
+ 1570 01af 00       		.byte	0
+ 1571 01b0 06       		.uleb128 0x6
+ 1572 01b1 86030000 		.4byte	.LASF38
+ 1573 01b5 05       		.byte	0x5
+ 1574 01b6 5D       		.byte	0x5d
+ 1575 01b7 B8000000 		.4byte	0xb8
+ 1576 01bb 02       		.byte	0x2
+ 1577 01bc 06       		.uleb128 0x6
+ 1578 01bd 8D030000 		.4byte	.LASF39
+ 1579 01c1 05       		.byte	0x5
+ 1580 01c2 5E       		.byte	0x5e
+ 1581 01c3 B8000000 		.4byte	0xb8
+ 1582 01c7 04       		.byte	0x4
+ 1583 01c8 06       		.uleb128 0x6
+ 1584 01c9 16030000 		.4byte	.LASF40
+ 1585 01cd 05       		.byte	0x5
+ 1586 01ce 60       		.byte	0x60
+ 1587 01cf C3000000 		.4byte	0xc3
+ 1588 01d3 06       		.byte	0x6
+ 1589 01d4 06       		.uleb128 0x6
+ 1590 01d5 6C010000 		.4byte	.LASF41
+ 1591 01d9 05       		.byte	0x5
+ 1592 01da 61       		.byte	0x61
+ 1593 01db B8000000 		.4byte	0xb8
+ 1594 01df 08       		.byte	0x8
+ 1595 01e0 06       		.uleb128 0x6
+ 1596 01e1 34020000 		.4byte	.LASF42
+ 1597 01e5 05       		.byte	0x5
+ 1598 01e6 62       		.byte	0x62
+ 1599 01e7 B8000000 		.4byte	0xb8
+ 1600 01eb 0A       		.byte	0xa
+ 1601 01ec 06       		.uleb128 0x6
+ 1602 01ed 2B030000 		.4byte	.LASF43
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\cc4xzKPt.s 			page 35
+
+
+ 1603 01f1 05       		.byte	0x5
+ 1604 01f2 63       		.byte	0x63
+ 1605 01f3 B8000000 		.4byte	0xb8
+ 1606 01f7 0C       		.byte	0xc
+ 1607 01f8 06       		.uleb128 0x6
+ 1608 01f9 32030000 		.4byte	.LASF44
+ 1609 01fd 05       		.byte	0x5
+ 1610 01fe 64       		.byte	0x64
+ 1611 01ff B8000000 		.4byte	0xb8
+ 1612 0203 0E       		.byte	0xe
+ 1613 0204 06       		.uleb128 0x6
+ 1614 0205 39030000 		.4byte	.LASF45
+ 1615 0209 05       		.byte	0x5
+ 1616 020a 65       		.byte	0x65
+ 1617 020b B8000000 		.4byte	0xb8
+ 1618 020f 10       		.byte	0x10
+ 1619 0210 06       		.uleb128 0x6
+ 1620 0211 40030000 		.4byte	.LASF46
+ 1621 0215 05       		.byte	0x5
+ 1622 0216 66       		.byte	0x66
+ 1623 0217 B8000000 		.4byte	0xb8
+ 1624 021b 12       		.byte	0x12
+ 1625 021c 06       		.uleb128 0x6
+ 1626 021d 47030000 		.4byte	.LASF47
+ 1627 0221 05       		.byte	0x5
+ 1628 0222 67       		.byte	0x67
+ 1629 0223 B8000000 		.4byte	0xb8
+ 1630 0227 14       		.byte	0x14
+ 1631 0228 06       		.uleb128 0x6
+ 1632 0229 4E030000 		.4byte	.LASF48
+ 1633 022d 05       		.byte	0x5
+ 1634 022e 68       		.byte	0x68
+ 1635 022f B8000000 		.4byte	0xb8
+ 1636 0233 16       		.byte	0x16
+ 1637 0234 00       		.byte	0
+ 1638 0235 03       		.uleb128 0x3
+ 1639 0236 36000000 		.4byte	.LASF49
+ 1640 023a 05       		.byte	0x5
+ 1641 023b 6C       		.byte	0x6c
+ 1642 023c 9C010000 		.4byte	0x19c
+ 1643 0240 05       		.uleb128 0x5
+ 1644 0241 2C       		.byte	0x2c
+ 1645 0242 05       		.byte	0x5
+ 1646 0243 70       		.byte	0x70
+ 1647 0244 85020000 		.4byte	0x285
+ 1648 0248 06       		.uleb128 0x6
+ 1649 0249 BE010000 		.4byte	.LASF50
+ 1650 024d 05       		.byte	0x5
+ 1651 024e 72       		.byte	0x72
+ 1652 024f 91010000 		.4byte	0x191
+ 1653 0253 00       		.byte	0
+ 1654 0254 06       		.uleb128 0x6
+ 1655 0255 05020000 		.4byte	.LASF51
+ 1656 0259 05       		.byte	0x5
+ 1657 025a 73       		.byte	0x73
+ 1658 025b 35020000 		.4byte	0x235
+ 1659 025f 08       		.byte	0x8
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\cc4xzKPt.s 			page 36
+
+
+ 1660 0260 06       		.uleb128 0x6
+ 1661 0261 FE010000 		.4byte	.LASF52
+ 1662 0265 05       		.byte	0x5
+ 1663 0266 74       		.byte	0x74
+ 1664 0267 CE000000 		.4byte	0xce
+ 1665 026b 20       		.byte	0x20
+ 1666 026c 06       		.uleb128 0x6
+ 1667 026d DD010000 		.4byte	.LASF53
+ 1668 0271 05       		.byte	0x5
+ 1669 0272 75       		.byte	0x75
+ 1670 0273 05010000 		.4byte	0x105
+ 1671 0277 24       		.byte	0x24
+ 1672 0278 06       		.uleb128 0x6
+ 1673 0279 1D030000 		.4byte	.LASF54
+ 1674 027d 05       		.byte	0x5
+ 1675 027e 76       		.byte	0x76
+ 1676 027f 05010000 		.4byte	0x105
+ 1677 0283 28       		.byte	0x28
+ 1678 0284 00       		.byte	0
+ 1679 0285 03       		.uleb128 0x3
+ 1680 0286 B1010000 		.4byte	.LASF55
+ 1681 028a 05       		.byte	0x5
+ 1682 028b 78       		.byte	0x78
+ 1683 028c 40020000 		.4byte	0x240
+ 1684 0290 07       		.uleb128 0x7
+ 1685 0291 8F000000 		.4byte	.LASF56
+ 1686 0295 01       		.byte	0x1
+ 1687 0296 2B       		.byte	0x2b
+ 1688 0297 00000000 		.4byte	.LFB56
+ 1689 029b 10000000 		.4byte	.LFE56-.LFB56
+ 1690 029f 01       		.uleb128 0x1
+ 1691 02a0 9C       		.byte	0x9c
+ 1692 02a1 07       		.uleb128 0x7
+ 1693 02a2 AE020000 		.4byte	.LASF57
+ 1694 02a6 01       		.byte	0x1
+ 1695 02a7 30       		.byte	0x30
+ 1696 02a8 00000000 		.4byte	.LFB57
+ 1697 02ac 0C000000 		.4byte	.LFE57-.LFB57
+ 1698 02b0 01       		.uleb128 0x1
+ 1699 02b1 9C       		.byte	0x9c
+ 1700 02b2 08       		.uleb128 0x8
+ 1701 02b3 70000000 		.4byte	.LASF77
+ 1702 02b7 01       		.byte	0x1
+ 1703 02b8 3D       		.byte	0x3d
+ 1704 02b9 AD000000 		.4byte	0xad
+ 1705 02bd 00000000 		.4byte	.LFB58
+ 1706 02c1 30020000 		.4byte	.LFE58-.LFB58
+ 1707 02c5 01       		.uleb128 0x1
+ 1708 02c6 9C       		.byte	0x9c
+ 1709 02c7 E8020000 		.4byte	0x2e8
+ 1710 02cb 09       		.uleb128 0x9
+ 1711 02cc 7B010000 		.4byte	.LASF58
+ 1712 02d0 01       		.byte	0x1
+ 1713 02d1 40       		.byte	0x40
+ 1714 02d2 AD000000 		.4byte	0xad
+ 1715 02d6 02       		.uleb128 0x2
+ 1716 02d7 91       		.byte	0x91
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\cc4xzKPt.s 			page 37
+
+
+ 1717 02d8 6F       		.sleb128 -17
+ 1718 02d9 09       		.uleb128 0x9
+ 1719 02da 3F010000 		.4byte	.LASF59
+ 1720 02de 01       		.byte	0x1
+ 1721 02df 40       		.byte	0x40
+ 1722 02e0 AD000000 		.4byte	0xad
+ 1723 02e4 02       		.uleb128 0x2
+ 1724 02e5 91       		.byte	0x91
+ 1725 02e6 6E       		.sleb128 -18
+ 1726 02e7 00       		.byte	0
+ 1727 02e8 07       		.uleb128 0x7
+ 1728 02e9 1B020000 		.4byte	.LASF60
+ 1729 02ed 01       		.byte	0x1
+ 1730 02ee 70       		.byte	0x70
+ 1731 02ef 00000000 		.4byte	.LFB59
+ 1732 02f3 10000000 		.4byte	.LFE59-.LFB59
+ 1733 02f7 01       		.uleb128 0x1
+ 1734 02f8 9C       		.byte	0x9c
+ 1735 02f9 0A       		.uleb128 0xa
+ 1736 02fa CF020000 		.4byte	.LASF65
+ 1737 02fe 01       		.byte	0x1
+ 1738 02ff 7B       		.byte	0x7b
+ 1739 0300 05010000 		.4byte	0x105
+ 1740 0304 00000000 		.4byte	.LFB60
+ 1741 0308 BC030000 		.4byte	.LFE60-.LFB60
+ 1742 030c 01       		.uleb128 0x1
+ 1743 030d 9C       		.byte	0x9c
+ 1744 030e 4B030000 		.4byte	0x34b
+ 1745 0312 09       		.uleb128 0x9
+ 1746 0313 4E010000 		.4byte	.LASF61
+ 1747 0317 01       		.byte	0x1
+ 1748 0318 80       		.byte	0x80
+ 1749 0319 CE000000 		.4byte	0xce
+ 1750 031d 02       		.uleb128 0x2
+ 1751 031e 91       		.byte	0x91
+ 1752 031f 5C       		.sleb128 -36
+ 1753 0320 09       		.uleb128 0x9
+ 1754 0321 2A010000 		.4byte	.LASF62
+ 1755 0325 01       		.byte	0x1
+ 1756 0326 82       		.byte	0x82
+ 1757 0327 E4000000 		.4byte	0xe4
+ 1758 032b 02       		.uleb128 0x2
+ 1759 032c 91       		.byte	0x91
+ 1760 032d 50       		.sleb128 -48
+ 1761 032e 09       		.uleb128 0x9
+ 1762 032f 2F010000 		.4byte	.LASF63
+ 1763 0333 01       		.byte	0x1
+ 1764 0334 82       		.byte	0x82
+ 1765 0335 E4000000 		.4byte	0xe4
+ 1766 0339 02       		.uleb128 0x2
+ 1767 033a 91       		.byte	0x91
+ 1768 033b 48       		.sleb128 -56
+ 1769 033c 09       		.uleb128 0x9
+ 1770 033d 89020000 		.4byte	.LASF64
+ 1771 0341 01       		.byte	0x1
+ 1772 0342 82       		.byte	0x82
+ 1773 0343 E4000000 		.4byte	0xe4
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\cc4xzKPt.s 			page 38
+
+
+ 1774 0347 02       		.uleb128 0x2
+ 1775 0348 91       		.byte	0x91
+ 1776 0349 40       		.sleb128 -64
+ 1777 034a 00       		.byte	0
+ 1778 034b 0A       		.uleb128 0xa
+ 1779 034c 00000000 		.4byte	.LASF66
+ 1780 0350 01       		.byte	0x1
+ 1781 0351 98       		.byte	0x98
+ 1782 0352 05010000 		.4byte	0x105
+ 1783 0356 00000000 		.4byte	.LFB61
+ 1784 035a 80000000 		.4byte	.LFE61-.LFB61
+ 1785 035e 01       		.uleb128 0x1
+ 1786 035f 9C       		.byte	0x9c
+ 1787 0360 73030000 		.4byte	0x373
+ 1788 0364 09       		.uleb128 0x9
+ 1789 0365 EB030000 		.4byte	.LASF67
+ 1790 0369 01       		.byte	0x1
+ 1791 036a 9A       		.byte	0x9a
+ 1792 036b 05010000 		.4byte	0x105
+ 1793 036f 02       		.uleb128 0x2
+ 1794 0370 91       		.byte	0x91
+ 1795 0371 6C       		.sleb128 -20
+ 1796 0372 00       		.byte	0
+ 1797 0373 0A       		.uleb128 0xa
+ 1798 0374 49020000 		.4byte	.LASF68
+ 1799 0378 01       		.byte	0x1
+ 1800 0379 A1       		.byte	0xa1
+ 1801 037a 05010000 		.4byte	0x105
+ 1802 037e 00000000 		.4byte	.LFB62
+ 1803 0382 48000000 		.4byte	.LFE62-.LFB62
+ 1804 0386 01       		.uleb128 0x1
+ 1805 0387 9C       		.byte	0x9c
+ 1806 0388 9B030000 		.4byte	0x39b
+ 1807 038c 09       		.uleb128 0x9
+ 1808 038d EB030000 		.4byte	.LASF67
+ 1809 0391 01       		.byte	0x1
+ 1810 0392 A3       		.byte	0xa3
+ 1811 0393 05010000 		.4byte	0x105
+ 1812 0397 02       		.uleb128 0x2
+ 1813 0398 91       		.byte	0x91
+ 1814 0399 6C       		.sleb128 -20
+ 1815 039a 00       		.byte	0
+ 1816 039b 0A       		.uleb128 0xa
+ 1817 039c 67030000 		.4byte	.LASF69
+ 1818 03a0 01       		.byte	0x1
+ 1819 03a1 B3       		.byte	0xb3
+ 1820 03a2 05010000 		.4byte	0x105
+ 1821 03a6 00000000 		.4byte	.LFB63
+ 1822 03aa C8000000 		.4byte	.LFE63-.LFB63
+ 1823 03ae 01       		.uleb128 0x1
+ 1824 03af 9C       		.byte	0x9c
+ 1825 03b0 ED030000 		.4byte	0x3ed
+ 1826 03b4 09       		.uleb128 0x9
+ 1827 03b5 C1030000 		.4byte	.LASF70
+ 1828 03b9 01       		.byte	0x1
+ 1829 03ba B9       		.byte	0xb9
+ 1830 03bb CE000000 		.4byte	0xce
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\cc4xzKPt.s 			page 39
+
+
+ 1831 03bf 02       		.uleb128 0x2
+ 1832 03c0 91       		.byte	0x91
+ 1833 03c1 6C       		.sleb128 -20
+ 1834 03c2 09       		.uleb128 0x9
+ 1835 03c3 2A010000 		.4byte	.LASF62
+ 1836 03c7 01       		.byte	0x1
+ 1837 03c8 BC       		.byte	0xbc
+ 1838 03c9 E4000000 		.4byte	0xe4
+ 1839 03cd 02       		.uleb128 0x2
+ 1840 03ce 91       		.byte	0x91
+ 1841 03cf 60       		.sleb128 -32
+ 1842 03d0 09       		.uleb128 0x9
+ 1843 03d1 2F010000 		.4byte	.LASF63
+ 1844 03d5 01       		.byte	0x1
+ 1845 03d6 BC       		.byte	0xbc
+ 1846 03d7 E4000000 		.4byte	0xe4
+ 1847 03db 02       		.uleb128 0x2
+ 1848 03dc 91       		.byte	0x91
+ 1849 03dd 58       		.sleb128 -40
+ 1850 03de 09       		.uleb128 0x9
+ 1851 03df D5030000 		.4byte	.LASF71
+ 1852 03e3 01       		.byte	0x1
+ 1853 03e4 C2       		.byte	0xc2
+ 1854 03e5 05010000 		.4byte	0x105
+ 1855 03e9 02       		.uleb128 0x2
+ 1856 03ea 91       		.byte	0x91
+ 1857 03eb 54       		.sleb128 -44
+ 1858 03ec 00       		.byte	0
+ 1859 03ed 0A       		.uleb128 0xa
+ 1860 03ee 99010000 		.4byte	.LASF72
+ 1861 03f2 01       		.byte	0x1
+ 1862 03f3 CA       		.byte	0xca
+ 1863 03f4 05010000 		.4byte	0x105
+ 1864 03f8 00000000 		.4byte	.LFB64
+ 1865 03fc 40000000 		.4byte	.LFE64-.LFB64
+ 1866 0400 01       		.uleb128 0x1
+ 1867 0401 9C       		.byte	0x9c
+ 1868 0402 15040000 		.4byte	0x415
+ 1869 0406 09       		.uleb128 0x9
+ 1870 0407 D5030000 		.4byte	.LASF71
+ 1871 040b 01       		.byte	0x1
+ 1872 040c CC       		.byte	0xcc
+ 1873 040d 05010000 		.4byte	0x105
+ 1874 0411 02       		.uleb128 0x2
+ 1875 0412 91       		.byte	0x91
+ 1876 0413 74       		.sleb128 -12
+ 1877 0414 00       		.byte	0
+ 1878 0415 0A       		.uleb128 0xa
+ 1879 0416 0C040000 		.4byte	.LASF73
+ 1880 041a 01       		.byte	0x1
+ 1881 041b D7       		.byte	0xd7
+ 1882 041c AD000000 		.4byte	0xad
+ 1883 0420 00000000 		.4byte	.LFB65
+ 1884 0424 A4000000 		.4byte	.LFE65-.LFB65
+ 1885 0428 01       		.uleb128 0x1
+ 1886 0429 9C       		.byte	0x9c
+ 1887 042a 67040000 		.4byte	0x467
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\cc4xzKPt.s 			page 40
+
+
+ 1888 042e 0B       		.uleb128 0xb
+ 1889 042f F7010000 		.4byte	.LASF79
+ 1890 0433 01       		.byte	0x1
+ 1891 0434 D7       		.byte	0xd7
+ 1892 0435 AD000000 		.4byte	0xad
+ 1893 0439 02       		.uleb128 0x2
+ 1894 043a 91       		.byte	0x91
+ 1895 043b 6F       		.sleb128 -17
+ 1896 043c 09       		.uleb128 0x9
+ 1897 043d 2F000000 		.4byte	.LASF74
+ 1898 0441 01       		.byte	0x1
+ 1899 0442 DA       		.byte	0xda
+ 1900 0443 AD000000 		.4byte	0xad
+ 1901 0447 02       		.uleb128 0x2
+ 1902 0448 91       		.byte	0x91
+ 1903 0449 74       		.sleb128 -12
+ 1904 044a 09       		.uleb128 0x9
+ 1905 044b 5C010000 		.4byte	.LASF75
+ 1906 044f 01       		.byte	0x1
+ 1907 0450 DB       		.byte	0xdb
+ 1908 0451 AD000000 		.4byte	0xad
+ 1909 0455 02       		.uleb128 0x2
+ 1910 0456 91       		.byte	0x91
+ 1911 0457 75       		.sleb128 -11
+ 1912 0458 09       		.uleb128 0x9
+ 1913 0459 C7030000 		.4byte	.LASF76
+ 1914 045d 01       		.byte	0x1
+ 1915 045e DD       		.byte	0xdd
+ 1916 045f FA000000 		.4byte	0xfa
+ 1917 0463 02       		.uleb128 0x2
+ 1918 0464 91       		.byte	0x91
+ 1919 0465 76       		.sleb128 -10
+ 1920 0466 00       		.byte	0
+ 1921 0467 0C       		.uleb128 0xc
+ 1922 0468 BA020000 		.4byte	.LASF78
+ 1923 046c 01       		.byte	0x1
+ 1924 046d 0C01     		.2byte	0x10c
+ 1925 046f 00000000 		.4byte	.LFB66
+ 1926 0473 78000000 		.4byte	.LFE66-.LFB66
+ 1927 0477 01       		.uleb128 0x1
+ 1928 0478 9C       		.byte	0x9c
+ 1929 0479 BA040000 		.4byte	0x4ba
+ 1930 047d 0D       		.uleb128 0xd
+ 1931 047e F7010000 		.4byte	.LASF79
+ 1932 0482 01       		.byte	0x1
+ 1933 0483 0C01     		.2byte	0x10c
+ 1934 0485 AD000000 		.4byte	0xad
+ 1935 0489 02       		.uleb128 0x2
+ 1936 048a 91       		.byte	0x91
+ 1937 048b 6F       		.sleb128 -17
+ 1938 048c 0D       		.uleb128 0xd
+ 1939 048d 26030000 		.4byte	.LASF80
+ 1940 0491 01       		.byte	0x1
+ 1941 0492 0C01     		.2byte	0x10c
+ 1942 0494 AD000000 		.4byte	0xad
+ 1943 0498 02       		.uleb128 0x2
+ 1944 0499 91       		.byte	0x91
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\cc4xzKPt.s 			page 41
+
+
+ 1945 049a 6E       		.sleb128 -18
+ 1946 049b 0E       		.uleb128 0xe
+ 1947 049c AA010000 		.4byte	.LASF81
+ 1948 04a0 01       		.byte	0x1
+ 1949 04a1 0E01     		.2byte	0x10e
+ 1950 04a3 BA040000 		.4byte	0x4ba
+ 1951 04a7 02       		.uleb128 0x2
+ 1952 04a8 91       		.byte	0x91
+ 1953 04a9 74       		.sleb128 -12
+ 1954 04aa 0E       		.uleb128 0xe
+ 1955 04ab C7030000 		.4byte	.LASF76
+ 1956 04af 01       		.byte	0x1
+ 1957 04b0 0F01     		.2byte	0x10f
+ 1958 04b2 FA000000 		.4byte	0xfa
+ 1959 04b6 02       		.uleb128 0x2
+ 1960 04b7 91       		.byte	0x91
+ 1961 04b8 76       		.sleb128 -10
+ 1962 04b9 00       		.byte	0
+ 1963 04ba 0F       		.uleb128 0xf
+ 1964 04bb EF000000 		.4byte	0xef
+ 1965 04bf CA040000 		.4byte	0x4ca
+ 1966 04c3 10       		.uleb128 0x10
+ 1967 04c4 21010000 		.4byte	0x121
+ 1968 04c8 01       		.byte	0x1
+ 1969 04c9 00       		.byte	0
+ 1970 04ca 11       		.uleb128 0x11
+ 1971 04cb FF030000 		.4byte	.LASF82
+ 1972 04cf 06       		.byte	0x6
+ 1973 04d0 1606     		.2byte	0x616
+ 1974 04d2 D6040000 		.4byte	0x4d6
+ 1975 04d6 12       		.uleb128 0x12
+ 1976 04d7 CE000000 		.4byte	0xce
+ 1977 04db 13       		.uleb128 0x13
+ 1978 04dc 89010000 		.4byte	.LASF83
+ 1979 04e0 01       		.byte	0x1
+ 1980 04e1 17       		.byte	0x17
+ 1981 04e2 85020000 		.4byte	0x285
+ 1982 04e6 05       		.uleb128 0x5
+ 1983 04e7 03       		.byte	0x3
+ 1984 04e8 00000000 		.4byte	bmp280
+ 1985 04ec 00       		.byte	0
+ 1986              		.section	.debug_abbrev,"",%progbits
+ 1987              	.Ldebug_abbrev0:
+ 1988 0000 01       		.uleb128 0x1
+ 1989 0001 11       		.uleb128 0x11
+ 1990 0002 01       		.byte	0x1
+ 1991 0003 25       		.uleb128 0x25
+ 1992 0004 0E       		.uleb128 0xe
+ 1993 0005 13       		.uleb128 0x13
+ 1994 0006 0B       		.uleb128 0xb
+ 1995 0007 03       		.uleb128 0x3
+ 1996 0008 0E       		.uleb128 0xe
+ 1997 0009 1B       		.uleb128 0x1b
+ 1998 000a 0E       		.uleb128 0xe
+ 1999 000b 55       		.uleb128 0x55
+ 2000 000c 17       		.uleb128 0x17
+ 2001 000d 11       		.uleb128 0x11
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\cc4xzKPt.s 			page 42
+
+
+ 2002 000e 01       		.uleb128 0x1
+ 2003 000f 10       		.uleb128 0x10
+ 2004 0010 17       		.uleb128 0x17
+ 2005 0011 00       		.byte	0
+ 2006 0012 00       		.byte	0
+ 2007 0013 02       		.uleb128 0x2
+ 2008 0014 24       		.uleb128 0x24
+ 2009 0015 00       		.byte	0
+ 2010 0016 0B       		.uleb128 0xb
+ 2011 0017 0B       		.uleb128 0xb
+ 2012 0018 3E       		.uleb128 0x3e
+ 2013 0019 0B       		.uleb128 0xb
+ 2014 001a 03       		.uleb128 0x3
+ 2015 001b 0E       		.uleb128 0xe
+ 2016 001c 00       		.byte	0
+ 2017 001d 00       		.byte	0
+ 2018 001e 03       		.uleb128 0x3
+ 2019 001f 16       		.uleb128 0x16
+ 2020 0020 00       		.byte	0
+ 2021 0021 03       		.uleb128 0x3
+ 2022 0022 0E       		.uleb128 0xe
+ 2023 0023 3A       		.uleb128 0x3a
+ 2024 0024 0B       		.uleb128 0xb
+ 2025 0025 3B       		.uleb128 0x3b
+ 2026 0026 0B       		.uleb128 0xb
+ 2027 0027 49       		.uleb128 0x49
+ 2028 0028 13       		.uleb128 0x13
+ 2029 0029 00       		.byte	0
+ 2030 002a 00       		.byte	0
+ 2031 002b 04       		.uleb128 0x4
+ 2032 002c 24       		.uleb128 0x24
+ 2033 002d 00       		.byte	0
+ 2034 002e 0B       		.uleb128 0xb
+ 2035 002f 0B       		.uleb128 0xb
+ 2036 0030 3E       		.uleb128 0x3e
+ 2037 0031 0B       		.uleb128 0xb
+ 2038 0032 03       		.uleb128 0x3
+ 2039 0033 08       		.uleb128 0x8
+ 2040 0034 00       		.byte	0
+ 2041 0035 00       		.byte	0
+ 2042 0036 05       		.uleb128 0x5
+ 2043 0037 13       		.uleb128 0x13
+ 2044 0038 01       		.byte	0x1
+ 2045 0039 0B       		.uleb128 0xb
+ 2046 003a 0B       		.uleb128 0xb
+ 2047 003b 3A       		.uleb128 0x3a
+ 2048 003c 0B       		.uleb128 0xb
+ 2049 003d 3B       		.uleb128 0x3b
+ 2050 003e 0B       		.uleb128 0xb
+ 2051 003f 01       		.uleb128 0x1
+ 2052 0040 13       		.uleb128 0x13
+ 2053 0041 00       		.byte	0
+ 2054 0042 00       		.byte	0
+ 2055 0043 06       		.uleb128 0x6
+ 2056 0044 0D       		.uleb128 0xd
+ 2057 0045 00       		.byte	0
+ 2058 0046 03       		.uleb128 0x3
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\cc4xzKPt.s 			page 43
+
+
+ 2059 0047 0E       		.uleb128 0xe
+ 2060 0048 3A       		.uleb128 0x3a
+ 2061 0049 0B       		.uleb128 0xb
+ 2062 004a 3B       		.uleb128 0x3b
+ 2063 004b 0B       		.uleb128 0xb
+ 2064 004c 49       		.uleb128 0x49
+ 2065 004d 13       		.uleb128 0x13
+ 2066 004e 38       		.uleb128 0x38
+ 2067 004f 0B       		.uleb128 0xb
+ 2068 0050 00       		.byte	0
+ 2069 0051 00       		.byte	0
+ 2070 0052 07       		.uleb128 0x7
+ 2071 0053 2E       		.uleb128 0x2e
+ 2072 0054 00       		.byte	0
+ 2073 0055 3F       		.uleb128 0x3f
+ 2074 0056 19       		.uleb128 0x19
+ 2075 0057 03       		.uleb128 0x3
+ 2076 0058 0E       		.uleb128 0xe
+ 2077 0059 3A       		.uleb128 0x3a
+ 2078 005a 0B       		.uleb128 0xb
+ 2079 005b 3B       		.uleb128 0x3b
+ 2080 005c 0B       		.uleb128 0xb
+ 2081 005d 11       		.uleb128 0x11
+ 2082 005e 01       		.uleb128 0x1
+ 2083 005f 12       		.uleb128 0x12
+ 2084 0060 06       		.uleb128 0x6
+ 2085 0061 40       		.uleb128 0x40
+ 2086 0062 18       		.uleb128 0x18
+ 2087 0063 9642     		.uleb128 0x2116
+ 2088 0065 19       		.uleb128 0x19
+ 2089 0066 00       		.byte	0
+ 2090 0067 00       		.byte	0
+ 2091 0068 08       		.uleb128 0x8
+ 2092 0069 2E       		.uleb128 0x2e
+ 2093 006a 01       		.byte	0x1
+ 2094 006b 3F       		.uleb128 0x3f
+ 2095 006c 19       		.uleb128 0x19
+ 2096 006d 03       		.uleb128 0x3
+ 2097 006e 0E       		.uleb128 0xe
+ 2098 006f 3A       		.uleb128 0x3a
+ 2099 0070 0B       		.uleb128 0xb
+ 2100 0071 3B       		.uleb128 0x3b
+ 2101 0072 0B       		.uleb128 0xb
+ 2102 0073 49       		.uleb128 0x49
+ 2103 0074 13       		.uleb128 0x13
+ 2104 0075 11       		.uleb128 0x11
+ 2105 0076 01       		.uleb128 0x1
+ 2106 0077 12       		.uleb128 0x12
+ 2107 0078 06       		.uleb128 0x6
+ 2108 0079 40       		.uleb128 0x40
+ 2109 007a 18       		.uleb128 0x18
+ 2110 007b 9642     		.uleb128 0x2116
+ 2111 007d 19       		.uleb128 0x19
+ 2112 007e 01       		.uleb128 0x1
+ 2113 007f 13       		.uleb128 0x13
+ 2114 0080 00       		.byte	0
+ 2115 0081 00       		.byte	0
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\cc4xzKPt.s 			page 44
+
+
+ 2116 0082 09       		.uleb128 0x9
+ 2117 0083 34       		.uleb128 0x34
+ 2118 0084 00       		.byte	0
+ 2119 0085 03       		.uleb128 0x3
+ 2120 0086 0E       		.uleb128 0xe
+ 2121 0087 3A       		.uleb128 0x3a
+ 2122 0088 0B       		.uleb128 0xb
+ 2123 0089 3B       		.uleb128 0x3b
+ 2124 008a 0B       		.uleb128 0xb
+ 2125 008b 49       		.uleb128 0x49
+ 2126 008c 13       		.uleb128 0x13
+ 2127 008d 02       		.uleb128 0x2
+ 2128 008e 18       		.uleb128 0x18
+ 2129 008f 00       		.byte	0
+ 2130 0090 00       		.byte	0
+ 2131 0091 0A       		.uleb128 0xa
+ 2132 0092 2E       		.uleb128 0x2e
+ 2133 0093 01       		.byte	0x1
+ 2134 0094 3F       		.uleb128 0x3f
+ 2135 0095 19       		.uleb128 0x19
+ 2136 0096 03       		.uleb128 0x3
+ 2137 0097 0E       		.uleb128 0xe
+ 2138 0098 3A       		.uleb128 0x3a
+ 2139 0099 0B       		.uleb128 0xb
+ 2140 009a 3B       		.uleb128 0x3b
+ 2141 009b 0B       		.uleb128 0xb
+ 2142 009c 27       		.uleb128 0x27
+ 2143 009d 19       		.uleb128 0x19
+ 2144 009e 49       		.uleb128 0x49
+ 2145 009f 13       		.uleb128 0x13
+ 2146 00a0 11       		.uleb128 0x11
+ 2147 00a1 01       		.uleb128 0x1
+ 2148 00a2 12       		.uleb128 0x12
+ 2149 00a3 06       		.uleb128 0x6
+ 2150 00a4 40       		.uleb128 0x40
+ 2151 00a5 18       		.uleb128 0x18
+ 2152 00a6 9642     		.uleb128 0x2116
+ 2153 00a8 19       		.uleb128 0x19
+ 2154 00a9 01       		.uleb128 0x1
+ 2155 00aa 13       		.uleb128 0x13
+ 2156 00ab 00       		.byte	0
+ 2157 00ac 00       		.byte	0
+ 2158 00ad 0B       		.uleb128 0xb
+ 2159 00ae 05       		.uleb128 0x5
+ 2160 00af 00       		.byte	0
+ 2161 00b0 03       		.uleb128 0x3
+ 2162 00b1 0E       		.uleb128 0xe
+ 2163 00b2 3A       		.uleb128 0x3a
+ 2164 00b3 0B       		.uleb128 0xb
+ 2165 00b4 3B       		.uleb128 0x3b
+ 2166 00b5 0B       		.uleb128 0xb
+ 2167 00b6 49       		.uleb128 0x49
+ 2168 00b7 13       		.uleb128 0x13
+ 2169 00b8 02       		.uleb128 0x2
+ 2170 00b9 18       		.uleb128 0x18
+ 2171 00ba 00       		.byte	0
+ 2172 00bb 00       		.byte	0
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\cc4xzKPt.s 			page 45
+
+
+ 2173 00bc 0C       		.uleb128 0xc
+ 2174 00bd 2E       		.uleb128 0x2e
+ 2175 00be 01       		.byte	0x1
+ 2176 00bf 3F       		.uleb128 0x3f
+ 2177 00c0 19       		.uleb128 0x19
+ 2178 00c1 03       		.uleb128 0x3
+ 2179 00c2 0E       		.uleb128 0xe
+ 2180 00c3 3A       		.uleb128 0x3a
+ 2181 00c4 0B       		.uleb128 0xb
+ 2182 00c5 3B       		.uleb128 0x3b
+ 2183 00c6 05       		.uleb128 0x5
+ 2184 00c7 27       		.uleb128 0x27
+ 2185 00c8 19       		.uleb128 0x19
+ 2186 00c9 11       		.uleb128 0x11
+ 2187 00ca 01       		.uleb128 0x1
+ 2188 00cb 12       		.uleb128 0x12
+ 2189 00cc 06       		.uleb128 0x6
+ 2190 00cd 40       		.uleb128 0x40
+ 2191 00ce 18       		.uleb128 0x18
+ 2192 00cf 9642     		.uleb128 0x2116
+ 2193 00d1 19       		.uleb128 0x19
+ 2194 00d2 01       		.uleb128 0x1
+ 2195 00d3 13       		.uleb128 0x13
+ 2196 00d4 00       		.byte	0
+ 2197 00d5 00       		.byte	0
+ 2198 00d6 0D       		.uleb128 0xd
+ 2199 00d7 05       		.uleb128 0x5
+ 2200 00d8 00       		.byte	0
+ 2201 00d9 03       		.uleb128 0x3
+ 2202 00da 0E       		.uleb128 0xe
+ 2203 00db 3A       		.uleb128 0x3a
+ 2204 00dc 0B       		.uleb128 0xb
+ 2205 00dd 3B       		.uleb128 0x3b
+ 2206 00de 05       		.uleb128 0x5
+ 2207 00df 49       		.uleb128 0x49
+ 2208 00e0 13       		.uleb128 0x13
+ 2209 00e1 02       		.uleb128 0x2
+ 2210 00e2 18       		.uleb128 0x18
+ 2211 00e3 00       		.byte	0
+ 2212 00e4 00       		.byte	0
+ 2213 00e5 0E       		.uleb128 0xe
+ 2214 00e6 34       		.uleb128 0x34
+ 2215 00e7 00       		.byte	0
+ 2216 00e8 03       		.uleb128 0x3
+ 2217 00e9 0E       		.uleb128 0xe
+ 2218 00ea 3A       		.uleb128 0x3a
+ 2219 00eb 0B       		.uleb128 0xb
+ 2220 00ec 3B       		.uleb128 0x3b
+ 2221 00ed 05       		.uleb128 0x5
+ 2222 00ee 49       		.uleb128 0x49
+ 2223 00ef 13       		.uleb128 0x13
+ 2224 00f0 02       		.uleb128 0x2
+ 2225 00f1 18       		.uleb128 0x18
+ 2226 00f2 00       		.byte	0
+ 2227 00f3 00       		.byte	0
+ 2228 00f4 0F       		.uleb128 0xf
+ 2229 00f5 01       		.uleb128 0x1
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\cc4xzKPt.s 			page 46
+
+
+ 2230 00f6 01       		.byte	0x1
+ 2231 00f7 49       		.uleb128 0x49
+ 2232 00f8 13       		.uleb128 0x13
+ 2233 00f9 01       		.uleb128 0x1
+ 2234 00fa 13       		.uleb128 0x13
+ 2235 00fb 00       		.byte	0
+ 2236 00fc 00       		.byte	0
+ 2237 00fd 10       		.uleb128 0x10
+ 2238 00fe 21       		.uleb128 0x21
+ 2239 00ff 00       		.byte	0
+ 2240 0100 49       		.uleb128 0x49
+ 2241 0101 13       		.uleb128 0x13
+ 2242 0102 2F       		.uleb128 0x2f
+ 2243 0103 0B       		.uleb128 0xb
+ 2244 0104 00       		.byte	0
+ 2245 0105 00       		.byte	0
+ 2246 0106 11       		.uleb128 0x11
+ 2247 0107 34       		.uleb128 0x34
+ 2248 0108 00       		.byte	0
+ 2249 0109 03       		.uleb128 0x3
+ 2250 010a 0E       		.uleb128 0xe
+ 2251 010b 3A       		.uleb128 0x3a
+ 2252 010c 0B       		.uleb128 0xb
+ 2253 010d 3B       		.uleb128 0x3b
+ 2254 010e 05       		.uleb128 0x5
+ 2255 010f 49       		.uleb128 0x49
+ 2256 0110 13       		.uleb128 0x13
+ 2257 0111 3F       		.uleb128 0x3f
+ 2258 0112 19       		.uleb128 0x19
+ 2259 0113 3C       		.uleb128 0x3c
+ 2260 0114 19       		.uleb128 0x19
+ 2261 0115 00       		.byte	0
+ 2262 0116 00       		.byte	0
+ 2263 0117 12       		.uleb128 0x12
+ 2264 0118 35       		.uleb128 0x35
+ 2265 0119 00       		.byte	0
+ 2266 011a 49       		.uleb128 0x49
+ 2267 011b 13       		.uleb128 0x13
+ 2268 011c 00       		.byte	0
+ 2269 011d 00       		.byte	0
+ 2270 011e 13       		.uleb128 0x13
+ 2271 011f 34       		.uleb128 0x34
+ 2272 0120 00       		.byte	0
+ 2273 0121 03       		.uleb128 0x3
+ 2274 0122 0E       		.uleb128 0xe
+ 2275 0123 3A       		.uleb128 0x3a
+ 2276 0124 0B       		.uleb128 0xb
+ 2277 0125 3B       		.uleb128 0x3b
+ 2278 0126 0B       		.uleb128 0xb
+ 2279 0127 49       		.uleb128 0x49
+ 2280 0128 13       		.uleb128 0x13
+ 2281 0129 3F       		.uleb128 0x3f
+ 2282 012a 19       		.uleb128 0x19
+ 2283 012b 02       		.uleb128 0x2
+ 2284 012c 18       		.uleb128 0x18
+ 2285 012d 00       		.byte	0
+ 2286 012e 00       		.byte	0
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\cc4xzKPt.s 			page 47
+
+
+ 2287 012f 00       		.byte	0
+ 2288              		.section	.debug_aranges,"",%progbits
+ 2289 0000 6C000000 		.4byte	0x6c
+ 2290 0004 0200     		.2byte	0x2
+ 2291 0006 00000000 		.4byte	.Ldebug_info0
+ 2292 000a 04       		.byte	0x4
+ 2293 000b 00       		.byte	0
+ 2294 000c 0000     		.2byte	0
+ 2295 000e 0000     		.2byte	0
+ 2296 0010 00000000 		.4byte	.LFB56
+ 2297 0014 10000000 		.4byte	.LFE56-.LFB56
+ 2298 0018 00000000 		.4byte	.LFB57
+ 2299 001c 0C000000 		.4byte	.LFE57-.LFB57
+ 2300 0020 00000000 		.4byte	.LFB58
+ 2301 0024 30020000 		.4byte	.LFE58-.LFB58
+ 2302 0028 00000000 		.4byte	.LFB59
+ 2303 002c 10000000 		.4byte	.LFE59-.LFB59
+ 2304 0030 00000000 		.4byte	.LFB60
+ 2305 0034 BC030000 		.4byte	.LFE60-.LFB60
+ 2306 0038 00000000 		.4byte	.LFB61
+ 2307 003c 80000000 		.4byte	.LFE61-.LFB61
+ 2308 0040 00000000 		.4byte	.LFB62
+ 2309 0044 48000000 		.4byte	.LFE62-.LFB62
+ 2310 0048 00000000 		.4byte	.LFB63
+ 2311 004c C8000000 		.4byte	.LFE63-.LFB63
+ 2312 0050 00000000 		.4byte	.LFB64
+ 2313 0054 40000000 		.4byte	.LFE64-.LFB64
+ 2314 0058 00000000 		.4byte	.LFB65
+ 2315 005c A4000000 		.4byte	.LFE65-.LFB65
+ 2316 0060 00000000 		.4byte	.LFB66
+ 2317 0064 78000000 		.4byte	.LFE66-.LFB66
+ 2318 0068 00000000 		.4byte	0
+ 2319 006c 00000000 		.4byte	0
+ 2320              		.section	.debug_ranges,"",%progbits
+ 2321              	.Ldebug_ranges0:
+ 2322 0000 00000000 		.4byte	.LFB56
+ 2323 0004 10000000 		.4byte	.LFE56
+ 2324 0008 00000000 		.4byte	.LFB57
+ 2325 000c 0C000000 		.4byte	.LFE57
+ 2326 0010 00000000 		.4byte	.LFB58
+ 2327 0014 30020000 		.4byte	.LFE58
+ 2328 0018 00000000 		.4byte	.LFB59
+ 2329 001c 10000000 		.4byte	.LFE59
+ 2330 0020 00000000 		.4byte	.LFB60
+ 2331 0024 BC030000 		.4byte	.LFE60
+ 2332 0028 00000000 		.4byte	.LFB61
+ 2333 002c 80000000 		.4byte	.LFE61
+ 2334 0030 00000000 		.4byte	.LFB62
+ 2335 0034 48000000 		.4byte	.LFE62
+ 2336 0038 00000000 		.4byte	.LFB63
+ 2337 003c C8000000 		.4byte	.LFE63
+ 2338 0040 00000000 		.4byte	.LFB64
+ 2339 0044 40000000 		.4byte	.LFE64
+ 2340 0048 00000000 		.4byte	.LFB65
+ 2341 004c A4000000 		.4byte	.LFE65
+ 2342 0050 00000000 		.4byte	.LFB66
+ 2343 0054 78000000 		.4byte	.LFE66
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\cc4xzKPt.s 			page 48
+
+
+ 2344 0058 00000000 		.4byte	0
+ 2345 005c 00000000 		.4byte	0
+ 2346              		.section	.debug_line,"",%progbits
+ 2347              	.Ldebug_line0:
+ 2348 0000 C2020000 		.section	.debug_str,"MS",%progbits,1
+ 2348      02005A01 
+ 2348      00000201 
+ 2348      FB0E0D00 
+ 2348      01010101 
+ 2349              	.LASF66:
+ 2350 0000 424D5032 		.ascii	"BMP280_readFloatAltitudeMeters\000"
+ 2350      38305F72 
+ 2350      65616446 
+ 2350      6C6F6174 
+ 2350      416C7469 
+ 2351              	.LASF35:
+ 2352 001f 70726573 		.ascii	"pressOverSample\000"
+ 2352      734F7665 
+ 2352      7253616D 
+ 2352      706C6500 
+ 2353              	.LASF74:
+ 2354 002f 72657375 		.ascii	"result\000"
+ 2354      6C7400
+ 2355              	.LASF49:
+ 2356 0036 53656E73 		.ascii	"SensorCalibration\000"
+ 2356      6F724361 
+ 2356      6C696272 
+ 2356      6174696F 
+ 2356      6E00
+ 2357              	.LASF30:
+ 2358 0048 63686970 		.ascii	"chipSelectPin\000"
+ 2358      53656C65 
+ 2358      63745069 
+ 2358      6E00
+ 2359              	.LASF29:
+ 2360 0056 49324341 		.ascii	"I2CAddress\000"
+ 2360      64647265 
+ 2360      737300
+ 2361              	.LASF34:
+ 2362 0061 74656D70 		.ascii	"tempOverSample\000"
+ 2362      4F766572 
+ 2362      53616D70 
+ 2362      6C6500
+ 2363              	.LASF77:
+ 2364 0070 424D5032 		.ascii	"BMP280_init\000"
+ 2364      38305F69 
+ 2364      6E697400 
+ 2365              	.LASF4:
+ 2366 007c 73686F72 		.ascii	"short int\000"
+ 2366      7420696E 
+ 2366      7400
+ 2367              	.LASF27:
+ 2368 0086 73697A65 		.ascii	"sizetype\000"
+ 2368      74797065 
+ 2368      00
+ 2369              	.LASF56:
+ 2370 008f 424D5032 		.ascii	"BMP280_start\000"
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\cc4xzKPt.s 			page 49
+
+
+ 2370      38305F73 
+ 2370      74617274 
+ 2370      00
+ 2371              	.LASF84:
+ 2372 009c 474E5520 		.ascii	"GNU C11 5.4.1 20160609 (release) [ARM/embedded-5-br"
+ 2372      43313120 
+ 2372      352E342E 
+ 2372      31203230 
+ 2372      31363036 
+ 2373 00cf 616E6368 		.ascii	"anch revision 237715] -mcpu=cortex-m3 -mthumb -g -O"
+ 2373      20726576 
+ 2373      6973696F 
+ 2373      6E203233 
+ 2373      37373135 
+ 2374 0102 30202D66 		.ascii	"0 -ffunction-sections -ffat-lto-objects\000"
+ 2374      66756E63 
+ 2374      74696F6E 
+ 2374      2D736563 
+ 2374      74696F6E 
+ 2375              	.LASF62:
+ 2376 012a 76617231 		.ascii	"var1\000"
+ 2376      00
+ 2377              	.LASF63:
+ 2378 012f 76617232 		.ascii	"var2\000"
+ 2378      00
+ 2379              	.LASF5:
+ 2380 0134 5F5F7569 		.ascii	"__uint16_t\000"
+ 2380      6E743136 
+ 2380      5F7400
+ 2381              	.LASF59:
+ 2382 013f 64657669 		.ascii	"device_address\000"
+ 2382      63655F61 
+ 2382      64647265 
+ 2382      737300
+ 2383              	.LASF61:
+ 2384 014e 6164635F 		.ascii	"adc_P\000"
+ 2384      5000
+ 2385              	.LASF20:
+ 2386 0154 696E7436 		.ascii	"int64_t\000"
+ 2386      345F7400 
+ 2387              	.LASF75:
+ 2388 015c 6E756D42 		.ascii	"numBytes\000"
+ 2388      79746573 
+ 2388      00
+ 2389              	.LASF22:
+ 2390 0165 75696E74 		.ascii	"uint16\000"
+ 2390      313600
+ 2391              	.LASF41:
+ 2392 016c 6469675F 		.ascii	"dig_P2\000"
+ 2392      503200
+ 2393              	.LASF15:
+ 2394 0173 75696E74 		.ascii	"uint8_t\000"
+ 2394      385F7400 
+ 2395              	.LASF58:
+ 2396 017b 64617461 		.ascii	"data_to_write\000"
+ 2396      5F746F5F 
+ 2396      77726974 
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\cc4xzKPt.s 			page 50
+
+
+ 2396      6500
+ 2397              	.LASF83:
+ 2398 0189 626D7032 		.ascii	"bmp280\000"
+ 2398      383000
+ 2399              	.LASF85:
+ 2400 0190 424D5032 		.ascii	"BMP280.c\000"
+ 2400      38302E63 
+ 2400      00
+ 2401              	.LASF72:
+ 2402 0199 424D5032 		.ascii	"BMP280_readTempF\000"
+ 2402      38305F72 
+ 2402      65616454 
+ 2402      656D7046 
+ 2402      00
+ 2403              	.LASF81:
+ 2404 01aa 7061636B 		.ascii	"packet\000"
+ 2404      657400
+ 2405              	.LASF55:
+ 2406 01b1 424D5032 		.ascii	"BMP280\000"
+ 2406      383000
+ 2407              	.LASF23:
+ 2408 01b8 666C6F61 		.ascii	"float\000"
+ 2408      7400
+ 2409              	.LASF50:
+ 2410 01be 73657474 		.ascii	"settings\000"
+ 2410      696E6773 
+ 2410      00
+ 2411              	.LASF12:
+ 2412 01c7 6C6F6E67 		.ascii	"long long int\000"
+ 2412      206C6F6E 
+ 2412      6720696E 
+ 2412      7400
+ 2413              	.LASF31:
+ 2414 01d5 72756E4D 		.ascii	"runMode\000"
+ 2414      6F646500 
+ 2415              	.LASF53:
+ 2416 01dd 74656D70 		.ascii	"temp_C\000"
+ 2416      5F4300
+ 2417              	.LASF8:
+ 2418 01e4 6C6F6E67 		.ascii	"long int\000"
+ 2418      20696E74 
+ 2418      00
+ 2419              	.LASF11:
+ 2420 01ed 5F5F696E 		.ascii	"__int64_t\000"
+ 2420      7436345F 
+ 2420      7400
+ 2421              	.LASF79:
+ 2422 01f7 6F666673 		.ascii	"offset\000"
+ 2422      657400
+ 2423              	.LASF52:
+ 2424 01fe 745F6669 		.ascii	"t_fine\000"
+ 2424      6E6500
+ 2425              	.LASF51:
+ 2426 0205 63616C69 		.ascii	"calibration\000"
+ 2426      62726174 
+ 2426      696F6E00 
+ 2427              	.LASF2:
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\cc4xzKPt.s 			page 51
+
+
+ 2428 0211 5F5F7569 		.ascii	"__uint8_t\000"
+ 2428      6E74385F 
+ 2428      7400
+ 2429              	.LASF60:
+ 2430 021b 424D5032 		.ascii	"BMP280_reset\000"
+ 2430      38305F72 
+ 2430      65736574 
+ 2430      00
+ 2431              	.LASF26:
+ 2432 0228 6C6F6E67 		.ascii	"long double\000"
+ 2432      20646F75 
+ 2432      626C6500 
+ 2433              	.LASF42:
+ 2434 0234 6469675F 		.ascii	"dig_P3\000"
+ 2434      503300
+ 2435              	.LASF1:
+ 2436 023b 756E7369 		.ascii	"unsigned char\000"
+ 2436      676E6564 
+ 2436      20636861 
+ 2436      7200
+ 2437              	.LASF68:
+ 2438 0249 424D5032 		.ascii	"BMP280_readFloatAltitudeFeet\000"
+ 2438      38305F72 
+ 2438      65616446 
+ 2438      6C6F6174 
+ 2438      416C7469 
+ 2439              	.LASF0:
+ 2440 0266 7369676E 		.ascii	"signed char\000"
+ 2440      65642063 
+ 2440      68617200 
+ 2441              	.LASF13:
+ 2442 0272 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 2442      206C6F6E 
+ 2442      6720756E 
+ 2442      7369676E 
+ 2442      65642069 
+ 2443              	.LASF64:
+ 2444 0289 705F6163 		.ascii	"p_acc\000"
+ 2444      6300
+ 2445              	.LASF19:
+ 2446 028f 75696E74 		.ascii	"uint32_t\000"
+ 2446      33325F74 
+ 2446      00
+ 2447              	.LASF14:
+ 2448 0298 756E7369 		.ascii	"unsigned int\000"
+ 2448      676E6564 
+ 2448      20696E74 
+ 2448      00
+ 2449              	.LASF17:
+ 2450 02a5 75696E74 		.ascii	"uint16_t\000"
+ 2450      31365F74 
+ 2450      00
+ 2451              	.LASF57:
+ 2452 02ae 424D5032 		.ascii	"BMP280_stop\000"
+ 2452      38305F73 
+ 2452      746F7000 
+ 2453              	.LASF78:
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\cc4xzKPt.s 			page 52
+
+
+ 2454 02ba 424D5032 		.ascii	"BMP280_writeRegister\000"
+ 2454      38305F77 
+ 2454      72697465 
+ 2454      52656769 
+ 2454      73746572 
+ 2455              	.LASF65:
+ 2456 02cf 424D5032 		.ascii	"BMP280_readFloatPressure\000"
+ 2456      38305F72 
+ 2456      65616446 
+ 2456      6C6F6174 
+ 2456      50726573 
+ 2457              	.LASF6:
+ 2458 02e8 73686F72 		.ascii	"short unsigned int\000"
+ 2458      7420756E 
+ 2458      7369676E 
+ 2458      65642069 
+ 2458      6E7400
+ 2459              	.LASF25:
+ 2460 02fb 63686172 		.ascii	"char\000"
+ 2460      00
+ 2461              	.LASF18:
+ 2462 0300 696E7433 		.ascii	"int32_t\000"
+ 2462      325F7400 
+ 2463              	.LASF16:
+ 2464 0308 696E7431 		.ascii	"int16_t\000"
+ 2464      365F7400 
+ 2465              	.LASF21:
+ 2466 0310 75696E74 		.ascii	"uint8\000"
+ 2466      3800
+ 2467              	.LASF40:
+ 2468 0316 6469675F 		.ascii	"dig_P1\000"
+ 2468      503100
+ 2469              	.LASF54:
+ 2470 031d 70726573 		.ascii	"press_Pa\000"
+ 2470      735F5061 
+ 2470      00
+ 2471              	.LASF80:
+ 2472 0326 64617461 		.ascii	"data\000"
+ 2472      00
+ 2473              	.LASF43:
+ 2474 032b 6469675F 		.ascii	"dig_P4\000"
+ 2474      503400
+ 2475              	.LASF44:
+ 2476 0332 6469675F 		.ascii	"dig_P5\000"
+ 2476      503500
+ 2477              	.LASF45:
+ 2478 0339 6469675F 		.ascii	"dig_P6\000"
+ 2478      503600
+ 2479              	.LASF46:
+ 2480 0340 6469675F 		.ascii	"dig_P7\000"
+ 2480      503700
+ 2481              	.LASF47:
+ 2482 0347 6469675F 		.ascii	"dig_P8\000"
+ 2482      503800
+ 2483              	.LASF48:
+ 2484 034e 6469675F 		.ascii	"dig_P9\000"
+ 2484      503900
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\cc4xzKPt.s 			page 53
+
+
+ 2485              	.LASF10:
+ 2486 0355 6C6F6E67 		.ascii	"long unsigned int\000"
+ 2486      20756E73 
+ 2486      69676E65 
+ 2486      6420696E 
+ 2486      7400
+ 2487              	.LASF69:
+ 2488 0367 424D5032 		.ascii	"BMP280_readTempC\000"
+ 2488      38305F72 
+ 2488      65616454 
+ 2488      656D7043 
+ 2488      00
+ 2489              	.LASF24:
+ 2490 0378 646F7562 		.ascii	"double\000"
+ 2490      6C6500
+ 2491              	.LASF37:
+ 2492 037f 6469675F 		.ascii	"dig_T1\000"
+ 2492      543100
+ 2493              	.LASF38:
+ 2494 0386 6469675F 		.ascii	"dig_T2\000"
+ 2494      543200
+ 2495              	.LASF39:
+ 2496 038d 6469675F 		.ascii	"dig_T3\000"
+ 2496      543300
+ 2497              	.LASF28:
+ 2498 0394 636F6D6D 		.ascii	"commInterface\000"
+ 2498      496E7465 
+ 2498      72666163 
+ 2498      6500
+ 2499              	.LASF9:
+ 2500 03a2 5F5F7569 		.ascii	"__uint32_t\000"
+ 2500      6E743332 
+ 2500      5F7400
+ 2501              	.LASF7:
+ 2502 03ad 5F5F696E 		.ascii	"__int32_t\000"
+ 2502      7433325F 
+ 2502      7400
+ 2503              	.LASF3:
+ 2504 03b7 5F5F696E 		.ascii	"__int16_t\000"
+ 2504      7431365F 
+ 2504      7400
+ 2505              	.LASF70:
+ 2506 03c1 6164635F 		.ascii	"adc_T\000"
+ 2506      5400
+ 2507              	.LASF76:
+ 2508 03c7 69746572 		.ascii	"iter\000"
+ 2508      00
+ 2509              	.LASF32:
+ 2510 03cc 74537461 		.ascii	"tStandby\000"
+ 2510      6E646279 
+ 2510      00
+ 2511              	.LASF71:
+ 2512 03d5 6F757470 		.ascii	"output\000"
+ 2512      757400
+ 2513              	.LASF36:
+ 2514 03dc 53656E73 		.ascii	"SensorSettings\000"
+ 2514      6F725365 
+ARM GAS  C:\Users\Arisvis\AppData\Local\Temp\cc4xzKPt.s 			page 54
+
+
+ 2514      7474696E 
+ 2514      677300
+ 2515              	.LASF67:
+ 2516 03eb 68656967 		.ascii	"heightOutput\000"
+ 2516      68744F75 
+ 2516      74707574 
+ 2516      00
+ 2517              	.LASF33:
+ 2518 03f8 66696C74 		.ascii	"filter\000"
+ 2518      657200
+ 2519              	.LASF82:
+ 2520 03ff 49544D5F 		.ascii	"ITM_RxBuffer\000"
+ 2520      52784275 
+ 2520      66666572 
+ 2520      00
+ 2521              	.LASF73:
+ 2522 040c 424D5032 		.ascii	"BMP280_readRegister\000"
+ 2522      38305F72 
+ 2522      65616452 
+ 2522      65676973 
+ 2522      74657200 
+ 2523              	.LASF86:
+ 2524 0420 433A5C55 		.ascii	"C:\\Users\\Arisvis\\Desktop\\WheatherStation\\Proje"
+ 2524      73657273 
+ 2524      5C417269 
+ 2524      73766973 
+ 2524      5C446573 
+ 2525 044e 63745F42 		.ascii	"ct_BMP280.cydsn\000"
+ 2525      4D503238 
+ 2525      302E6379 
+ 2525      64736E00 
+ 2526              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 5.4.1 20160609 (release) [ARM/embedded-5-bran
